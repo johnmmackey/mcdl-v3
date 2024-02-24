@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
-import styles from "../page.module.css";
 import { fetchStandings } from '@/app/lib/data';
+import { Fragment } from 'react';
 
 export default async function Standings() {
   const standings = await fetchStandings();
@@ -13,45 +13,43 @@ export default async function Standings() {
   }
   
   return (
-    <main className={styles.main}>
       <table>
         {Object.entries(standings).map(([div, divResults]) =>
-          <>
+          <Fragment key={div}>
             <thead>
               <tr>
                 <th colSpan={8}>Division {div}</th>
               </tr>
               <tr>
-                <th>Pool</th>
-                <th>Seed</th>
-                <th>Dual Meets</th>
-                <th>Div Meets</th>
-                <th>Dual Rank Points</th>
-                <th>Div Meet Score</th>
-                <th>Rank Points</th>
-                <th>Total</th>
+                <th className='w-64'>Pool</th>
+                <th className="px-3">Seed</th>
+                <th className="px-3">Dual Meets</th>
+                <th className="px-3">Div Meets</th>
+                <th className="px-3">Dual Rank Points</th>
+                <th className="px-3">Div Meet Score</th>
+                <th className="px-3">Rank Points</th>
+                <th className="px-3">Total</th>
               </tr>
             </thead>
             <tbody>
-              {divResults.map(t =>
-                <tr>
+              {divResults.map( (t, k) =>
+                <tr key={k}>
                   <td>{t.teamName}</td>
-                  <td>{t.seed}</td>
-                  <td>{`${t.dualRecord.W}-${t.dualRecord.L}-${t.dualRecord.T}`}</td>
-                  <td>{`${t.dualRecord.dW}-${t.dualRecord.dL}-${t.dualRecord.dT}`}</td>
-                  <td>{t.dualMeetSeasonRank.rankPoints}</td>
-                  <td>{t.divMeetScore}</td>
-                  <td>{t.divMeetRank.rankPoints}</td>
-                  <td>
+                  <td className='text-center'>{t.seed}</td>
+                  <td className='text-center'>{`${t.dualRecord.W}-${t.dualRecord.L}-${t.dualRecord.T}`}</td>
+                  <td className='text-center'>{`${t.dualRecord.dW}-${t.dualRecord.dL}-${t.dualRecord.dT}`}</td>
+                  <td className='text-center'>{t.dualMeetSeasonRank.rankPoints}</td>
+                  <td className='text-center'>{t.divMeetScore}</td>
+                  <td className='text-center'>{t.divMeetRank.rankPoints}</td>
+                  <td className='text-center'>
                     {t.sumDualDivRankPoints + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
                   </td>
                 </tr>
               )}
             </tbody>
-          </>
+          </Fragment>
         )}
       </table>
-    </main >
   );
 }
 

@@ -14,9 +14,13 @@
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.15.10",
     "@mui/material-nextjs": "^5.15.11",
+    "@tailwindcss/forms": "^0.5.7",
+    "autoprefixer": "^10.4.17",
     "next": "14.1.0",
+    "prettier-plugin-tailwindcss": "^0.5.11",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
     "@types/node": "^20",
