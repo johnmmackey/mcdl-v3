@@ -4,13 +4,7 @@ import { Fragment } from 'react';
 
 export default async function Standings() {
   const standings = await fetchStandings();
-
-  const nStars = (n:number): string => {
-    let r = '';
-    for(let i=0; i<n; i++)
-      r = r.concat('*');
-    return r;
-  }
+  const nStars = (n:number): string => Array(n+1).join('*')
   
   return (
       <table>
@@ -18,7 +12,7 @@ export default async function Standings() {
           <Fragment key={div}>
             <thead>
               <tr>
-                <th colSpan={8}>Division {div}</th>
+                <th colSpan={8} className='text-left text-2xl pt-6 pb-2'>Division {div}</th>
               </tr>
               <tr>
                 <th className='w-64'>Pool</th>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MyNavbar } from "./ui/MyNavbar";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 
@@ -19,11 +20,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <div className="max-w-screen-lg mx-auto">
-            {children}
+          <MyNavbar />
+          {children}
         </div>
       </body>
     </html>
   );
 }
-
-

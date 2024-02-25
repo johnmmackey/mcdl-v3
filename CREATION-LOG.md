@@ -17,3 +17,9 @@ npx create-next-app@latest mcdl-v2 --use-npm
 * Location of theme.js file different - docs reference src directory - put in root
 * use V14 in layout.tsx file
 * had to manually install @emotion/styled and @emotion/react
+
+
+# Install TailwindCSS, Flowbite
+
+* [Procedure](https://flowbite.com/docs/getting-started/next-js/)
+* [Example of Navbar](https://www.flowbite-react.com/docs/components/navbar)
