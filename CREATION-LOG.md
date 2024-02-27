@@ -23,3 +23,8 @@ npx create-next-app@latest mcdl-v2 --use-npm
 
 * [Procedure](https://flowbite.com/docs/getting-started/next-js/)
 * [Example of Navbar](https://www.flowbite-react.com/docs/components/navbar)
+* [Component List](https://github.com/themesberg/flowbite-react)
+
+# Useful Tools
+* [Suspense and Streaming](https://nextjs.org/learn/dashboard-app/streaming)
+* [WP CMS Integration](https://vercel.com/guides/wordpress-with-vercel)

@@ -25,3 +25,7 @@ export type Standing = {
 export type GroupedStandings = {
     [id: string]: Standing[]
 }
+
+export type CurrentSeason = {
+    season_id: string
+}

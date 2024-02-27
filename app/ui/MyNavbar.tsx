@@ -12,10 +12,6 @@ export const MyNavbar = () => {
                 {/*<img src="/favicon.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />*/}
                 <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">MCDL</span>
             </Navbar.Brand>
-            <div className="flex md:order-2">
-                <Button>Get started</Button>
-                <Navbar.Toggle />
-            </div>
             <Navbar.Collapse>
                 <Navbar.Link as={Link} href="/" active={pathName === '/'}>
                     Home
@@ -23,7 +19,7 @@ export const MyNavbar = () => {
                 <Navbar.Link as={Link} href="/">
                     About
                 </Navbar.Link>
-                <Navbar.Link as={Link} href="/standings" active={pathName === '/standings'}>Standings</Navbar.Link>
+                <Navbar.Link as={Link} href="/standings/2023" active={pathName === '/standings/2023'}>Standings</Navbar.Link>
                 <Navbar.Link as={Link} href="/test" active={pathName === '/test'}>Test</Navbar.Link>
                 <Navbar.Link as={Link} href="#">Contact</Navbar.Link>
             </Navbar.Collapse>
