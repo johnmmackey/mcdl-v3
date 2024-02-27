@@ -29,3 +29,11 @@ export type GroupedStandings = {
 export type CurrentSeason = {
     season_id: string
 }
+
+export type Post = {
+    title: string,
+    slug: string,
+    content: string
+}
+
+export type Posts = Post[]
