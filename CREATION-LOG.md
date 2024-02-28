@@ -28,3 +28,4 @@ npx create-next-app@latest mcdl-v2 --use-npm
 # Useful Tools
 * [Suspense and Streaming](https://nextjs.org/learn/dashboard-app/streaming)
 * [WP CMS Integration](https://vercel.com/guides/wordpress-with-vercel)
+* [Data Caching Deep Dive](https://github.com/vercel/next.js/discussions/54075)
