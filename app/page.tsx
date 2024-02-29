@@ -15,7 +15,7 @@ export default async function Home() {
           />
         </div>
       )}
-      <div>Below are menues</div>
+      <div>Below are menus</div>
       <pre>
         {JSON.stringify(menus, null, 2)}
       </pre>

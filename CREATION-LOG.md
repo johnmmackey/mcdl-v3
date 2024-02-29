@@ -29,3 +29,6 @@ npx create-next-app@latest mcdl-v2 --use-npm
 * [Suspense and Streaming](https://nextjs.org/learn/dashboard-app/streaming)
 * [WP CMS Integration](https://vercel.com/guides/wordpress-with-vercel)
 * [Data Caching Deep Dive](https://github.com/vercel/next.js/discussions/54075)
+
+# Sequalize
+* [Setup](https://stackoverflow.com/questions/76239621/critical-dependency-the-request-of-a-dependency-sequelize-is-an-expression-in)
