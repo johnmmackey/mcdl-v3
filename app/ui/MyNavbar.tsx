@@ -19,7 +19,8 @@ export const MyNavbar = () => {
                 <Navbar.Link as={Link} href="/">
                     About
                 </Navbar.Link>
-                <Navbar.Link as={Link} href="/standings/2023" active={pathName === '/standings/2023'}>Standings</Navbar.Link>
+                <Navbar.Link as={Link} href="/meets" active={pathName === '/meets'}>Meets</Navbar.Link>
+                <Navbar.Link as={Link} href="/standings" active={pathName === '/standings'}>Standings</Navbar.Link>
                 <Navbar.Link as={Link} href="/test" active={pathName === '/test'}>Test</Navbar.Link>
                 <Navbar.Link as={Link} href="#">Contact</Navbar.Link>
             </Navbar.Collapse>

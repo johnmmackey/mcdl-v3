@@ -8,7 +8,7 @@ const years: number[] = [];
 for (let year = currentYear; year >= BASEYEAR; year--)
   years.push(year);
 
-export const SeasonDropdown = ({ base, currentSeason, label }: { base: string, currentSeason: string, label?: string }) => {
+export const SeasonDropdown = ({ base, label }: { base: string, label?: string }) => {
   return (
     <Dropdown dismissOnClick={false} label={label || "Other Seasons"} size="sm">
       {years.map((y, k) =>

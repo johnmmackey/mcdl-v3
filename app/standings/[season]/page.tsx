@@ -15,7 +15,7 @@ export default async function Standings({ params }: { params: { season: string }
     <div>
       <h1 className="text-center text-2xl text-bold">{params.season} Divisional Standings</h1>
       <div className="flex justify-center">
-        <SeasonDropdown base="/standings" currentSeason={params.season} />
+        <SeasonDropdown base="/standings" />
       </div>
       <table>
         {Object.entries(standings).map(([div, divResults]) =>

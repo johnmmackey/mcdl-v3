@@ -4,12 +4,17 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy'; <Table></Table>
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
+import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
 
-export default async function Test() {
-    const season = await fetch(`${process.env.DATA_URL}/currentseason`).then(r => r.json());
-    const teams = await fetch(`${process.env.DATA_URL}/teams`).then(r => r.json());
+export default async function Meets({ params }: { params: { season: string } }) {
+
+    const q = new URLSearchParams({
+        season: params.season 
+    })
+
+    const teams = await (await fetch(`${process.env.DATA_URL}/teams`)).json();
     const kteams = keyBy(teams, 'poolcode');
-    const meets = await fetch(`${process.env.DATA_URL}/meets?season=2023`).then(r => r.json());
+    const meets = await (await fetch(`${process.env.DATA_URL}/meets?${q}`)).json();
     const smeets = sortBy(meets, ['meetDate', 'division']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
@@ -26,6 +31,10 @@ export default async function Test() {
 
     return (
         <div>
+        <h1 className="text-center text-2xl text-bold">{params.season} Meets & Results</h1>
+        <div className="flex justify-center">
+          <SeasonDropdown base="/meets" />
+        </div>
             <Table striped>
                 <TableHead>
                     <TableHeadCell>Date</TableHeadCell>

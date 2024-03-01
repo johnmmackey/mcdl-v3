@@ -5,7 +5,7 @@ export async function fetchStandings(season: string): Promise<GroupedStandings> 
         'season': season,
     });
     let standings = await fetch(
-        `http://host.countryglen.org:8094/standings?${params}`,
+        `${process.env.DATA_URL}/standings?${params}`,
         {
 
             headers: {
@@ -17,11 +17,10 @@ export async function fetchStandings(season: string): Promise<GroupedStandings> 
 
 export async function fetchCurrentSeason(): Promise<CurrentSeason> {
     return (await fetch(
-        `http://host.countryglen.org:8094/currentseason`,
+        `${process.env.DATA_URL}/currentseason`,
         {
             headers: {
                 'Accept': 'application/json'
               }
         })).json();
-    //return {currentSeason: sc.season_id}
 }
