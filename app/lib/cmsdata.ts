@@ -12,6 +12,7 @@ export async function fetchPosts(): Promise<Posts> {
     let f = await fetch(`https://cms.mcdiving.org/graphql?${postsQuery}`)
     let d: GraphQLPosts = await f.json();
 
+
     return d.data.posts.edges
         .filter(e => !e.node.postacf.expiry || ((new Date(e.node.postacf.expiry)).getTime() > Date.now()))
         .map(e => ({
@@ -26,6 +27,8 @@ export async function fetchMenus(): Promise<Menus> {
     let f = await fetch(`https://cms.mcdiving.org/graphql?${menusQuery}`)
     let d: GraphQLMenus = await f.json();
 
+    console.log(`https://cms.mcdiving.org/graphql?${menusQuery}`);
+    console.log(JSON.stringify(d));
     return d.data.menus.nodes
         .map(e => ({
             name: e.name,

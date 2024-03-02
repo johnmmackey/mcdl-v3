@@ -1,12 +1,12 @@
-
 import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
-import keyBy from 'lodash/keyBy'; <Table></Table>
+import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
+import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
 
-export default async function Meets({ params }: { params: { season: string } }) {
+export default async function Page({ params }: { params: { season: string } }) {
 
     const q = new URLSearchParams({
         season: params.season 
@@ -29,11 +29,12 @@ export default async function Meets({ params }: { params: { season: string } }) 
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
 
+
     return (
         <div>
         <h1 className="text-center text-2xl text-bold">{params.season} Meets & Results</h1>
         <div className="flex justify-center">
-          <SeasonDropdown base="/meets" />
+          <SeasonDropdown base="/meets/season" />
         </div>
             <Table striped>
                 <TableHead>
@@ -45,13 +46,12 @@ export default async function Meets({ params }: { params: { season: string } }) 
                 <TableBody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <TableRow key={k2}>
-                                <TableCell >{format(m.meetDate, 'PPP')}</TableCell>
-
+                            <LinkTableRow key={k2} className='cursor-pointer hover:font-bold' href={`/meets/meet/${m.id}`}>
+                                <TableCell>{format(m.meetDate, 'PPP')}</TableCell>
                                 <TableCell className='pl-12'>{m.division}</TableCell>
                                 <TableCell>{meetName(m)}</TableCell>
                                 <TableCell>{scoreStr(m)}</TableCell>
-                            </TableRow>
+                            </LinkTableRow>
                         )
                     )}
                 </TableBody>

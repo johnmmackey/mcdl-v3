@@ -5,7 +5,7 @@ import keyBy from 'lodash/keyBy'; <Table></Table>
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
 
-export default async function Test() {
+export default async function Page() {
     const season = await fetch(`${process.env.DATA_URL}/currentseason`).then(r => r.json());
     const teams = await fetch(`${process.env.DATA_URL}/teams`).then(r => r.json());
     const kteams = keyBy(teams, 'poolcode');

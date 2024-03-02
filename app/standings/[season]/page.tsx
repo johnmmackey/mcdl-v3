@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { notFound } from 'next/navigation';
 import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
 
-export default async function Standings({ params }: { params: { season: string } }) {
+export default async function Page({ params }: { params: { season: string } }) {
   const standings = await fetchStandings(params.season);
   if (!standings) {
     notFound();

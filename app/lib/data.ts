@@ -7,7 +7,6 @@ export async function fetchStandings(season: string): Promise<GroupedStandings> 
     let standings = await fetch(
         `${process.env.DATA_URL}/standings?${params}`,
         {
-
             headers: {
                 'Accept': 'application/json'
               }

@@ -19,8 +19,8 @@ export const MyNavbar = () => {
                 <Navbar.Link as={Link} href="/">
                     About
                 </Navbar.Link>
-                <Navbar.Link as={Link} href="/meets" active={pathName === '/meets'}>Meets</Navbar.Link>
-                <Navbar.Link as={Link} href="/standings" active={pathName === '/standings'}>Standings</Navbar.Link>
+                <Navbar.Link as={Link} href="/meets" active={pathName.substring(0, '/meets'.length) === '/meets'}>Meets</Navbar.Link>
+                <Navbar.Link as={Link} href="/standings" active={pathName.substring(0, '/standings'.length) === '/standings'}>Standings</Navbar.Link>
                 <Navbar.Link as={Link} href="/test" active={pathName === '/test'}>Test</Navbar.Link>
                 <Navbar.Link as={Link} href="#">Contact</Navbar.Link>
             </Navbar.Collapse>
