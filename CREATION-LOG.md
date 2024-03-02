@@ -32,3 +32,6 @@ npx create-next-app@latest mcdl-v2 --use-npm
 
 # Sequalize
 * [Setup](https://stackoverflow.com/questions/76239621/critical-dependency-the-request-of-a-dependency-sequelize-is-an-expression-in)
+
+## NextJS Wierdness
+* Loading file location for dynamic routes: must be in PARENT: [ISSUE](https://github.com/vercel/next.js/issues/43548)

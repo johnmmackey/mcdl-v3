@@ -15,11 +15,7 @@ export default async function Home() {
           />
         </div>
       )}
-      <div>Below are menus</div>
-      <pre>
-        {JSON.stringify(menus, null, 2)}
-      </pre>
+      <div>{`Got ${menus.length} menus`}</div>
     </div>
-
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Navbar } from 'flowbite-react';
+import { Navbar } from 'flowbite-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link'
 

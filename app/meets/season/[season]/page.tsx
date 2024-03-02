@@ -9,7 +9,7 @@ import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
 export default async function Page({ params }: { params: { season: string } }) {
 
     const q = new URLSearchParams({
-        season: params.season 
+        season: params.season
     })
 
     const teams = await (await fetch(`${process.env.DATA_URL}/teams`)).json();
@@ -31,31 +31,25 @@ export default async function Page({ params }: { params: { season: string } }) {
 
 
     return (
-        <div>
-        <h1 className="text-center text-2xl text-bold">{params.season} Meets & Results</h1>
-        <div className="flex justify-center">
-          <SeasonDropdown base="/meets/season" />
-        </div>
-            <Table striped>
-                <TableHead>
-                    <TableHeadCell>Date</TableHeadCell>
-                    <TableHeadCell>Division</TableHeadCell>
-                    <TableHeadCell>Meet Name</TableHeadCell>
-                    <TableHeadCell>Score</TableHeadCell>
-                </TableHead>
-                <TableBody>
-                    {Object.entries(gmeets).map(([dt, meets], k1) =>
-                        meets.map((m, k2) =>
-                            <LinkTableRow key={k2} className='cursor-pointer hover:font-bold' href={`/meets/meet/${m.id}`}>
-                                <TableCell>{format(m.meetDate, 'PPP')}</TableCell>
-                                <TableCell className='pl-12'>{m.division}</TableCell>
-                                <TableCell>{meetName(m)}</TableCell>
-                                <TableCell>{scoreStr(m)}</TableCell>
-                            </LinkTableRow>
-                        )
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+        <Table striped>
+            <TableHead>
+                <TableHeadCell>Date</TableHeadCell>
+                <TableHeadCell>Division</TableHeadCell>
+                <TableHeadCell>Meet Name</TableHeadCell>
+                <TableHeadCell>Score</TableHeadCell>
+            </TableHead>
+            <TableBody>
+                {Object.entries(gmeets).map(([dt, meets], k1) =>
+                    meets.map((m, k2) =>
+                        <LinkTableRow key={k2} className='cursor-pointer hover:font-bold' href={`/meets/meet/${m.id}`}>
+                            <TableCell>{format(m.meetDate, 'PPP')}</TableCell>
+                            <TableCell className='pl-12'>{m.division}</TableCell>
+                            <TableCell>{meetName(m)}</TableCell>
+                            <TableCell>{scoreStr(m)}</TableCell>
+                        </LinkTableRow>
+                    )
+                )}
+            </TableBody>
+        </Table>
     )
 }

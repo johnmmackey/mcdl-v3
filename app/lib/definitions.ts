@@ -26,8 +26,12 @@ export type GroupedStandings = {
     [id: string]: Standing[]
 }
 
-export type CurrentSeason = {
-    season_id: string
+export type Season = {
+    id: number,
+    name: string,
+    registerDate: string,
+    startDate: string,
+    endDate: string
 }
 
 export type GraphQLPosts = {

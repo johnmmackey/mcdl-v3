@@ -27,8 +27,6 @@ export async function fetchMenus(): Promise<Menus> {
     let f = await fetch(`https://cms.mcdiving.org/graphql?${menusQuery}`)
     let d: GraphQLMenus = await f.json();
 
-    console.log(`https://cms.mcdiving.org/graphql?${menusQuery}`);
-    console.log(JSON.stringify(d));
     return d.data.menus.nodes
         .map(e => ({
             name: e.name,

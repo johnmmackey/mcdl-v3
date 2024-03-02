@@ -1,4 +1,4 @@
-import { GroupedStandings, CurrentSeason } from "./definitions";
+import { GroupedStandings, Season } from "./definitions";
 
 export async function fetchStandings(season: string): Promise<GroupedStandings> {
     const params = new URLSearchParams({
@@ -14,12 +14,10 @@ export async function fetchStandings(season: string): Promise<GroupedStandings> 
     return standings.json();
 }
 
-export async function fetchCurrentSeason(): Promise<CurrentSeason> {
-    return (await fetch(
-        `${process.env.DATA_URL}/currentseason`,
-        {
-            headers: {
-                'Accept': 'application/json'
-              }
-        })).json();
+export async function fetchCurrentSeason(): Promise<Season> {
+    return (await fetch(`${process.env.DATA_URL}/currentseason`)).json();
+}
+
+export async function fetchSeasons(): Promise<Season[]> {
+    return (await fetch(`${process.env.DATA_URL}/seasons`)).json();
 }

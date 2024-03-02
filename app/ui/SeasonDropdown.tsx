@@ -1,21 +1,17 @@
-import Link from 'next/link';
-import { Dropdown, DropdownItem } from 'flowbite-react';
+import { SeasonDropdownCC } from './SeasonDropdownCC';
 
-const BASEYEAR = 2010;
-const currentYear = (new Date()).getFullYear(); // FIX - need to deal with 'current season' issue
-const years: number[] = [];
+import { fetchCurrentSeason, fetchSeasons } from '@/app/lib/data';
 
-for (let year = currentYear; year >= BASEYEAR; year--)
-  years.push(year);
+export const SeasonDropdown = async ({ base }: { base: string }) => {
 
-export const SeasonDropdown = ({ base, label }: { base: string, label?: string }) => {
+  const currentSeason = await fetchCurrentSeason();
+  const sortedSeasons = (await fetchSeasons()).sort( (a, b) => {
+    if (a.startDate < b.startDate) return 1;
+    if (a.startDate > b.startDate) return -1;
+    return 0;
+  });
+
   return (
-    <Dropdown dismissOnClick={false} label={label || "Other Seasons"} size="sm">
-      {years.map((y, k) =>
-        <DropdownItem key={k} as={Link} href={base + `/${y}`}>
-          {y}
-        </DropdownItem>
-      )}
-    </Dropdown>
-  );
+    <SeasonDropdownCC base={base} sortedSeasons={sortedSeasons} />
+  )
 }
