@@ -2,19 +2,15 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
+import { Table, TableBody, TableCell, TableHead, TableHeadCell } from 'flowbite-react';
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
-import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
+import { fetchTeams, fetchMeets } from '@/app/lib/data';
 
-export default async function Page({ params }: { params: { season: string } }) {
+export default async function Page({ params }: { params: { seasonId: number } }) {
 
-    const q = new URLSearchParams({
-        season: params.season
-    })
-
-    const teams = await (await fetch(`${process.env.DATA_URL}/teams`)).json();
+    const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
-    const meets = await (await fetch(`${process.env.DATA_URL}/meets?${q}`)).json();
+    const meets = await fetchMeets(params.seasonId);
     const smeets = sortBy(meets, ['meetDate', 'division']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 

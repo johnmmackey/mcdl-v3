@@ -1,3 +1,74 @@
+export type Team = {
+    poolcode: string,
+    name: string | null,
+    clubName: string | null,
+    teamName: string | null,
+    address1: string | null,
+    address2: string | null,
+    phone: string | null,
+    url: string | null
+}
+
+export type MeetPool = {
+    id: number,
+    meetId: number,
+    poolcode: string,
+    score: number,
+    meetRank: number,
+    meetRankPeers: number,
+    meetRankPoints: number    
+}
+
+export type Meet = {
+    id: number,
+    seasonId: number,
+    name: string | null,
+    meetDate: string,
+    entryDeadline: string | null,
+    hostPool: string | null,
+    visitingPool: string | null,
+    visitingPool2: string | null,
+    coordinatorPool: string | null,
+    meetType: string,
+    division: number | null,
+    week: number | null,
+    minAge: number | null,
+    maxAge: number | null,
+    scoresPublished: string | null,
+    meetsPools: MeetPool[]
+}
+
+export type MeetResult = {
+    diverScoresByAgeGrp: {
+        [id: number]: DiverScore[]
+    },
+    ageGroups: AgeGroup[],
+    meet: Meet
+}
+
+export type AgeGroup = {
+    id: number,
+    gender: string,
+    name: string,
+    min: number,
+    max: number
+}
+
+export type DiverScore = {
+    scoreId: number,
+    diverId: number,
+    firstName: string,
+    lastName: string,
+    exhibition: number | null,
+    agRank: {
+        rank: number | null,
+        rankPoints: number | null
+    },
+    score: number,
+    diverAgeGroupScore: number | null,
+    team: string
+}
+
 export type Rank = {
     rank: number,
     rankPoints: number,
@@ -56,19 +127,19 @@ export type GraphQLPosts = {
 }
 
 export type GraphQLMenus = {
-    "data": {
-        "menus": {
-            "nodes": {
-                "name": string,
-                "slug": string,
-                "menuItems": {
-                    "edges": [
+    data: {
+        menus: {
+            nodes: {
+                name: string,
+                slug: string,
+                menuItems: {
+                    edges: [
                         {
-                            "node": {
-                                "label": string,
-                                "target": string,
-                                "url": string,
-                                "order": number
+                            node: {
+                                label: string,
+                                target: string,
+                                url: string,
+                                order: number
                             }
                         }
                     ]
@@ -95,10 +166,10 @@ export type Menu = {
     name: string,
     slug: string,
     menuItems: {
-        "label": string,
-        "target": string,
-        "url": string,
-        "order": number
+        label: string,
+        target: string,
+        url: string,
+        order: number
     }[]
 }
 

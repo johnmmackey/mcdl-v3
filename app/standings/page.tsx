@@ -3,6 +3,6 @@ import { fetchCurrentSeason } from '@/app/lib/data';
 
 export default async function Page() {
   const sc = await fetchCurrentSeason();
-  redirect(`/standings/${sc}`);
+  redirect(`/standings/${sc.id}`);
 }
 

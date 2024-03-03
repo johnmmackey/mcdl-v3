@@ -1,23 +1,21 @@
 
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
-import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
+import { fetchTeams, fetchMeetResults } from '@/app/lib/data';
 
-export default async function Page({ params }: { params: { meet: string } }) {
+export default async function Page({ params }: { params: { meetId: number } }) {
 
-    const teams = await (await fetch(`${process.env.DATA_URL}/teams`)).json();
+    const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
-    const results = await (await fetch(`${process.env.DATA_URL}/meetresults/${params.meet}`)).json();
+    const results = await fetchMeetResults(params.meetId);
 
     const meetName = () => {
-        let m = results.meetInfo;
+        let m = results.meet;
 
         return (m.name
-        || (m.meetType === 'Dual' && `${kteams[m.visitingPool].name} at ${kteams[m.hostPool].name}`)
-        || `Meet ID ${params.meet}`
+        || (m.meetType === 'Dual' && `${kteams[m.visitingPool || '']?.name} at ${kteams[m.hostPool || '']?.name}`)
+        || `Meet ID ${params.meetId}`
         ) + ` (${format(m.meetDate, 'PPP')})`;
     }
 
@@ -26,9 +24,9 @@ export default async function Page({ params }: { params: { meet: string } }) {
             <h1 className="text-center text-2xl text-bold py-4">Meet Results for {meetName()}</h1>
             <Table className="w-96">
                 <TableBody>
-                    {results.teamScores.map((ts:any, k:number) =>
+                    {results.meet.meetsPools.map((ts:any, k:number) =>
                         <TableRow key={k}>
-                            <TableCell className='py-1'>{kteams[ts.team].name}</TableCell>
+                            <TableCell className='py-1'>{kteams[ts.poolcode].name}</TableCell>
                             <TableCell className='py-1'>{ts.score.toFixed(1)}</TableCell>
                         </TableRow>
                     )}
@@ -49,16 +47,16 @@ export default async function Page({ params }: { params: { meet: string } }) {
                             <TableHeadCell className="w-64"></TableHeadCell>
                         </TableHead>
                         <TableBody>
-                            {!results.diverScores[ag.id] &&
+                            {!results.diverScoresByAgeGrp[ag.id] &&
                                 <TableRow>
                                     <TableCell colSpan={5} className='py-1'>
                                         <em>No Divers In This Age Group</em>
                                     </TableCell>
                                 </TableRow>
                             }
-                            {(results.diverScores[ag.id] || []).map((ds:any, k:number) =>
+                            {(results.diverScoresByAgeGrp[ag.id] || []).map((ds:any, k:number) =>
                                 <TableRow key={k}>
-                                    <TableCell className='py-1'>{ds.team}</TableCell>
+                                    <TableCell className='py-1'>{ds.poolcode}</TableCell>
                                     <TableCell className='py-1'>{ds.firstName} {ds.lastName}</TableCell>
                                     <TableCell className='py-1'>{ds.score.toFixed(2)}</TableCell>
                                     <TableCell className="py-1 text-center">
