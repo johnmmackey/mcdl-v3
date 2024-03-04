@@ -16,12 +16,15 @@ export default async function Page({ params }: { params: { meetId: number } }) {
         return (m.name
         || (m.meetType === 'Dual' && `${kteams[m.visitingPool || '']?.name} at ${kteams[m.hostPool || '']?.name}`)
         || `Meet ID ${params.meetId}`
-        ) + ` (${format(m.meetDate, 'PPP')})`;
+        );
     }
+
+    const meetDateStr = () => format(results.meet.meetDate, 'PPP');
 
     return (
         <div>
             <h1 className="text-center text-2xl text-bold py-4">Meet Results for {meetName()}</h1>
+            <h2 className="text-center text-xl text-bold pb-4">{meetDateStr()}</h2>
             <Table className="w-96">
                 <TableBody>
                     {results.meet.meetsPools.map((ts:any, k:number) =>

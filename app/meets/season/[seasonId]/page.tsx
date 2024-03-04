@@ -37,11 +37,11 @@ export default async function Page({ params }: { params: { seasonId: number } })
             <TableBody>
                 {Object.entries(gmeets).map(([dt, meets], k1) =>
                     meets.map((m, k2) =>
-                        <LinkTableRow key={k2} className='cursor-pointer hover:font-bold' href={`/meets/meet/${m.id}`}>
-                            <TableCell>{format(m.meetDate, 'PPP')}</TableCell>
-                            <TableCell className='pl-12'>{m.division}</TableCell>
-                            <TableCell>{meetName(m)}</TableCell>
-                            <TableCell>{scoreStr(m)}</TableCell>
+                        <LinkTableRow key={k2} className='cursor-pointer hover:bg-slate-400 hover:text-white' href={`/meets/meet/${m.id}`}>
+                            <TableCell className='py-2'>{format(m.meetDate, 'PPP')}</TableCell>
+                            <TableCell className='pl-12 py-2'>{m.division || 'NDM'}</TableCell>
+                            <TableCell className='py-2'>{meetName(m)}</TableCell>
+                            <TableCell className='py-2'>{scoreStr(m)}</TableCell>
                         </LinkTableRow>
                     )
                 )}
