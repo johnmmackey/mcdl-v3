@@ -40,6 +40,13 @@ npx create-next-app@latest mcdl-v2 --use-npm
 * (https://next-auth.js.org/getting-started/example)
 * (https://next-auth.js.org/providers/cognito)
 
+### Auth ENV
+DATA_URL=http://docker:8095
+AUTH_SECRET=<base64 secrect>
+AUTH_COGNITO_ID=<COGNITO app id>
+AUTH_COGNITO_SECRET=<COGNITO secret>
+AUTH_COGNITO_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/{USER POOL ID: e.g. us-east-1_xxxxxxx}
+
 ### Auth Flow
 ```
 signin callback (user, account, profile, email, credentials)

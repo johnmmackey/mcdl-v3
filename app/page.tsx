@@ -1,26 +1,20 @@
 import styles from "./page.module.css";
-import { fetchPosts, fetchMenus } from '@/app/lib/cmsdata'
-import { auth } from "@/auth"
+import { Card } from 'flowbite-react';
+import { fetchPosts } from '@/app/lib/cmsdata'
 
 export default async function Home() {
   const posts = await fetchPosts();
-  const menus = await fetchMenus();
-  const session = await auth();
+
   return (
-    <div>
-      <h1>Hello.</h1>
-      <pre>Session: {JSON.stringify(session, null, 2)}</pre>
-      <h1>Posts</h1>
-      {posts.map((p, k) =>
-        <div key={k}>
-          <h1>{p.title}</h1>
-          <div
-            className={styles.revertstyles}
-            dangerouslySetInnerHTML={{ __html: p.content }}
-          />
-        </div>
-      )}
-      <div>{`Got ${menus.length} menus`}</div>
-    </div>
-  );
+    posts.map((p, k) => (
+        <Card key={k} className="w-xl m-4 border-slate-800">
+          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white p-2">
+            {p.title}
+          </h5>
+          <div className="revertstyles font-normal text-gray-700 dark:text-gray-400" dangerouslySetInnerHTML={{ __html: p.content }} />
+        </Card>
+      )
+    )
+  )
 }
+

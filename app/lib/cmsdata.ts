@@ -14,7 +14,7 @@ export async function fetchPosts(): Promise<Posts> {
 
 
     return d.data.posts.edges
-        .filter(e => !e.node.postacf.expiry || ((new Date(e.node.postacf.expiry)).getTime() > Date.now()))
+        //.filter(e => !e.node.postacf.expiry || ((new Date(e.node.postacf.expiry)).getTime() > Date.now()))
         .map(e => ({
             title: e.node.title,
             content: e.node.content,

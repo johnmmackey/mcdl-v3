@@ -16,3 +16,39 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+div.revertstyles h1 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1.5em;
+}
+div.revertstyles h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.5em;
+}
+div.revertstyles h3 {
+  font-size: 1.2rem;
+  font-weight: 200;
+  line-height: 1.5em;
+}
+
+div.revertstyles a {
+  color: blue;
+  text-decoration: underline;
+}
+
+div.revertstyles ul {
+  list-style-type: disc;
+  padding-left: 40px;
+}
+
+div.revertstyles ol {
+  list-style-type: decimal;
+  padding-left: 40px;
+}
+
+div.revertstyles p {
+  margin-top: 0.875em;
+  margin-bottom: 0.875em;
+}
