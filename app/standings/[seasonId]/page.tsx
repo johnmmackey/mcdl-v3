@@ -1,7 +1,8 @@
 import { fetchStandings } from '@/app/lib/data';
 import { Fragment } from 'react';
+import { Table, TableBody, TableRow, TableCell, TableHead, TableHeadCell } from 'flowbite-react';
 import { notFound } from 'next/navigation';
-import { SeasonDropdown } from '@/app/ui/SeasonDropdown';
+
 
 export default async function Page({ params }: { params: { seasonId: number } }) {
   const standings = await fetchStandings(params.seasonId);
@@ -12,43 +13,42 @@ export default async function Page({ params }: { params: { seasonId: number } })
   const fmt = (a: number | null, places?: number): string => a === null ? '' : (places ? a.toFixed(places) : a.toString());
 
   return (
-    <table>
+    <Table striped>
       {Object.entries(standings).map(([div, divResults]) =>
         <Fragment key={div}>
-          <thead>
-            <tr>
-              <th colSpan={8} className='text-left text-2xl pt-6 pb-2'>Division {div}</th>
-            </tr>
-            <tr>
-              <th className='w-64'>Pool</th>
-              <th className="px-3">Seed</th>
-              <th className="px-3">Dual Meets</th>
-              <th className="px-3">Div Meets</th>
-              <th className="px-3">Dual Rank Points</th>
-              <th className="px-3">Div Meet Score</th>
-              <th className="px-3">Rank Points</th>
-              <th className="px-3">Total</th>
-            </tr>
-          </thead>
-          <tbody>
+          <TableHead>
+            <TableHeadCell colSpan={8} className='text-left text-2xl pt-6 pb-2'>Division {div}</TableHeadCell>
+          </TableHead>
+          <TableHead>
+            <TableHeadCell className='w-64'>Pool</TableHeadCell>
+            <TableHeadCell className="px-3">Seed</TableHeadCell>
+            <TableHeadCell className="px-3">Dual Meets</TableHeadCell>
+            <TableHeadCell className="px-3">Div Meets</TableHeadCell>
+            <TableHeadCell className="px-3">Dual Rank Points</TableHeadCell>
+            <TableHeadCell className="px-3">Div Meet Score</TableHeadCell>
+            <TableHeadCell className="px-3">Rank Points</TableHeadCell>
+            <TableHeadCell className="px-3">Total</TableHeadCell>
+
+          </TableHead>
+          <TableBody>
             {divResults.map((t, k) =>
-              <tr key={k}>
-                <td>{t.teamName}</td>
-                <td className='text-center'>{t.seed}</td>
-                <td className='text-center'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</td>
-                <td className='text-center'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</td>
-                <td className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</td>
-                <td className='text-right pr-10'>{fmt(t.divMeetScore, 1)}</td>
-                <td className='text-center'>{fmt(t.divMeetRank.rankPoints)}</td>
-                <td className='text-center'>
+              <TableRow key={k}>
+                <TableCell>{t.teamName}</TableCell>
+                <TableCell className='text-center'>{t.seed}</TableCell>
+                <TableCell className='text-center'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</TableCell>
+                <TableCell className='text-center'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</TableCell>
+                <TableCell className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</TableCell>
+                <TableCell className='text-right pr-10'>{fmt(t.divMeetScore, 1)}</TableCell>
+                <TableCell className='text-center'>{fmt(t.divMeetRank.rankPoints)}</TableCell>
+                <TableCell className='text-center'>
                   {fmt(t.sumDualDivRankPoints) + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
+          </TableBody>
         </Fragment>
       )}
-    </table>
+    </Table>
   );
 }
 

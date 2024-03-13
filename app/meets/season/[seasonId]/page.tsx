@@ -2,7 +2,7 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Table, TableBody, TableCell, TableHead, TableHeadCell } from 'flowbite-react';
+import { Table, TableBody, TableRow, TableCell, TableHead, TableHeadCell } from 'flowbite-react';
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets } from '@/app/lib/data';
 
