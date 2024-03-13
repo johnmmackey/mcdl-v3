@@ -17,7 +17,7 @@ export const SeasonDropdownCC = ({
     <Dropdown
       dismissOnClick={true}
       label={(sortedSeasons.find(e => e.id === Number(pathName.substring(base.length + 1)))?.name) || "Season"}
-      size="sm"
+      size="xs"
     >
       {sortedSeasons.map((s, k) =>
         <Link key={k} href={base + `/${s.id}`}>

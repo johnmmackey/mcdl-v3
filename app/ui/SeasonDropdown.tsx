@@ -2,7 +2,7 @@ import { SeasonDropdownCC } from './SeasonDropdownCC';
 
 import { fetchCurrentSeason, fetchSeasons } from '@/app/lib/data';
 
-export const SeasonDropdown = async ({ base }: { base: string }) => {
+export const SeasonDropdown = async ({ base, }: { base: string, }) => {
 
   const currentSeason = await fetchCurrentSeason();
   const sortedSeasons = (await fetchSeasons()).sort( (a, b) => {

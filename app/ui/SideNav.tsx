@@ -3,7 +3,7 @@
 import { Sidebar } from 'flowbite-react';
 import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from 'react-icons/hi';
 
-export const SideNav = function Component() {
+export const SideNav = function () {
   return (
     <Sidebar aria-label="Default sidebar example">
       <Sidebar.Items>

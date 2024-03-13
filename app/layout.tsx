@@ -21,8 +21,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <div className="max-w-screen-lg mx-auto p-2">
           <MyNavbar />
-          <div className="mt-8">
-            {children}
+          <div className="mt-8 flex">
+            <SideNav />
+            <div>
+              {children}
+            </div>
           </div>
         </div>
       </body>

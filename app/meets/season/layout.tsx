@@ -1,4 +1,4 @@
-import { SeasonDropdown } from "@/app/ui/SeasonDropdown";
+import { SeasonalPage } from "@/app/ui/SeasonalPage";
 
 export default function MeetsSeasonsLayout({
     children,
@@ -6,12 +6,8 @@ export default function MeetsSeasonsLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div>
-            <h1 className="text-center text-2xl text-bold">Meet Schedule & Results</h1>
-            <div className="flex justify-center">
-                <SeasonDropdown base="/meets/season" />     
-            </div>
+        <SeasonalPage base="/meets/season" heading="Meet Schedule & Results">
             {children}
-        </div>
+        </SeasonalPage>
     );
 }
