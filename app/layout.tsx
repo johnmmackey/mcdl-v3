@@ -22,8 +22,8 @@ export default function RootLayout({
         <div className="max-w-screen-lg mx-auto p-2">
           <MyNavbar />
           <div className="mt-8 flex">
-            <SideNav />
-            <div>
+            {/*<SideNav />*/}
+            <div className="grow">
               {children}
             </div>
           </div>

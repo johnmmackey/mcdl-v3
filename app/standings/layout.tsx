@@ -1,17 +1,13 @@
-import { SeasonDropdown } from "@/app/ui/SeasonDropdown";
+import { SeasonalPage } from "@/app/ui/SeasonalPage";
 
-export default function StandingsLayout({
+export default function MeetsSeasonsLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
-        <div>
-            <h1 className="text-center text-2xl text-bold">Divisional Standings</h1>
-            <div className="flex justify-center">
-                <SeasonDropdown base="/standings" />     
-            </div>
+        <SeasonalPage base="/standings" heading="Divisional Standings">
             {children}
-        </div>
+        </SeasonalPage>
     );
 }
