@@ -66,6 +66,7 @@ export type DiverScore = {
     },
     score: number,
     diverAgeGroupScore: number | null,
+    diverAgeGroupId: number,
     team: string
 }
 

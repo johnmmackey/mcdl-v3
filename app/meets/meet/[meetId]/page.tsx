@@ -3,6 +3,7 @@ import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
 import { fetchTeams, fetchMeetResults } from '@/app/lib/data';
+import { MeetPool } from '@/app/lib/definitions';
 
 export default async function Page({ params }: { params: { meetId: number } }) {
 
@@ -27,7 +28,7 @@ export default async function Page({ params }: { params: { meetId: number } }) {
             <h2 className="text-center text-xl text-bold pb-4">{meetDateStr()}</h2>
             <Table className="w-96">
                 <TableBody>
-                    {results.meet.meetsPools.map((ts:any, k:number) =>
+                    {results.meet.meetsPools.map((ts, k) =>
                         <TableRow key={k}>
                             <TableCell className='py-1'>{kteams[ts.poolcode].name}</TableCell>
                             <TableCell className='py-1'>{ts.score.toFixed(1)}</TableCell>
@@ -36,7 +37,7 @@ export default async function Page({ params }: { params: { meetId: number } }) {
                 </TableBody>
             </Table>
 
-            {results.ageGroups.map((ag: any, k:number) =>
+            {results.ageGroups.map((ag, k) =>
                 <div key={k} className='my-8'>
                     <Table striped>
                         <TableHead>
@@ -57,9 +58,9 @@ export default async function Page({ params }: { params: { meetId: number } }) {
                                     </TableCell>
                                 </TableRow>
                             }
-                            {(results.diverScoresByAgeGrp[ag.id] || []).map((ds:any, k:number) =>
+                            {(results.diverScoresByAgeGrp[ag.id] || []).map((ds, k) =>
                                 <TableRow key={k}>
-                                    <TableCell className='py-1'>{ds.poolcode}</TableCell>
+                                    <TableCell className='py-1'>{ds.team}</TableCell>
                                     <TableCell className='py-1'>{ds.firstName} {ds.lastName}</TableCell>
                                     <TableCell className='py-1'>{ds.score.toFixed(2)}</TableCell>
                                     <TableCell className="py-1 text-center">
