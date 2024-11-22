@@ -1,6 +1,20 @@
 import NextAuth from "next-auth"
 import Cognito from "next-auth/providers/cognito"
 
+type Profile = {
+  familyName: string,
+  givenName: string,
+  groups: string[]
+}
+
+declare module "next-auth" {
+  interface User {
+    /** The user's postal address. */
+    address: string,
+    profile: Profile
+  }
+}
+
 export const {
   handlers: { GET, POST },
   auth,
@@ -18,8 +32,8 @@ export const {
       return baseUrl
     },
     async session({ session, user, token }) {
-      //console.log('session callback',session, user, token );
-      let ns = Object.assign(session, {profile: token.profile});
+      //console.log('session callback',session);
+      session.user.profile = <Profile>token.profile; 
       return session
     },
     async jwt({ token, user, account, profile, isNewUser }) {

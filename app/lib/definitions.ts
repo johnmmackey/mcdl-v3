@@ -16,7 +16,7 @@ export type MeetPool = {
     score: number,
     meetRank: number,
     meetRankPeers: number,
-    meetRankPoints: number    
+    meetRankPoints: number
 }
 
 export type Meet = {
@@ -104,6 +104,19 @@ export type Season = {
     registerDate: string,
     startDate: string,
     endDate: string
+}
+
+export type Diver = {
+    id: number,
+    firstName: string,
+    lastName: string,
+    birthdate: string,
+    sex: string,
+    poolcode: string,
+    createDate: string,
+    ageGroupId: number,
+    firstYear: boolean,
+    registrationDate: string
 }
 
 export type GraphQLPosts = {

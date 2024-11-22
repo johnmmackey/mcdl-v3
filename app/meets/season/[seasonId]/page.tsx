@@ -25,7 +25,6 @@ export default async function Page({ params }: { params: { seasonId: number } })
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
 
-
     return (
         <Table striped>
             <TableHead>
