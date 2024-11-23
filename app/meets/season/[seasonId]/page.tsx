@@ -6,7 +6,8 @@ import { Table, TableBody, TableRow, TableCell, TableHead, TableHeadCell } from 
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets } from '@/app/lib/data';
 
-export default async function Page({ params }: { params: { seasonId: number } }) {
+export default async function Page(props: { params: Promise<{ seasonId: number }> }) {
+    const params = await props.params;
 
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');

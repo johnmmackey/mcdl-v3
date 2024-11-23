@@ -5,7 +5,8 @@ import { notFound } from 'next/navigation';
 import styles from "./page.module.css";
 
 
-export default async function Page({ params }: { params: { seasonId: number } }) {
+export default async function Page(props: { params: Promise<{ seasonId: number }> }) {
+  const params = await props.params;
   const standings = await fetchStandings(params.seasonId);
   if (!standings) {
     notFound();

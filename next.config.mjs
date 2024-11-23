@@ -1,7 +1,6 @@
+// @ts-check
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-        serverComponentsExternalPackages: ['sequelize'],
-    },
+        serverExternalPackages: ['sequelize'],
 }
 export default nextConfig;

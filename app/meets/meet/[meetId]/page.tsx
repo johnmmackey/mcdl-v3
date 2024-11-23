@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 
 import { fetchTeams, fetchMeetResults } from '@/app/lib/data';
 import { MeetPool } from '@/app/lib/definitions';
 
-export default async function Page({ params }: { params: { meetId: number } }) {
+export default async function Page(props: { params: Promise<{ meetId: number }> }) {
+    const params = await props.params;
 
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
