@@ -28,7 +28,8 @@ export async function fetchMeetResults(meetId: number): Promise<MeetResult> {
 }
 
 export async function fetchStandings(seasonId: number): Promise<GroupedStandings> {
-    return (await fetch(`${process.env.DATA_URL}/standings/${seasonId}`)).json();
+    console.log(`Fetching standings...`)
+    return (await fetch(`${process.env.DATA_URL}/standings/${seasonId}`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchDivers({seasonId, poolcode} : {seasonId: number, poolcode: string}): Promise<Diver[]> {

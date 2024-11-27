@@ -9,7 +9,7 @@ const menusQuery = new URLSearchParams({
 })
 
 export async function fetchPosts(): Promise<Posts> {
-    let f = await fetch(`https://cms.mcdiving.org/graphql?${postsQuery}`)
+    let f = await fetch(`https://cms.mcdiving.org/graphql?${postsQuery}`, { next: { revalidate: 3600 } })
     let d: GraphQLPosts = await f.json();
 
 
