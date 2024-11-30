@@ -52,7 +52,7 @@ export default async function Page(props: {
                 <TableBody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <TableRow key={k2}>
+                            <LinkTableRow key={k2} href={`/meets/${m.id}`}>
                                 <TableCell className='py-2'>{format(m.meetDate, 'PPP')}</TableCell>
                                 <TableCell className='pl-12 py-2'>{m.division || 'NDM'}</TableCell>
                                 <TableCell className='py-2'>{meetName(m)}</TableCell>
@@ -86,7 +86,7 @@ export default async function Page(props: {
                                         </div>
                                     </TableCell>
                                 }
-                            </TableRow>
+                            </LinkTableRow>
                         )
                     )}
                 </TableBody>
