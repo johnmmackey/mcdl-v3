@@ -1,13 +1,17 @@
-import { fetchStandings } from '@/app/lib/data';
+import { fetchStandings, fetchCurrentSeason } from '@/app/lib/data';
 import { Fragment } from 'react';
 import { Table, TableBody, TableRow, TableCell, TableHead, TableHeadCell } from 'flowbite-react';
 import { notFound } from 'next/navigation';
-import styles from "./page.module.css";
+
+import { SeasonalPage } from '@/app/ui/SeasonalPage';
 
 
-export default async function Page(props: { params: Promise<{ seasonId: number }> }) {
-  const params = await props.params;
-  const standings = await fetchStandings(params.seasonId);
+export default async function Page(props: { searchParams: Promise<{ 'season-id': number }> }) {
+  const searchParams = await props.searchParams;
+  const currentSeason = await fetchCurrentSeason();
+
+  const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeason.id;
+  const standings = await fetchStandings(selectedSeasonId);
   if (!standings) {
     notFound();
   }
@@ -15,40 +19,43 @@ export default async function Page(props: { params: Promise<{ seasonId: number }
   const fmt = (a: number | null, places?: number): string => a === null ? '' : (places ? a.toFixed(places) : a.toString());
 
   return (
-    Object.entries(standings).map(([div, divResults]) =>
-      <Table key={div} striped className="mb-4">
-        <TableHead>
-          <TableHeadCell colSpan={8} className='text-left text-2xl pt-6 pb-2'>Division {div}</TableHeadCell>
-        </TableHead>
-        <TableHead>
-          <TableHeadCell className='px-2'>Pool</TableHeadCell>
-          <TableHeadCell className="px-2">Seed</TableHeadCell>
-          <TableHeadCell className="px-2">Dual Meets</TableHeadCell>
-          <TableHeadCell className="px-2">Div Meets</TableHeadCell>
-          <TableHeadCell className="px-2">Dual Rank Points</TableHeadCell>
-          <TableHeadCell className="px-2">Div Meet Score</TableHeadCell>
-          <TableHeadCell className="px-2">Rank Points</TableHeadCell>
-          <TableHeadCell className="px-2">Total</TableHeadCell>
+    <SeasonalPage base="/standings" heading="Divisional Standings" selectedSeasonId={selectedSeasonId}>
+      {Object.entries(standings).map(([div, divResults]) =>
 
-        </TableHead>
-        <TableBody>
-          {divResults.map((t, k) =>
-            <TableRow key={k} className="hover:bg-slate-400 hover:text-white">
-              <TableCell className='text-nowrap'>{t.teamName}</TableCell>
-              <TableCell className='text-center'>{t.seed}</TableCell>
-              <TableCell className='text-center text-nowrap'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</TableCell>
-              <TableCell className='text-center text-nowrap'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</TableCell>
-              <TableCell className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</TableCell>
-              <TableCell className='text-right pr-10'>{fmt(t.divMeetScore, 1)}</TableCell>
-              <TableCell className='text-center'>{fmt(t.divMeetRank.rankPoints)}</TableCell>
-              <TableCell className='text-center'>
-                {fmt(t.sumDualDivRankPoints) + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    )
+        <Table key={div} striped className="mb-4">
+          <TableHead>
+            <TableHeadCell colSpan={8} className='text-left text-2xl pt-6 pb-2'>Division {div}</TableHeadCell>
+          </TableHead>
+          <TableHead>
+            <TableHeadCell className='px-2'>Pool</TableHeadCell>
+            <TableHeadCell className="px-2">Seed</TableHeadCell>
+            <TableHeadCell className="px-2">Dual Meets</TableHeadCell>
+            <TableHeadCell className="px-2">Div Meets</TableHeadCell>
+            <TableHeadCell className="px-2">Dual Rank Points</TableHeadCell>
+            <TableHeadCell className="px-2">Div Meet Score</TableHeadCell>
+            <TableHeadCell className="px-2">Rank Points</TableHeadCell>
+            <TableHeadCell className="px-2">Total</TableHeadCell>
+
+          </TableHead>
+          <TableBody>
+            {divResults.map((t, k) =>
+              <TableRow key={k} className="hover:bg-slate-400 hover:text-white">
+                <TableCell className='text-nowrap'>{t.teamName}</TableCell>
+                <TableCell className='text-center'>{t.seed}</TableCell>
+                <TableCell className='text-center text-nowrap'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</TableCell>
+                <TableCell className='text-center text-nowrap'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</TableCell>
+                <TableCell className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</TableCell>
+                <TableCell className='text-right pr-10'>{fmt(t.divMeetScore, 1)}</TableCell>
+                <TableCell className='text-center'>{fmt(t.divMeetRank.rankPoints)}</TableCell>
+                <TableCell className='text-center'>
+                  {fmt(t.sumDualDivRankPoints) + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      )}
+    </SeasonalPage>
   )
 }
 

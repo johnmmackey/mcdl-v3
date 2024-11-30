@@ -1,7 +1,0 @@
-.standings-container {
-        display: grid;
-        grid-template-columns: [pool] 1fr [seed] 1fr [dualM] 1fr [divM] 1fr [div-rank] 1fr [div-score] 1fr [rank-points] 1fr [total] 1fr;
-        grid-template-rows: [header] 1fr [header2];
-        grid-auto-flow: row;
-
-}
