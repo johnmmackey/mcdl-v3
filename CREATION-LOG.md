@@ -150,3 +150,19 @@ session callback {
   jti: '6adabc9f-3156-4e26-93cb-af91afdf85bb'
 }
 ```
+session object
+```
+{
+  "user":{
+    "email":"john.m.mackey@gmail.com",
+    "profile":{
+      "familyName":"Mackey",
+      "givenName":"John",
+      "groups":[
+        "CG"
+      ]
+    }
+  },
+  "expires":"2024-12-29T15:44:06.060Z"
+}
+```

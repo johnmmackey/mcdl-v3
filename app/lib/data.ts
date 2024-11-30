@@ -20,7 +20,7 @@ export async function fetchAgeGroups(): Promise<AgeGroup[]> {
 }
 
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${seasonId}`)).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets/${seasonId}`, { next: { revalidate: 30 }})).json();
 }
 
 export async function fetchMeetResults(meetId: number): Promise<MeetResult> {
@@ -42,3 +42,4 @@ export async function fetchDivers({seasonId, poolcode} : {seasonId: number, pool
         }
     )).json();
 }
+
