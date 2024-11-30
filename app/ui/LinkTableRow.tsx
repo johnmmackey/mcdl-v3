@@ -9,7 +9,7 @@ export function LinkTableRow({ className, children, href }: {  children: React.R
     const router = useRouter();
    
     return (
-        <TableRow className={className} onClick={() => router.push(href)}>
+        <TableRow className={className} onClick={(e) => {console.log(e);  router.push(href)}}>
            {children}
         </TableRow>
     )

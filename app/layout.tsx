@@ -26,7 +26,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <div className="max-w-screen-lg mx-auto">
           <MyNavbar session={session} currentSeasonId={currentSeason.id} />
-          <div className="mt-8 mx-2 flex">
+          <div className="mx-2 flex">
             {/*<SideNav />*/}
             <div className="grow">
               {children}

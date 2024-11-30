@@ -32,3 +32,17 @@ Get a list of meets for a season
 /meets                  // All the meets for the current season
 /meets?season-id=2024   // All the meets for 2024
 /meets/123              // Meet 123 results
+
+## Meet Operations
+* List
+
+* Enter Divers (explicitly rostered meets only)
+
+* View Roster / Scoring Sheet
+** Print Labels
+
+* Enter/Edit Results
+* View / Preview Results
+
+* Publish
+* Unpublish

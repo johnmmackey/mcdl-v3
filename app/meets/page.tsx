@@ -9,6 +9,7 @@ import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { meetPermissions } from '@/app/lib/definitions';
 import { SeasonalPage } from '@/app/ui/SeasonalPage';
+import { ActionDropdown } from '../ui/ActionDropdown';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number }>
@@ -52,7 +53,7 @@ export default async function Page(props: {
                 <TableBody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <LinkTableRow key={k2} href={`/meets/${m.id}`}>
+                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200 ' > 
                                 <TableCell className='py-2'>{format(m.meetDate, 'PPP')}</TableCell>
                                 <TableCell className='pl-12 py-2'>{m.division || 'NDM'}</TableCell>
                                 <TableCell className='py-2'>{meetName(m)}</TableCell>
@@ -61,7 +62,7 @@ export default async function Page(props: {
                                         {scoreStr(m)}
                                     </a>
                                 </TableCell>
-                                {meetPermissions(session, m).length > 0 &&
+                                {false && meetPermissions(session, m).length > 0 &&
                                     <TableCell>
 
 
@@ -86,6 +87,9 @@ export default async function Page(props: {
                                         </div>
                                     </TableCell>
                                 }
+                                <TableCell>
+                                <ActionDropdown />
+                                </TableCell>
                             </LinkTableRow>
                         )
                     )}
