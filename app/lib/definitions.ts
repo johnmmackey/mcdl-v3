@@ -196,12 +196,3 @@ export type Permissions = string[];
 
 
 
-export function meetPermissions(session: Session | null, meet: Meet) {
-    if(session?.user?.profile?.groups?.includes('admin'))
-        return (['viewRoster', 'enterScores'])
-    if(session?.user?.profile?.groups?.includes(meet.hostPool || ''))
-        return (['viewRoster', 'enterScores'])
-    if(session?.user)
-        return (['viewRoster'])
-    return []
-}

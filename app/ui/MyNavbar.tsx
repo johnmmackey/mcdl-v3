@@ -15,7 +15,7 @@ export const MyNavbar = ({
     const pathName = usePathname();
 
     return (
-        <Navbar className="bg-blue-100 sticky top-0 left-0 right-0 z-50" fluid rounded >
+        <Navbar className="bg-blue-100 sticky top-0 left-0 right-0 z-50 mb-4" fluid rounded >
 
             <Navbar.Brand href="https://www.mcdiving.org">
                 {/*<img src="/favicon.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite React Logo" />*/}

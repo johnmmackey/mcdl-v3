@@ -34,15 +34,18 @@ Get a list of meets for a season
 /meets/123              // Meet 123 results
 
 ## Meet Operations
-* List
+* List - any user
+* View Roster / Scoring Sheet - any logged in user
 
-* Enter Divers (explicitly rostered meets only)
+* Enter Divers (explicitly rostered meets only) - team rep
 
-* View Roster / Scoring Sheet
-** Print Labels
+* Print Labels - home team rep
 
-* Enter/Edit Results
-* View / Preview Results
+* Enter/Edit Results - home team rep for dual meets
+* Preview Results - any participating team rep
+* View Results - any user
 
-* Publish
-* Unpublish
+* Publish - dual meets - home team rep
+* Unpublish - admin
+
+## Permissions Flow

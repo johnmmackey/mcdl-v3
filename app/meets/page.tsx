@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Dropdown, DropdownItem } from 'flowbite-react';
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
-import { meetPermissions } from '@/app/lib/definitions';
+import { userCan } from '@/app/lib/userCan';
 import { SeasonalPage } from '@/app/ui/SeasonalPage';
 import { ActionDropdown } from '../ui/ActionDropdown';
 
@@ -38,6 +38,9 @@ export default async function Page(props: {
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
 
+    console.log('testing userCan')
+    console.log(`userCan view Results: `, userCan('meet', meets[0], 'viewResults', session));
+
     return (
         <SeasonalPage base="/meets" heading="Meet Schedule & Results" selectedSeasonId={selectedSeasonId}>
             <Table striped>
@@ -53,7 +56,7 @@ export default async function Page(props: {
                 <TableBody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200 ' > 
+                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200' inactive={!userCan('meet', m, 'viewResults', session)}> 
                                 <TableCell className='py-2'>{format(m.meetDate, 'PPP')}</TableCell>
                                 <TableCell className='pl-12 py-2'>{m.division || 'NDM'}</TableCell>
                                 <TableCell className='py-2'>{meetName(m)}</TableCell>
@@ -62,13 +65,13 @@ export default async function Page(props: {
                                         {scoreStr(m)}
                                     </a>
                                 </TableCell>
-                                {false && meetPermissions(session, m).length > 0 &&
+                                {false && //meetPermissions(session, m).length > 0 &&
                                     <TableCell>
 
 
                                         <div className="flex items-center gap-4">
                                             <Dropdown label="" size="sm">
-                                                {meetPermissions(session, m).includes('viewRoster') &&
+                                                {false && //meetPermissions(session, m).includes('viewRoster') &&
                                                     <>
                                                         <Link href={`/roster/${m.id}`}>
                                                             <DropdownItem>
@@ -80,7 +83,7 @@ export default async function Page(props: {
                                                     </>
 
                                                 }
-                                                {meetPermissions(session, m).includes('enterScores') &&
+                                                {false && //meetPermissions(session, m).includes('enterScores') &&
                                                     <DropdownItem>Enter Scores</DropdownItem>
                                                 }
                                             </Dropdown>
