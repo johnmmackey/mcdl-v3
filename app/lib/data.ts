@@ -4,15 +4,15 @@ import jwt from "jsonwebtoken";
 
 
 export async function fetchCurrentSeason(): Promise<Season> {
-    return (await fetch(`${process.env.DATA_URL}/currentseason`)).json();
+    return (await fetch(`${process.env.DATA_URL}/currentseason`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchSeasons(): Promise<Season[]> {
-    return (await fetch(`${process.env.DATA_URL}/seasons`)).json();
+    return (await fetch(`${process.env.DATA_URL}/seasons`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchTeams(): Promise<Team[]> {
-    return await (await fetch(`${process.env.DATA_URL}/teams`)).json();
+    return await (await fetch(`${process.env.DATA_URL}/teams`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchAgeGroups(): Promise<AgeGroup[]> {
