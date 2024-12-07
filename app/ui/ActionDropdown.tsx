@@ -10,7 +10,7 @@ export function ActionDropdown() {
 
     return (
         <span onClick={e => {console.log('dropdown clicked'); e.stopPropagation()}}>
-        <Dropdown >
+        <Dropdown inline={true}>
             <Dropdown.Item>1</Dropdown.Item>
             <Dropdown.Item>2</Dropdown.Item>
         </Dropdown>
