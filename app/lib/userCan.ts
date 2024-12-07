@@ -28,7 +28,7 @@ export function userCan(targetType: string, target: any,  op: string, session: S
         let tokens = g.split(':');
         Object.assign(roles, { [tokens[0]]: tokens.length > 1 ? tokens[1] : null });
     });
-console.log(`--- userCan: loggedIn: ${loggedIn}, roles:`, roles);
-console.log(`targetType: ${targetType}, op: ${op}`)
+//console.log(`--- userCan: loggedIn: ${loggedIn}, roles:`, roles);
+//console.log(`targetType: ${targetType}, op: ${op}`)
     return permissions[targetType][op] && permissions[targetType][op](target, loggedIn, roles);
 }
