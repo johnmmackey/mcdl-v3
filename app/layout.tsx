@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { MyNavbar } from "@/app/ui/MyNavbar";
-import { SideNav } from '@/app/ui/SideNav';
 import { Inter } from "next/font/google";
 import { auth } from "@/auth"
 import "@/app/globals.css";
 import { fetchCurrentSeason } from "./lib/data";
+
+import '@mantine/core/styles.css';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { HeaderMenu } from "@/app/ui/HeaderMenu";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,17 +24,21 @@ export default async function RootLayout({
   const currentSeason = await fetchCurrentSeason();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <body className={inter.className}>
-        <div className="max-w-screen-lg mx-auto">
-          <MyNavbar session={session} currentSeasonId={currentSeason.id} />
-          <div className="mx-2 flex">
-            {/*<SideNav />*/}
-            <div className="grow">
-              {children}
+        <MantineProvider>
+          <div className="max-w-screen-lg mx-auto">
+            <HeaderMenu session={session} currentSeasonId={currentSeason.id} />
+            <div className="mx-2 flex">
+              <div className="grow">
+                {children}
+              </div>
             </div>
           </div>
-        </div>
+        </MantineProvider>
       </body>
     </html>
   );

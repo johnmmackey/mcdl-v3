@@ -1,5 +1,5 @@
 'use client'
-import { Table, TableRow, TableCell }  from 'flowbite-react';
+import { TableTr } from '@mantine/core';
 import { useRouter } from 'next/navigation'
 import React from 'react';
 
@@ -9,8 +9,8 @@ export function LinkTableRow({ className, children, href, inactive }: {  childre
     const router = useRouter();
        
     return (
-        <TableRow className={className} onClick={(e) => {console.log(e);  !inactive && router.push(href)}}>
+        <TableTr className={className} onClick={(e) => {console.log(e);  !inactive && router.push(href)}}>
            {children}
-        </TableRow>
+        </TableTr>
     )
 }
