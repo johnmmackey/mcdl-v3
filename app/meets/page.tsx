@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Dropdown, DropdownItem } from 'flowbite-react';
+import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
@@ -44,59 +44,45 @@ export default async function Page(props: {
     return (
         <SeasonalPage base="/meets" heading="Meet Schedule & Results" selectedSeasonId={selectedSeasonId}>
             <Table striped>
-                <TableHead>
-                    <TableHeadCell>Date</TableHeadCell>
-                    <TableHeadCell>Division</TableHeadCell>
-                    <TableHeadCell>Meet Name</TableHeadCell>
-                    <TableHeadCell>Score</TableHeadCell>
+                <TableThead>
+                    <TableTr>
+                    <TableTh>Date</TableTh>
+                    <TableTh>Division</TableTh>
+                    <TableTh>Meet Name</TableTh>
+                    <TableTh>Score</TableTh>
                     {session?.user &&
-                        <TableHeadCell>Actions</TableHeadCell>
+                        <TableTh>Actions</TableTh>
                     }
-                </TableHead>
-                <TableBody>
+                    </TableTr>
+                </TableThead>
+                <TableTbody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
                             <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200' inactive={!userCan('meet', m, 'viewResults', session)}> 
-                                <TableCell className='py-2'>{format(m.meetDate, 'PPP')}</TableCell>
-                                <TableCell className='pl-12 py-2'>{m.division || 'NDM'}</TableCell>
-                                <TableCell className='py-2'>{meetName(m)}</TableCell>
-                                <TableCell className='py-2'>
+                                <TableTd className='py-2'>{format(m.meetDate, 'PPP')}</TableTd>
+                                <TableTd className='pl-12 py-2'>{m.division || 'NDM'}</TableTd>
+                                <TableTd className='py-2'>{meetName(m)}</TableTd>
+                                <TableTd className='py-2'>
                                     <a href={`/meets/${m.id}`}>
                                         {scoreStr(m)}
                                     </a>
-                                </TableCell>
+                                </TableTd>
                                 {false && //meetPermissions(session, m).length > 0 &&
-                                    <TableCell>
+                                    <TableTd>
 
 
                                         <div className="flex items-center gap-4">
-                                            <Dropdown label="" size="sm">
-                                                {false && //meetPermissions(session, m).includes('viewRoster') &&
-                                                    <>
-                                                        <Link href={`/roster/${m.id}`}>
-                                                            <DropdownItem>
-                                                                View Roster
-                                                            </DropdownItem>
-                                                        </Link>
-                                                        <DropdownItem>Labels</DropdownItem>
-                                                        <DropdownItem>Scoring Worksheet</DropdownItem>
-                                                    </>
-
-                                                }
-                                                {false && //meetPermissions(session, m).includes('enterScores') &&
-                                                    <DropdownItem>Enter Scores</DropdownItem>
-                                                }
-                                            </Dropdown>
+blah
                                         </div>
-                                    </TableCell>
+                                    </TableTd>
                                 }
-                                <TableCell>
+                                <TableTd>
                                 <ActionDropdown />
-                                </TableCell>
+                                </TableTd>
                             </LinkTableRow>
                         )
                     )}
-                </TableBody>
+                </TableTbody>
             </Table>
         </SeasonalPage>
     )
