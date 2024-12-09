@@ -19,9 +19,9 @@ export function ActionDropdown() {
     const router = useRouter();
 
     return (
-        <Menu trigger="hover" transitionProps={{ exitDuration: 0 }} withinPortal>
+        <Menu transitionProps={{ exitDuration: 0 }} withinPortal>
             <MenuTarget>
-                <IconChevronDown size={18} stroke={1.5} />
+                <IconChevronDown size={18} stroke={1.5} onClick={e => e.stopPropagation()}/>
             </MenuTarget>
             <MenuDropdown>
                 {actionMap.map((s, k) =>

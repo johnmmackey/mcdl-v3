@@ -38,7 +38,7 @@ const SeasonDropdown = async ({ base, selectedSeasonId }: { base: string, select
 
 
   return (
-    <Menu trigger="hover" transitionProps={{ exitDuration: 0 }} withinPortal>
+    <Menu transitionProps={{ exitDuration: 0 }} withinPortal>
       <MenuTarget>
         <Button rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12} className={classes.button}>
           {selectedSeasonId}

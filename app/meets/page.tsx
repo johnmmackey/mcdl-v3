@@ -14,6 +14,7 @@ import { ActionDropdown } from '../ui/ActionDropdown';
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number }>
 }) {
+
     const searchParams = await props.searchParams;
     const currentSeason = await fetchCurrentSeason();
 
@@ -38,27 +39,24 @@ export default async function Page(props: {
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
 
-    console.log('testing userCan')
-    console.log(`userCan view Results: `, userCan('meet', meets[0], 'viewResults', session));
-
     return (
         <SeasonalPage base="/meets" heading="Meet Schedule & Results" selectedSeasonId={selectedSeasonId}>
             <Table striped>
                 <TableThead>
                     <TableTr>
-                    <TableTh>Date</TableTh>
-                    <TableTh>Division</TableTh>
-                    <TableTh>Meet Name</TableTh>
-                    <TableTh>Score</TableTh>
-                    {session?.user &&
-                        <TableTh>Actions</TableTh>
-                    }
+                        <TableTh>Date</TableTh>
+                        <TableTh>Division</TableTh>
+                        <TableTh>Meet Name</TableTh>
+                        <TableTh>Score</TableTh>
+                        {session?.user &&
+                            <TableTh>Actions</TableTh>
+                        }
                     </TableTr>
                 </TableThead>
                 <TableTbody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200' inactive={!userCan('meet', m, 'viewResults', session)}> 
+                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200' inactive={!userCan('meet', m, 'viewResults', session)}>
                                 <TableTd className='py-2'>{format(m.meetDate, 'PPP')}</TableTd>
                                 <TableTd className='pl-12 py-2'>{m.division || 'NDM'}</TableTd>
                                 <TableTd className='py-2'>{meetName(m)}</TableTd>
@@ -67,17 +65,8 @@ export default async function Page(props: {
                                         {scoreStr(m)}
                                     </a>
                                 </TableTd>
-                                {false && //meetPermissions(session, m).length > 0 &&
-                                    <TableTd>
-
-
-                                        <div className="flex items-center gap-4">
-blah
-                                        </div>
-                                    </TableTd>
-                                }
                                 <TableTd>
-                                <ActionDropdown />
+                                    <ActionDropdown />
                                 </TableTd>
                             </LinkTableRow>
                         )
