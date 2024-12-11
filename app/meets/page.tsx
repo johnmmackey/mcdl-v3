@@ -5,21 +5,23 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
-import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonalPage } from '@/app/ui/SeasonalPage';
 import { ActionDropdown } from '../ui/ActionDropdown';
+import Loading from './loading'
 
 export default async function Page(props: {
-    searchParams: Promise<{ 'season-id': number }>
+    searchParams: Promise<{ 'season-id': number, active?: Boolean }>
 }) {
 
     const searchParams = await props.searchParams;
     const currentSeason = await fetchCurrentSeason();
 
     const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeason.id;
-    const session = (await auth());
+
+    const session = await auth();
+    //const session = null;
 
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
@@ -38,7 +40,7 @@ export default async function Page(props: {
             + ' - '
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
-
+    //inactive={!userCan('meet', m, 'viewResults', session)}
     return (
         <SeasonalPage base="/meets" heading="Meet Schedule & Results" selectedSeasonId={selectedSeasonId}>
             <Table striped>
@@ -56,19 +58,28 @@ export default async function Page(props: {
                 <TableTbody>
                     {Object.entries(gmeets).map(([dt, meets], k1) =>
                         meets.map((m, k2) =>
-                            <LinkTableRow key={k2} href={`/meets/${m.id}`} className='cursor-pointer hover:bg-slate-200' inactive={!userCan('meet', m, 'viewResults', session)}>
+                            <TableTr key={k2} className='hover:bg-slate-200'>
                                 <TableTd className='py-2'>{format(m.meetDate, 'PPP')}</TableTd>
                                 <TableTd className='pl-12 py-2'>{m.division || 'NDM'}</TableTd>
-                                <TableTd className='py-2'>{meetName(m)}</TableTd>
                                 <TableTd className='py-2'>
-                                    <a href={`/meets/${m.id}`}>
-                                        {scoreStr(m)}
-                                    </a>
+                                    <Link href={`/meets/${m.id}`}>
+                                        <div className='w-96'>{meetName(m)}</div>
+                                    </Link>
                                 </TableTd>
+                                <TableTd className='py-2'>
+                                    <Link href={`/meets/${m.id}`}>
+                                        <div className='w-16'>{scoreStr(m)}</div>
+                                    </Link>
+                                </TableTd>
+
                                 <TableTd>
-                                    <ActionDropdown />
+                                    {session &&
+                                        <ActionDropdown />
+                                    }
+
                                 </TableTd>
-                            </LinkTableRow>
+
+                            </TableTr>
                         )
                     )}
                 </TableTbody>
@@ -76,3 +87,4 @@ export default async function Page(props: {
         </SeasonalPage>
     )
 }
+
