@@ -20,7 +20,8 @@ export async function fetchAgeGroups(): Promise<AgeGroup[]> {
 }
 
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
-    process.env.FETCH_DELAY && delay(Number(process.env.FETCH_DELAY) || 0);
+    console.log(`Delaying fetch by ${process.env.FETCH_DELAY || 0} ms...`)
+    await delay(Number(process.env.FETCH_DELAY) || 0);
     return await (await fetch(`${process.env.DATA_URL}/meets/${seasonId}`, { next: { revalidate: 30 } })).json();
 }
 

@@ -1,3 +1,3 @@
-export default function Loading() {
-    return <div>Loading Standings...</div>;
-  }
+import Loading from '@/app/ui/Loading'
+
+export default Loading;

@@ -7,19 +7,16 @@ import {
 import classes from './SeasonalPage.module.css';
 
 export const SeasonalPage = function ({
-  heading,
   base,
   selectedSeasonId,
   children,
 }: Readonly<{
-  heading: string,
   base: string,
   selectedSeasonId: number,
-  children: React.ReactNode;
+  children?: React.ReactNode
 }>) {
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-2xl text-bold mb-1">{heading}</h1>
       <SeasonDropdown base={base} selectedSeasonId={selectedSeasonId} />
       <div className="mt-8">
         {children}
