@@ -6,7 +6,7 @@ import {
 } from '@tabler/icons-react';
 import classes from './SeasonalPage.module.css';
 
-export const SeasonalPage = function ({
+export const SeasonSelector = async ({
   base,
   selectedSeasonId,
   children,
@@ -14,25 +14,13 @@ export const SeasonalPage = function ({
   base: string,
   selectedSeasonId: number,
   children?: React.ReactNode
-}>) {
-  return (
-    <div className="flex flex-col items-center">
-      <SeasonDropdown base={base} selectedSeasonId={selectedSeasonId} />
-      <div className="mt-8">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-const SeasonDropdown = async ({ base, selectedSeasonId }: { base: string, selectedSeasonId: number }) => {
+}>) => {
 
   const sortedSeasons = (await fetchSeasons()).sort((a, b) => {
     if (a.startDate < b.startDate) return 1;
     if (a.startDate > b.startDate) return -1;
     return 0;
   });
-
 
   return (
     <Menu transitionProps={{ exitDuration: 0 }} withinPortal>
@@ -46,13 +34,13 @@ const SeasonDropdown = async ({ base, selectedSeasonId }: { base: string, select
         {sortedSeasons.map((s, k) =>
 
           <MenuItem key={k}>
-            <Link key={k} href={base + `?season-id=${s.id}`}>{s.id.toString()}</Link>
+            <Link key={k} href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
           </MenuItem>
 
         )}
       </MenuDropdown>
     </Menu>
   )
-}
 
+}
 

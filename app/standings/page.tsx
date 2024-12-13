@@ -19,7 +19,7 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
   const fmt = (a: number | null, places?: number): string => a === null ? '' : (places ? a.toFixed(places) : a.toString());
 
   return (
-    <SeasonalPage base="/standings" heading="Divisional Standings" selectedSeasonId={selectedSeasonId}>
+    <SeasonalPage base="/standings" selectedSeasonId={selectedSeasonId}>
       {Object.entries(standings).map(([div, divResults]) =>
         <Table key={div} striped className="mb-4">
           <TableThead>

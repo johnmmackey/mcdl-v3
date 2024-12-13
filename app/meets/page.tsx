@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
-import { SeasonalPage } from '@/app/ui/SeasonalPage';
+import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import { ActionDropdown } from '../ui/ActionDropdown';
 import Loading from './loading'
 import PageTitle from '@/app/ui/PageTitle'
@@ -24,14 +24,10 @@ export default async function Page(props: {
 
     return (
         <>
-
-            <PageTitle>Meet Schedule & Results</PageTitle>
-
-            <SeasonalPage base="/meets" selectedSeasonId={selectedSeasonId}/>
-                <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
-                    <Meets season={selectedSeasonId} />
-                </Suspense>
-
+            <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
+            <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
+                <Meets season={selectedSeasonId} />
+            </Suspense>
         </>
     )
 }
