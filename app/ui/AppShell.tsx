@@ -12,7 +12,7 @@ export default function MyAppShell({
 
     return (
         <AppShell
-            header={{ height: 60 }}
+            header={{ height: 60,  }}
             navbar={{
                 width: 300,
                 breakpoint: 'sm',
@@ -27,7 +27,7 @@ export default function MyAppShell({
                     hiddenFrom="sm"
                     size="sm"
                 />
-                <div>MCDL</div>
+                <div  className='bg-blue-100'>MCDL</div>
             </AppShell.Header>
 
             <AppShell.Navbar p="md">

@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
 import { notFound } from 'next/navigation';
 
-import { SeasonalPage } from '@/app/ui/SeasonalPage';
+import {SeasonSelector} from '@/app/ui/SeasonSelector';
 
 
 export default async function Page(props: { searchParams: Promise<{ 'season-id': number }> }) {
@@ -19,7 +19,8 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
   const fmt = (a: number | null, places?: number): string => a === null ? '' : (places ? a.toFixed(places) : a.toString());
 
   return (
-    <SeasonalPage base="/standings" selectedSeasonId={selectedSeasonId}>
+    <>
+      <SeasonSelector base="/standings" selectedSeasonId={selectedSeasonId} />
       {Object.entries(standings).map(([div, divResults]) =>
         <Table key={div} striped className="mb-4">
           <TableThead>
@@ -57,7 +58,7 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
           </TableTbody>
         </Table>
       )}
-    </SeasonalPage >
+    </>
   )
 }
 
