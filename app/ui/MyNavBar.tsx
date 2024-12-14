@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Avatar } from '@mantine/core';
 import Link from 'next/link'
 import {
     IconHome,
@@ -10,12 +11,13 @@ import {
     IconDatabaseImport,
     IconFingerprint,
     IconKey,
+    IconLogin,
     IconLogout,
     IconReceipt2,
     IconSettings,
     IconSwitchHorizontal,
 } from '@tabler/icons-react';
-import { Code, Group } from '@mantine/core';
+import { signIn, signOut } from "next-auth/react"
 
 import classes from './MyNavBar.module.css';
 
@@ -30,8 +32,9 @@ const data = [
     { link: '', label: 'Other Settings', icon: IconSettings },
 ];
 
-export function MyNavBar() {
+export function MyNavBar({ session }: { session: any }) {
     const [active, setActive] = useState('Home');
+    console.log(session)
 
     const links = data.map((item) => (
         <Link
@@ -56,15 +59,24 @@ export function MyNavBar() {
             </div>
 
             <div className={classes.footer}>
-                <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-                    <IconSwitchHorizontal className={classes.linkIcon} stroke={1.5} />
-                    <span>Change account</span>
-                </a>
+                {!session?.user
+                    ? <div className={classes.link} onClick={(event) => signIn('cognito')}>
+                        <IconLogin className={classes.linkIcon} stroke={1.5} />
+                        <span>Login</span>
+                    </div>
+                    : <>
 
-                <a href="#" className={classes.link} onClick={(event) => event.preventDefault()}>
-                    <IconLogout className={classes.linkIcon} stroke={1.5} />
-                    <span>Logout</span>
-                </a>
+
+                        <div className={classes.link} onClick={(event) => signOut()}>
+                        <Avatar color="cyan" radius="xl" className="mr-2">
+                            {session.user.profile.givenName[0] + session.user.profile.familyName[0]}
+                        </Avatar>
+                            <span>Logout</span>
+                        </div>
+                    </>
+                }
+
+
             </div>
         </nav>
     );

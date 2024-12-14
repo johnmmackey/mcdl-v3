@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import sanitizeHtml from 'sanitize-html';
 import { Card, Text } from '@mantine/core';
 import { fetchPosts } from '@/app/lib/cmsdata'
 
@@ -13,7 +14,7 @@ export default async function Home() {
           </Text>
             
 
-          <div className="revertstyles" dangerouslySetInnerHTML={{ __html: p.content }} />
+          <div className="revertstyles" dangerouslySetInnerHTML={{ __html: sanitizeHtml(p.content) }} />
 
 
         </Card>

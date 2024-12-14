@@ -34,7 +34,8 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
         <MantineProvider>
-          <MyAppShell>
+          
+          <MyAppShell session={session}>
             {children}
           </MyAppShell>
         </MantineProvider>

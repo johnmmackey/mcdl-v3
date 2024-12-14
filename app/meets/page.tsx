@@ -5,6 +5,7 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
+import { Center, Grid, GridCol } from '@mantine/core';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
@@ -25,9 +26,11 @@ export default async function Page(props: {
     return (
         <>
             <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
+
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
                 <Meets season={selectedSeasonId} />
             </Suspense>
+
         </>
     )
 }
@@ -37,7 +40,6 @@ async function Meets(props: {
 }) {
 
     const session = await auth();
-
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
     const meets = await fetchMeets(props.season);
@@ -49,60 +51,54 @@ async function Meets(props: {
         if (!m.scoresPublished || !m.meetsPools.length)
             return '';
         if (m.meetsPools.length > 2)
-            return 'Full Results';
+            return 'Results';
         return m.meetsPools.find((e: any) => e.poolcode === m.visitingPool)?.score
             + ' - '
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
-    //inactive={!userCan('meet', m, 'viewResults', session)}
     return (
-        <Table striped>
-            <TableThead>
-                <TableTr>
-                    <TableTh>Date</TableTh>
-                    <TableTh>Division</TableTh>
-                    <TableTh>Meet Name</TableTh>
-                    <TableTh>Score</TableTh>
-                    {session?.user &&
-                        <TableTh>Actions</TableTh>
-                    }
-                </TableTr>
-            </TableThead>
-            <TableTbody>
-                {Object.entries(gmeets).map(([dt, meets], k1) =>
-                    meets.map((m, k2) =>
-                        <TableTr key={k2} className='hover:bg-slate-200'>
-                            <TableTd className='py-2'>{format(m.meetDate, 'PPP')}</TableTd>
-                            <TableTd className='pl-12 py-2'>{m.division || 'NDM'}</TableTd>
-                            <TableTd className='py-2'>
-                                <Link href={`/meets/${m.id}`}>
-                                    <div className='w-96'>{meetName(m)}</div>
-                                </Link>
-                            </TableTd>
-                            <TableTd className='py-2'>
-                                <Link href={`/meets/${m.id}`}>
-                                    <div className='w-16'>{scoreStr(m)}</div>
-                                </Link>
-                            </TableTd>
+        <div style={{ maxWidth: '1000px' }}>
+            {Object.entries(gmeets).map(([dt, meets], k1) =>
+                <div key={k1} className="border-2 m-8 p-4" >
 
-                            <TableTd>
+                    <div className="mb-4 font-bold">{dt}</div>
+
+                    <Grid columns={6}>
+                        <GridCol span={1} className='text-center font-semibold'>Division</GridCol>
+                        <GridCol span={3} className='text-center font-semibold'>Meet Name</GridCol>
+                        <GridCol span={1} className='text-center font-semibold'>Score</GridCol>
+                        {session?.user &&
+                            <GridCol span={1} className='text-center font-semibold'>Actions</GridCol>
+                        }
+                    </Grid>
+
+                    {meets.map((m, k2) =>
+                        <Grid key={k2} className='hover:bg-slate-200' columns={6} >
+                            <GridCol span={1} className='text-center'>{m.division || 'NDM'}</GridCol>
+                            <GridCol span={3} className=''>
+                                <Link href={`/meets/${m.id}`}>
+                                    <div>{meetName(m)}</div>
+                                </Link>
+                            </GridCol>
+                            <GridCol span={1} className='text-center'>
+                                <Link href={`/meets/${m.id}`}>
+                                    <div>{scoreStr(m)}</div>
+                                </Link>
+                            </GridCol>
+
+                            <GridCol span={1}>
+                                <Center>
                                 {session &&
                                     <ActionDropdown />
                                 }
+                                </Center>
+                            </GridCol>
 
-                            </TableTd>
-
-                        </TableTr>
-                    )
-                )}
-            </TableTbody>
-        </Table>
-
+                        </Grid>
+                    )}
+                </div>
+            )}
+        </div>
     )
 }
 
-function MeetsSkeleton() {
-    return (
-        <div>Skeleton</div>
-    )
-}

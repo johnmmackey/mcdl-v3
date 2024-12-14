@@ -48,4 +48,10 @@ Get a list of meets for a season
 * Publish - dual meets - home team rep
 * Unpublish - admin
 
+Inputs to action list:
+- logged in
+- groups/roles
+- meet type
+- meet status - published / unpublished
+
 ## Permissions Flow
