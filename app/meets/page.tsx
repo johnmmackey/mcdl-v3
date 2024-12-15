@@ -10,7 +10,7 @@ import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import { ActionDropdown } from '../ui/ActionDropdown';
-import Loading from './loading'
+import Loading from '@/app/ui/Loading'
 import PageTitle from '@/app/ui/PageTitle'
 import { Suspense } from 'react';
 
