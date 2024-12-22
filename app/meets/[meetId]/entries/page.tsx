@@ -4,7 +4,7 @@ import { Grid, GridCol } from '@mantine/core';
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups } from '@/app/lib/data';
 import strcmp from '@/app/lib/strcmp'
 import { Meet, Entry, AgeGroup } from '@/app/lib/definitions'
-import { MeetHeading, AgeGroupIterator } from '@/app/meets/[meetId]/MeetComponents'
+import { MeetHeading, AgeGroupIterator, IGroupElement, IGroupHeader } from '@/app/meets/[meetId]/MeetComponents'
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
     const params = await props.params;
@@ -25,7 +25,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
             <AgeGroupIterator
                 ageGroups={ageGroups}
                 meet={meet}
-                iteree={meetEntries}
+                iteree={meetEntries} 
                 field='ageGroupId'
                 GroupHeader={EntriesHeader}
                 GroupElement={EntriesElement}
@@ -35,7 +35,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     )
 }
 
-export const EntriesHeader = ({meet}: {meet: Meet}) =>
+export const EntriesHeader = () =>
 {
     return (
         <Grid columns={8}>
@@ -45,9 +45,9 @@ export const EntriesHeader = ({meet}: {meet: Meet}) =>
     )
 }
 
-export const EntriesElement = ({e, k, meet, ag }: {e: Entry, k:number, meet: Meet, ag: AgeGroup}) => {
+export const EntriesElement = ({e}: IGroupElement) => {
     return (
-            <Grid key={k} columns={8} className='hover:bg-slate-200'>
+            <Grid columns={8} className='hover:bg-slate-200'>
                 <GridCol span={1} className='py-1'>{e.poolcode}</GridCol>
                 <GridCol span={3} className='py-1'>{e.firstName} {e.lastName}</GridCol>
             </Grid>

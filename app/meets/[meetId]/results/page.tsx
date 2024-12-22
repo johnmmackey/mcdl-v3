@@ -1,6 +1,6 @@
 import { Grid, GridCol } from '@mantine/core';
 import { fetchTeams, fetchMeet, fetchMeetResults, fetchAgeGroups } from '@/app/lib/data';
-import { MeetHeading, MeetScore, AgeGroupIterator } from '@/app/meets/[meetId]/MeetComponents';
+import { MeetHeading, MeetScore, AgeGroupIterator, IGroupHeader, IGroupElement } from '@/app/meets/[meetId]/MeetComponents';
 import { Meet, DiverScore, AgeGroup } from '@/app/lib/definitions'
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
@@ -18,7 +18,12 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     return (
 
         <div style={{ maxWidth: '800px' }}>
-            <MeetHeading meet={meet} teams={teams}>Meet Results</MeetHeading>
+            <MeetHeading meet={meet} teams={teams}>
+                {!meet.scoresPublished &&
+                    <span className="text-red-500">Preliminary&nbsp;</span>
+                }
+                Meet Results
+            </MeetHeading>
 
             {/* Team Score */}
             {meet.scoresPublished && meet.meetType != 'Star' &&
@@ -38,7 +43,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     )
 }
 
-export const ResultsHeader = ({meet}: {meet: Meet}) =>
+export const ResultsHeader = ({meet}: IGroupHeader) =>
 {
     return (
         <Grid columns={8}>
@@ -54,9 +59,9 @@ export const ResultsHeader = ({meet}: {meet: Meet}) =>
     )
 }
 
-export const ResultsElement = ({e, k, meet, ag }: {e: DiverScore, k:number, meet: Meet, ag: AgeGroup}) => {
+export const ResultsElement = ({e, meet, ag }: IGroupElement) => {
     return (
-            <Grid key={k} columns={8} className='hover:bg-slate-200'>
+            <Grid columns={8} className='hover:bg-slate-200'>
                 <GridCol span={1} className='py-1'>{e.team}</GridCol>
                 <GridCol span={3} className='py-1'>{e.firstName} {e.lastName}</GridCol>
                 <GridCol span={1} className='py-1 text-right'>{e.score.toFixed(2)}</GridCol>
