@@ -41,13 +41,31 @@ export type Meet = {
     meetsPools: MeetPool[]
 }
 
-export type MeetResult = {
-    diverScoresByAgeGrp: {
+/*
+export type MeetResults = {
         [id: number]: DiverScore[]
-    },
-    ageGroups: AgeGroup[],
-    meet: Meet
 }
+        */
+
+export type Entry = {
+        id: number,
+        firstName: string,
+        lastName: string,
+        sex: string,
+        poolcode: string,
+        createDate: string,
+        ageGroupId: 6,
+        firstYear: boolean,
+        registrationDate: string,
+        lateRegistration: boolean
+}
+
+/*
+
+export type MeetEntries = {
+    [id: number]: Entry[]
+}
+    */
 
 export type AgeGroup = {
     id: number,
@@ -195,4 +213,9 @@ export type Menus = Menu[];
 export type Permissions = string[];
 
 
-
+export enum MeetView {
+    Entries = 1,
+    Scoring,
+    Preview,
+    Results
+}

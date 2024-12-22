@@ -34,7 +34,6 @@ const data = [
 
 export function MyNavBar({ session }: { session: any }) {
     const [active, setActive] = useState('Home');
-    console.log(session)
 
     const links = data.map((item) => (
         <Link

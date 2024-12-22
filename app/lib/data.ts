@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Team, Meet, MeetResult, Diver, AgeGroup } from "./definitions";
+import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGroup } from "./definitions";
 import jwt from "jsonwebtoken";
 
 
@@ -16,17 +16,25 @@ export async function fetchTeams(): Promise<Team[]> {
 }
 
 export async function fetchAgeGroups(): Promise<AgeGroup[]> {
-    return await (await fetch(`${process.env.DATA_URL}/agegroups`)).json();
+    return await (await fetch(`${process.env.DATA_URL}/agegroups`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
     console.log(`Delaying fetch by ${process.env.FETCH_DELAY || 0} ms...`)
     await delay(Number(process.env.FETCH_DELAY) || 0);
-    return await (await fetch(`${process.env.DATA_URL}/meets/${seasonId}`, { next: { revalidate: 30 } })).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30 } })).json();
 }
 
-export async function fetchMeetResults(meetId: number): Promise<MeetResult> {
-    return await (await fetch(`${process.env.DATA_URL}/meetresults/${meetId}`)).json();
+export async function fetchMeet(meetId: number): Promise<Meet> {
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30 } })).json();
+}
+
+export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30 } })).json();
+}
+
+export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/entries`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchStandings(seasonId: number): Promise<GroupedStandings> {

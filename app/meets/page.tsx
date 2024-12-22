@@ -26,11 +26,9 @@ export default async function Page(props: {
     return (
         <>
             <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
                 <Meets season={selectedSeasonId} />
             </Suspense>
-
         </>
     )
 }
@@ -38,8 +36,6 @@ export default async function Page(props: {
 async function Meets(props: {
     season: number
 }) {
-
-    const session = await auth();
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'poolcode');
     const meets = await fetchMeets(props.season);
@@ -56,6 +52,7 @@ async function Meets(props: {
             + ' - '
             + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
     }
+
     return (
         <div style={{ maxWidth: '1000px' }}>
             {Object.entries(gmeets).map(([dt, meets], k1) =>
@@ -63,42 +60,28 @@ async function Meets(props: {
 
                     <div className="mb-4 font-bold">{dt}</div>
 
-                    <Grid columns={6}>
+                    <Grid columns={5}>
                         <GridCol span={1} className='text-center font-semibold'>Division</GridCol>
                         <GridCol span={3} className='text-center font-semibold'>Meet Name</GridCol>
                         <GridCol span={1} className='text-center font-semibold'>Score</GridCol>
-                        {session?.user &&
-                            <GridCol span={1} className='text-center font-semibold'>Actions</GridCol>
-                        }
                     </Grid>
 
                     {meets.map((m, k2) =>
-                        <Grid key={k2} className='hover:bg-slate-200' columns={6} >
-                            <GridCol span={1} className='text-center'>{m.division || 'NDM'}</GridCol>
-                            <GridCol span={3} className=''>
-                                <Link href={`/meets/${m.id}`}>
+                        <Link key={k2} href={`/meets/${m.id}`}>
+                            <Grid key={k2} className='hover:bg-slate-200' columns={5} >
+                                <GridCol span={1} className='text-center'>{m.division || 'NDM'}</GridCol>
+                                <GridCol span={3} className=''>
                                     <div>{meetName(m)}</div>
-                                </Link>
-                            </GridCol>
-                            <GridCol span={1} className='text-center'>
-                                <Link href={`/meets/${m.id}`}>
+                                </GridCol>
+                                <GridCol span={1} className='text-center'>
                                     <div>{scoreStr(m)}</div>
-                                </Link>
-                            </GridCol>
-
-                            <GridCol span={1}>
-                                <Center>
-                                {session &&
-                                    <ActionDropdown />
-                                }
-                                </Center>
-                            </GridCol>
-
-                        </Grid>
+                                </GridCol>
+                            </Grid>
+                        </Link>
                     )}
                 </div>
             )}
-        </div>
+        </div >
     )
 }
 
