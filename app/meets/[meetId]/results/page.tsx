@@ -34,7 +34,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                 ageGroups={ageGroups}
                 meet={meet}
                 iteree={meetResults}
-                field='diverAgeGroupId'
+                field='ageGroupId'
                 GroupHeader={ResultsHeader}
                 GroupElement={ResultsElement}
                 groupSort={(a: DiverScore, b:DiverScore) => b.score - a.score}

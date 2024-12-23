@@ -76,6 +76,7 @@ export type AgeGroup = {
 }
 
 export type DiverScore = {
+    ageGroupId: number,
     scoreId: number,
     diverId: number,
     firstName: string,
