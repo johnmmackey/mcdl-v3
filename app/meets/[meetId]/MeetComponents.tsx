@@ -62,8 +62,7 @@ export interface IGroupElement {
     meet: Meet
     ag: AgeGroup
     e: any,
-    initialValues?: any[],
-    handleChange?: (e: any) => any
+    form?: any
 }
 
 export const AgeGroupIterator = ({
@@ -74,8 +73,7 @@ export const AgeGroupIterator = ({
     GroupHeader,
     GroupElement,
     groupSort,
-    initialValues,
-    handleChange
+    form
 }: Readonly<{
     ageGroups: AgeGroup[],
     meet: Meet,
@@ -84,8 +82,7 @@ export const AgeGroupIterator = ({
     GroupHeader: React.FC<IGroupHeader>,
     GroupElement: React.FC<IGroupElement>,
     groupSort: (a: any, b: any) => number,
-    initialValues? : any[],
-    handleChange?: (e: any) => any
+    form?: any
 }>) => (
     <>
         {
@@ -110,7 +107,7 @@ export const AgeGroupIterator = ({
                                 .filter(e => e[field] === ag.id)
                                 .sort(groupSort)
                                 .map((e, k1) =>
-                                    <GroupElement key={k1} meet={meet} e={e} ag={ag} initialValues={initialValues} handleChange={handleChange}/>
+                                    <GroupElement key={k1} meet={meet} e={e} ag={ag} form={form}/>
                                 )
                             }
                         </>
