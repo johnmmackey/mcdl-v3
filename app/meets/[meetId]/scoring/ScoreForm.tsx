@@ -83,28 +83,31 @@ const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
     const iVEx = !!iV?.exhibition;
     const iVDu = iV && (iV.ageGroupId !== ag.id);
 
-    let [duDisabled, setDuDisabled] = useState(iVEx);
-    let [wcDisabled, setWcDisabled] = useState(iVEx || !iVDu);
+    let [ex, setEx] = useState(iVEx);
+    let [du, setDu] = useState(iVDu);
 
-    let ex = useWatch({
+    let exNew = useWatch({
         control: form.control,
         name: e.id.toString() + '-ex',
         defaultValue: iVEx
     })
-    let du = useWatch({
+    let duNew = useWatch({
         control: form.control,
         name: e.id.toString() + '-du',
         defaultValue: iVDu
     })
 
     useEffect(() => {
-        setDuDisabled(ex);
-        setWcDisabled(ex || !du);
-        if(ex)
+        setEx(exNew);
+        setDu(duNew);
+        if(exNew)
             form.setValue(e.id.toString() + '-du', false)
-        if(ex || !du)
+        if(exNew|| !duNew)
             form.setValue(e.id.toString() + '-wc', '')
-    }, [ex, du, setDuDisabled])
+    }, [exNew, duNew, setEx, setDu])
+
+    if(e.id == 5384)
+        console.log('***', ex, du)
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
@@ -118,11 +121,11 @@ const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
             </GridCol>
 
             <GridCol span={1} className='mt-2'>
-                <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={duDisabled} />
+                <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
             </GridCol>
 
             <GridCol span={2} className='w-24'>
-                <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={wcDisabled} />
+                <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
             </GridCol>
 
         </Grid>
