@@ -2,13 +2,14 @@
 import { AppShell, Group, Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { MyNavBar } from '@/app/ui/MyNavBar'
+import { Session } from 'next-auth';
 
 export default function MyAppShell({
     children,
     session
 }: Readonly<{
     children: React.ReactNode;
-    session: any
+    session: Session | null
 }>) {
     const [opened, { toggle }] = useDisclosure();
     return (
@@ -35,7 +36,7 @@ export default function MyAppShell({
             </AppShell.Header>
 
             <AppShell.Navbar p="md" onClick={toggle}>
-                <MyNavBar session={session} onClick={toggle}/>
+                <MyNavBar session={session} toggle={toggle}/>
             </AppShell.Navbar>
 
             <AppShell.Main>

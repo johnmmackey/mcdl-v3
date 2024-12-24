@@ -4,14 +4,12 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
-import { Center, Grid, GridCol } from '@mantine/core';
+import { Grid, GridCol } from '@mantine/core';
 import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
-import { ActionDropdown } from '../ui/ActionDropdown';
 import Loading from '@/app/ui/Loading'
-import PageTitle from '@/app/ui/PageTitle'
+import { Meet, MeetPool } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 
 export default async function Page(props: {
@@ -42,15 +40,15 @@ async function Meets(props: {
     const smeets = sortBy(meets, ['meetDate', 'division']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
-    const meetName = (m: any) => m.name || (m.hostPool && m.visitingPool && `${kteams[m.visitingPool].name} at ${kteams[m.hostPool].name}`);
-    const scoreStr = (m: any) => {
+    const meetName = (m: Meet) => m.name || (m.hostPool && m.visitingPool && `${kteams[m.visitingPool].name} at ${kteams[m.hostPool].name}`);
+    const scoreStr = (m: Meet) => {
         if (!m.scoresPublished || !m.meetsPools.length)
             return '';
         if (m.meetsPools.length > 2)
             return 'Results';
-        return m.meetsPools.find((e: any) => e.poolcode === m.visitingPool)?.score
+        return m.meetsPools.find(e => e.poolcode === m.visitingPool)?.score
             + ' - '
-            + m.meetsPools.find((e: any) => e.poolcode === m.hostPool)?.score;
+            + m.meetsPools.find(e => e.poolcode === m.hostPool)?.score;
     }
 
     return (

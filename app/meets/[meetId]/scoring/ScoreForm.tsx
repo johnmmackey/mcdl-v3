@@ -22,27 +22,10 @@ export default ({
     meetEntries: Entry[],
     meetResults: DiverScore[]
 }>) => {
-    /*
-        const initialValues = meetResults.reduce( (acc, mr) => {
-            acc[mr.diverId + '-score'] = mr.score;
-            acc[mr.diverId + '-ex'] = !!mr.exhibition;
-            acc[mr.diverId + '-du'] = !!(mr.ageGroupId != mr.diverAgeGroupId);
-            acc[mr.diverId + '-wc'] = mr.diverAgeGroupScore || '';
-            return acc;
-        }, {});
-    */
-    //console.log(initialValues)
 
     const form = useForm();
     const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
-    /*
-        useEffect(() => {
-            const { unsubscribe } = form.watch((value, {name, type}) => {
-              console.log('***', value, name, type)
-            })
-            return () => unsubscribe()
-          }, [form.watch])
-    */
+
     return (
 
 
@@ -58,10 +41,8 @@ export default ({
                         groupSort={(a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName)}
                         form={form}
                         initialValues={meetResults}
-                    >
+                    />
 
-                        </AgeGroupIterator>
-        
                     <button type="submit" disabled={false}>
                         Submit
                     </button>
@@ -142,42 +123,3 @@ const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
     )
 }
 
-
-/*
-const initialState: Record<string, any> = {
-    ex: !!iV?.exhibition,
-    score: iV?.score || '',
-    du: !!(iV && iV.ageGroupId !== ag.id),  //ageGroupId is where the diver SCORED, not the ageGroup of the diver
-    wc: iV?.diverAgeGroupScore || ''
-}
-*/
-//let [state, setState] = useState(initialState);
-/*
-let [ex, setEx] = useState(!!iV?.exhibition);
-let [score, setScore] = useState(iV?.score || '');
-let [du, setDu] = useState(!!(iV && iV.ageGroupId !== ag.id));
-let [wc, setWc] = useState(iV?.diverAgeGroupScore || '');
-const handleChangeEx = () => null;
-const handleChangeDu = handleChangeEx
-*/
-
-/*    const handleChangeEx = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-        setEx(event.target.checked);
-
-        // side effects
-        if (event.target.checked) {
-            setWc('');
-            setDu(false);
-        }
-    }
-
-    const handleChangeDu = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setDu(event.target.checked);
-
-        // side effects
-        if (!event.target.checked)
-            setWc('');
-    }
-*/
-//const a = useWatch({control: form.control, name: e.id.toString() + '-ex'});

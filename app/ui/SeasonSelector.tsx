@@ -4,7 +4,7 @@ import { Menu, MenuTarget, MenuDropdown, MenuItem, Button } from '@mantine/core'
 import {
   IconChevronDown,
 } from '@tabler/icons-react';
-import classes from './SeasonalPage.module.css';
+//import classes from './SeasonalPage.module.css';
 
 export const SeasonSelector = async ({
   base,
@@ -25,7 +25,7 @@ export const SeasonSelector = async ({
   return (
     <Menu transitionProps={{ exitDuration: 0 }} withinPortal>
       <MenuTarget>
-        <Button rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12} className={classes.button}>
+        <Button rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12} variant='default'>
           {selectedSeasonId}
         </Button>
 

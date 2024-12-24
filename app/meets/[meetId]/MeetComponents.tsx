@@ -2,7 +2,7 @@
 import React from 'react';
 import { Grid, GridCol } from '@mantine/core'
 import { format } from 'date-fns';
-import { AgeGroup, Meet, Team } from '@/app/lib/definitions';
+import { AgeGroup, DiverScore, Meet, Team, Entry } from '@/app/lib/definitions';
 
 export const MeetHeading = ({
     meet,
@@ -61,9 +61,9 @@ export interface IGroupHeader {
 export interface IGroupElement {
     meet: Meet
     ag: AgeGroup
-    e: any,
+    e: DiverScore | Entry,
     form?: any
-    initialValues: any
+    initialValues?: DiverScore[] | Entry[]
 }
 
 export const AgeGroupIterator = ({
@@ -76,7 +76,6 @@ export const AgeGroupIterator = ({
     groupSort,
     form,
     initialValues,
-    children
 }: Readonly<{
     ageGroups: AgeGroup[],
     meet: Meet,
@@ -86,8 +85,7 @@ export const AgeGroupIterator = ({
     GroupElement: React.FC<IGroupElement>,
     groupSort: (a: any, b: any) => number,
     form?: any,
-    initialValues?: any
-    children?: any
+    initialValues?: DiverScore[] | Entry[]
 }>) => (
     <>
         {
@@ -120,7 +118,6 @@ export const AgeGroupIterator = ({
                 </div>
             )
         }
-        {children}
     </>
 )
 

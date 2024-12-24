@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Avatar } from '@mantine/core';
 import Link from 'next/link'
+import { Session } from 'next-auth';
 import {
     IconHome,
     IconScubaDiving,
@@ -32,7 +33,7 @@ const data = [
     { link: '', label: 'Other Settings', icon: IconSettings },
 ];
 
-export function MyNavBar({ session }: { session: any }) {
+export function MyNavBar({ session, toggle }: { session: Session | null, toggle: ()=>void }) {
     const [active, setActive] = useState('Home');
 
     const links = data.map((item) => (
@@ -52,7 +53,7 @@ export function MyNavBar({ session }: { session: any }) {
     ));
 
     return (
-        <nav className={classes.navbar}>
+        <nav className={classes.navbar} onClick={toggle}>
             <div className={classes.navbarMain}>
                 {links}
             </div>
