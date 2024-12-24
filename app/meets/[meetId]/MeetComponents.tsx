@@ -75,7 +75,8 @@ export const AgeGroupIterator = ({
     GroupElement,
     groupSort,
     form,
-    initialValues
+    initialValues,
+    children
 }: Readonly<{
     ageGroups: AgeGroup[],
     meet: Meet,
@@ -86,6 +87,7 @@ export const AgeGroupIterator = ({
     groupSort: (a: any, b: any) => number,
     form?: any,
     initialValues?: any
+    children?: any
 }>) => (
     <>
         {
@@ -118,6 +120,7 @@ export const AgeGroupIterator = ({
                 </div>
             )
         }
+        {children}
     </>
 )
 

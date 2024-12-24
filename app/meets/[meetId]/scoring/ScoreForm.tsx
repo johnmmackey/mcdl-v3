@@ -1,5 +1,5 @@
 "use client";
-//import { Formik, Form, Field, ErrorMessage } from 'formik';
+
 import React, { useState, useEffect } from 'react';
 import { Grid, GridCol, NumberInput, TextInput, Checkbox } from '@mantine/core';
 import { useForm, SubmitHandler, useWatch } from "react-hook-form"
@@ -44,22 +44,29 @@ export default ({
           }, [form.watch])
     */
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-            <AgeGroupIterator
-                ageGroups={ageGroups}
-                meet={meet}
-                iteree={meetEntries}
-                field='ageGroupId'
-                GroupHeader={ScoringHeader}
-                GroupElement={ScoringElement}
-                groupSort={(a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName)}
-                form={form}
-                initialValues={meetResults}
-            />
-            <button type="submit" disabled={false}>
-                Submit
-            </button>
-        </form>
+
+
+                <form>
+
+                    <AgeGroupIterator
+                        ageGroups={ageGroups}
+                        meet={meet}
+                        iteree={meetEntries}
+                        field='ageGroupId'
+                        GroupHeader={ScoringHeader}
+                        GroupElement={ScoringElement}
+                        groupSort={(a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName)}
+                        form={form}
+                        initialValues={meetResults}
+                    >
+
+                        </AgeGroupIterator>
+        
+                    <button type="submit" disabled={false}>
+                        Submit
+                    </button>
+
+                </form>
 
     )
 }
@@ -90,43 +97,46 @@ const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
         control: form.control,
         name: e.id.toString() + '-ex',
         defaultValue: iVEx
-    })
+    });
+
     let duNew = useWatch({
         control: form.control,
         name: e.id.toString() + '-du',
         defaultValue: iVDu
-    })
+    });
 
     useEffect(() => {
         setEx(exNew);
         setDu(duNew);
-        if(exNew)
-            form.setValue(e.id.toString() + '-du', false)
-        if(exNew|| !duNew)
-            form.setValue(e.id.toString() + '-wc', '')
-    }, [exNew, duNew, setEx, setDu])
+        if (exNew)
+            form.setValue(e.id.toString() + '-du', false);
+        if (exNew || !duNew)
+            form.setValue(e.id.toString() + '-wc', '');
+    }, [form, exNew, duNew, setEx, setDu]);
 
-    if(e.id == 5384)
+    if (e.id == 5384) {
         console.log('***', ex, du)
+    }
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
             <GridCol span={1} className='mt-2'>{e.poolcode}</GridCol>
             <GridCol span={3} className='mt-2'>{e.firstName} {e.lastName}</GridCol>
-            <GridCol span={1} className='mt-2'>
-                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
-            </GridCol>
-            <GridCol span={2}>
-                <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
-            </GridCol>
 
-            <GridCol span={1} className='mt-2'>
-                <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
-            </GridCol>
+                    <GridCol span={1} className='mt-2'>
+                        <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
+                    </GridCol>
+                    <GridCol span={2}>
+                        <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
+                    </GridCol>
 
-            <GridCol span={2} className='w-24'>
-                <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
-            </GridCol>
+                    <GridCol span={1} className='mt-2'>
+                        <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
+                    </GridCol>
+
+                    <GridCol span={2} className='w-24'>
+                        <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
+                    </GridCol>
 
         </Grid>
     )

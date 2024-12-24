@@ -34,8 +34,8 @@ export default function MyAppShell({
                 </Group>
             </AppShell.Header>
 
-            <AppShell.Navbar p="md">
-                <MyNavBar session={session}/>
+            <AppShell.Navbar p="md" onClick={toggle}>
+                <MyNavBar session={session} onClick={toggle}/>
             </AppShell.Navbar>
 
             <AppShell.Main>

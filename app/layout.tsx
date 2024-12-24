@@ -31,6 +31,10 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <ColorSchemeScript />
+        <meta
+          name="format-detection"
+          content="telephone=no, date=no, email=no, adddress=no"
+        />
       </head>
       <body className={inter.className}>
         <MantineProvider>

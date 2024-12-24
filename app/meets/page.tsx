@@ -67,7 +67,7 @@ async function Meets(props: {
                     </Grid>
 
                     {meets.map((m, k2) =>
-                        <Link key={k2} href={`/meets/${m.id}`}>
+                        <Link key={k2} href={`/meets/${m.id}/scoring`}>
                             <Grid key={k2} className='hover:bg-slate-200' columns={5} >
                                 <GridCol span={1} className='text-center'>{m.division || 'NDM'}</GridCol>
                                 <GridCol span={3} className=''>
