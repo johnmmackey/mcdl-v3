@@ -27,27 +27,22 @@ export default ({
     const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data)
 
     return (
+        <form>
+            <AgeGroupIterator
+                ageGroups={ageGroups}
+                meet={meet}
+                iteree={meetEntries}
+                field='ageGroupId'
+                GroupHeader={ScoringHeader}
+                GroupElement={ScoringElement}
+                groupSort={(a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName)}
+                eProps={{form, meetResults}}
+            />
+            <button type="submit" disabled={false}>
+                Submit
+            </button>
 
-
-                <form>
-
-                    <AgeGroupIterator
-                        ageGroups={ageGroups}
-                        meet={meet}
-                        iteree={meetEntries}
-                        field='ageGroupId'
-                        GroupHeader={ScoringHeader}
-                        GroupElement={ScoringElement}
-                        groupSort={(a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName)}
-                        form={form}
-                        initialValues={meetResults}
-                    />
-
-                    <button type="submit" disabled={false}>
-                        Submit
-                    </button>
-
-                </form>
+        </form>
 
     )
 }
@@ -65,8 +60,8 @@ const ScoringHeader = () => (
     </Grid>
 )
 
-const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
-    const iV: DiverScore = initialValues?.find((iv: DiverScore) => iv.diverId === e.id);
+const ScoringElement = ({ ag, e, eProps: {form, meetResults} }: IGroupElement) => {
+    const iV = meetResults?.find((iv: DiverScore) => iv.diverId === e.id);
 
     const iVEx = !!iV?.exhibition;
     const iVDu = iV && (iV.ageGroupId !== ag.id);
@@ -104,20 +99,20 @@ const ScoringElement = ({ ag, e, form, initialValues }: IGroupElement) => {
             <GridCol span={1} className='mt-2'>{e.poolcode}</GridCol>
             <GridCol span={3} className='mt-2'>{e.firstName} {e.lastName}</GridCol>
 
-                    <GridCol span={1} className='mt-2'>
-                        <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
-                    </GridCol>
-                    <GridCol span={2}>
-                        <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
-                    </GridCol>
+            <GridCol span={1} className='mt-2'>
+                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
+            </GridCol>
+            <GridCol span={2}>
+                <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
+            </GridCol>
 
-                    <GridCol span={1} className='mt-2'>
-                        <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
-                    </GridCol>
+            <GridCol span={1} className='mt-2'>
+                <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
+            </GridCol>
 
-                    <GridCol span={2} className='w-24'>
-                        <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
-                    </GridCol>
+            <GridCol span={2} className='w-24'>
+                <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
+            </GridCol>
 
         </Grid>
     )
