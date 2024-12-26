@@ -90,17 +90,13 @@ const ScoringElement = ({ ag, e, eProps: {form, meetResults} }: IGroupElement) =
             form.setValue(e.id.toString() + '-wc', '');
     }, [form, exNew, duNew, setEx, setDu]);
 
-    if (e.id == 5384) {
-        console.log('***', ex, du)
-    }
-
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
             <GridCol span={1} className='mt-2'>{e.poolcode}</GridCol>
             <GridCol span={3} className='mt-2'>{e.firstName} {e.lastName}</GridCol>
 
             <GridCol span={1} className='mt-2'>
-                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
+                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex', {onChange: (e)=>console.log(e)})} />
             </GridCol>
             <GridCol span={2}>
                 <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
