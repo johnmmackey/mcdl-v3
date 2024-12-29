@@ -58,7 +58,9 @@ export const MeetScore = ({
 export interface IGroupHeader {
     meet: Meet
 }
+
 export interface IGroupElement {
+    k: number,
     meet: Meet
     ag: AgeGroup
     e: any,
@@ -107,7 +109,7 @@ export const AgeGroupIterator = ({
                                 .filter(e => e[field] === ag.id)
                                 .sort(groupSort)
                                 .map((e, k1) =>
-                                    <GroupElement key={k1} meet={meet} e={e} ag={ag} eProps={eProps}/>
+                                    <GroupElement key={k1} k={k1} meet={meet} e={e} ag={ag} eProps={eProps}/>
                                 )
                             }
                         </>

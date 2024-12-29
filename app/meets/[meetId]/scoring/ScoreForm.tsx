@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Grid, GridCol, NumberInput, TextInput, Checkbox } from '@mantine/core';
+import React, { useState, useEffect, useRef } from 'react';
+import { Grid, GridCol, TextInput, Checkbox } from '@mantine/core';
 import { useForm, SubmitHandler, useWatch } from "react-hook-form"
 import { AgeGroupIterator, IGroupElement, IGroupHeader } from '../MeetComponents';
 import { AgeGroup, Meet, Team, Entry, DiverScore } from '@/app/lib/definitions';
 import strcmp from '@/app/lib/strcmp'
+import { NumberInput } from '@/app/ui/MyNumberInput'
 
 type Inputs = Record<string, any>
 
@@ -60,54 +61,73 @@ const ScoringHeader = () => (
     </Grid>
 )
 
-const ScoringElement = ({ ag, e, eProps: {form, meetResults} }: IGroupElement) => {
+const ScoringElement = ({ ag, e, k, eProps: {form, meetResults} }: IGroupElement) => {
     const iV = meetResults?.find((iv: DiverScore) => iv.diverId === e.id);
+    const ref = useRef(null);
 
     const iVEx = !!iV?.exhibition;
     const iVDu = iV && (iV.ageGroupId !== ag.id);
 
-    let [ex, setEx] = useState(iVEx);
-    let [du, setDu] = useState(iVDu);
-
-    let exNew = useWatch({
+    let ex = useWatch({
         control: form.control,
         name: e.id.toString() + '-ex',
         defaultValue: iVEx
     });
 
-    let duNew = useWatch({
+    let du = useWatch({
         control: form.control,
         name: e.id.toString() + '-du',
         defaultValue: iVDu
     });
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+            alert('pressed on element '+k)
+        }
+      };
+
     useEffect(() => {
-        setEx(exNew);
-        setDu(duNew);
-        if (exNew)
+        if (ex)
             form.setValue(e.id.toString() + '-du', false);
-        if (exNew || !duNew)
+        if (ex || !du)
             form.setValue(e.id.toString() + '-wc', '');
-    }, [form, exNew, duNew, setEx, setDu]);
+    }, [form, ex, du]);
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
             <GridCol span={1} className='mt-2'>{e.poolcode}</GridCol>
-            <GridCol span={3} className='mt-2'>{e.firstName} {e.lastName}</GridCol>
+            <GridCol span={3} className='mt-2'><span className="text-lg font-semibold">{e.lastName}</span>, {e.firstName}</GridCol>
 
             <GridCol span={1} className='mt-2'>
-                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex', {onChange: (e)=>console.log(e)})} />
+                <Checkbox defaultChecked={iVEx} {...form.register(e.id.toString() + '-ex')} />
             </GridCol>
             <GridCol span={2}>
-                <TextInput className='w-24' defaultValue={iV?.score || ''}{...form.register(e.id.toString() + '-score')} />
+                <NumberInput
+                    id={'score-index-'+k.toString()}
+                    className='w-16'
+                    control={form.control}
+                    defaultValue={iV?.score || ''}
+                    name={e.id.toString() + '-score'}
+                    onKeyDown={handleKeyDown}
+                    hideControls
+                />
             </GridCol>
 
             <GridCol span={1} className='mt-2'>
                 <Checkbox defaultChecked={iVDu} {...form.register(e.id.toString() + '-du')} disabled={ex} />
             </GridCol>
 
-            <GridCol span={2} className='w-24'>
-                <TextInput className='w-24' defaultValue={iV?.diverAgeGroupScore || ''} {...form.register(e.id.toString() + '-wc')} disabled={!du} />
+            <GridCol span={2}>
+                <NumberInput
+                    className='w-16'
+                    control={form.control}
+                    defaultValue={iV?.diverAgeGroupScore || ''}
+                    name={e.id.toString() + '-wc'}
+                    onKeyDown={handleKeyDown}
+                    disabled={!du}
+                    hideControls
+                />
             </GridCol>
 
         </Grid>
