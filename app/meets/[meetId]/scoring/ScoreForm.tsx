@@ -37,8 +37,10 @@ export default ({
         ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.id) || null })
     );
 
+    console.log(form.formState.errors);
+
     return (
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
             <AgeGroupGrid
                 GroupHeader={ScoringHeader}
                 ageGroups={ageGroups}
@@ -53,6 +55,7 @@ export default ({
                     )
                 }}
             />
+
             <button type="submit" disabled={false}>
                 Submit
             </button>
@@ -71,7 +74,7 @@ const ScoringHeader = () => (
     </Grid>
 )
 
-const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn}) => {
+const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn }) => {
     const iV = entry.result;
 
     const iVEx = !!iV?.exhibition;
@@ -112,14 +115,17 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                     className="w-24"
                     {...form.register('score.' + ag.id + '.' + k,
                         {
-                            min: 0,
-                            max: 999,
+                            min: { value: 0, message: 'no negs' },
+                            max: { value: 999, message: 'max 999' },
+                            pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: '2 digit' },
                             required: false,
                         }
                     )}
                     defaultValue={iV?.score || ''}
-                    step={0.01}
                 />
+                {(form.formState.errors.score)?.[ag.id]?.[k] &&
+                    <span className='text-red-500'>{form.formState.errors.score?.[ag.id]?.[k].message}</span>
+                }
             </GridCol>
 
             <GridCol span={1} className='mt-2'>
