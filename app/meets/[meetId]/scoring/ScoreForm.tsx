@@ -43,16 +43,12 @@ export default ({
                 GroupHeader={ScoringHeader}
                 ageGroups={ageGroups}
                 renderContent={(ag: AgeGroup) => {
-                    const refs: React.RefObject<HTMLInputElement>[] = [];
-                    const registerRef = (k: number, ref: React.RefObject<HTMLInputElement>) => refs[k] = ref;
-                    const onEnter = (k: number) => refs[k + 1]?.current.focus();
-
                     return (
                         entriesWithResults
                             .filter(e => e.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
-                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} registerRef={registerRef} onEnter={onEnter} />
+                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} />
                             )
                     )
                 }}
@@ -75,10 +71,8 @@ const ScoringHeader = () => (
     </Grid>
 )
 
-const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, registerRef: any, onEnter: any }) => {
+const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn}) => {
     const iV = entry.result;
-    const scoreRef = useRef<HTMLInputElement | null>(null);
-    registerRef(k, scoreRef);
 
     const iVEx = !!iV?.exhibition;
     const iVDu = !!(iV && (iV.ageGroupId !== ag.id));
@@ -94,21 +88,6 @@ const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeG
         name: entry.id.toString() + '-du',
         defaultValue: iVDu
     });
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            onEnter(k);
-        }
-    };
-
-    const { ref, ...rest } = form.register('score.' + ag.id + '.' + k,
-        {
-            min: 0,
-            max: 999,
-            required: false,
-        }
-    );
 
     useEffect(() => {
         if (ex)
@@ -129,14 +108,15 @@ const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeG
 
             <GridCol span={2}>
                 <input
-                    ref={(e) => {
-                        ref(e);
-                        scoreRef.current = e;
-                    }}
                     type="number"
                     className="w-24"
-                    {...rest}
-                    onKeyDown={handleKeyDown}
+                    {...form.register('score.' + ag.id + '.' + k,
+                        {
+                            min: 0,
+                            max: 999,
+                            required: false,
+                        }
+                    )}
                     defaultValue={iV?.score || ''}
                     step={0.01}
                 />
@@ -158,7 +138,6 @@ const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeG
                         }
                     )}
                     defaultValue={iV?.diverAgeGroupScore || ''}
-                    onKeyDown={handleKeyDown}
                     disabled={!du}
                     step={0.01}
                 />
