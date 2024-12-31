@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React, { RefObject, useEffect, useRef } from 'react';
 import { Grid, GridCol } from '@mantine/core';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
 import { AgeGroupGrid, } from '../MeetComponents';
@@ -8,7 +8,7 @@ import { AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
 import strcmp from '@/app/lib/strcmp'
 
 type Inputs = Record<string, any>
-type EntryWithResult = Entry & {result: DiverScore | null}
+type EntryWithResult = Entry & { result: DiverScore | null }
 
 export default ({
     ageGroups,
@@ -23,15 +23,23 @@ export default ({
     const form = useForm();
     const onSubmit: SubmitHandler<Inputs> = (data) => {
         console.log(data);
+        let diverIds = data.diverId.flat();
+        let scores = data.score.flat();
+        let ex = data.ex.flat();
+        let du = data.du.flat();
+        let wc = data.wc.flat();
+
+        let results = diverIds.map((d: number, k: number) => ({ diverId: d, score: scores[k], ex: ex[k], du: du[k], wc: wc[k] }));
+        console.log(results);
     }
 
-    const entriesWithResults: EntryWithResult[] = meetEntries.map(e => 
-        ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.id) || null})
+    const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
+        ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.id) || null })
     );
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
-            <AgeGroupGrid 
+            <AgeGroupGrid
                 GroupHeader={ScoringHeader}
                 ageGroups={ageGroups}
                 renderContent={(ag: AgeGroup) => {
@@ -44,7 +52,7 @@ export default ({
                             .filter(e => e.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
-                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} registerRef={registerRef} onEnter={onEnter}/>
+                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} registerRef={registerRef} onEnter={onEnter} />
                             )
                     )
                 }}
@@ -69,7 +77,7 @@ const ScoringHeader = () => (
 
 const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, registerRef: any, onEnter: any }) => {
     const iV = entry.result;
-    const scoreRef = useRef(null);
+    const scoreRef = useRef<HTMLInputElement | null>(null);
     registerRef(k, scoreRef);
 
     const iVEx = !!iV?.exhibition;
@@ -94,13 +102,19 @@ const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeG
         }
     };
 
-    const  {ref, ...rest} = form.register('score.'+ag.id+'.'+k);
+    const { ref, ...rest } = form.register('score.' + ag.id + '.' + k,
+        {
+            min: 0,
+            max: 999,
+            required: false,
+        }
+    );
 
     useEffect(() => {
         if (ex)
-            form.setValue('du.'+ag.id+'.'+k, false);
+            form.setValue('du.' + ag.id + '.' + k, false);
         if (ex || !du)
-            form.setValue('wc.'+ag.id+'.'+k, '');
+            form.setValue('wc.' + ag.id + '.' + k, '');
     }, [form, ex, du]);
 
     return (
@@ -109,33 +123,44 @@ const ScoringElement = ({ ag, entry, k, form, registerRef, onEnter }: { ag: AgeG
             <GridCol span={3} className='mt-2'><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
 
             <GridCol span={1} className='mt-2'>
-                <input type="hidden" {...form.register('diverId.'+ag.id+'.'+k)} value={entry.id.toString()} />
-                <input type="checkbox" defaultChecked={iVEx} {...form.register('ex.'+ag.id+'.'+k)} />
+                <input type="hidden" {...form.register('diverId.' + ag.id + '.' + k)} value={entry.id.toString()} />
+                <input type="checkbox" defaultChecked={iVEx} {...form.register('ex.' + ag.id + '.' + k)} />
             </GridCol>
-            
+
             <GridCol span={2}>
                 <input
-                    ref={scoreRef}
+                    ref={(e) => {
+                        ref(e);
+                        scoreRef.current = e;
+                    }}
                     type="number"
                     className="w-24"
                     {...rest}
                     onKeyDown={handleKeyDown}
                     defaultValue={iV?.score || ''}
-                    />
+                    step={0.01}
+                />
             </GridCol>
 
             <GridCol span={1} className='mt-2'>
-                <input type="checkbox" defaultChecked={iVDu} {...form.register('du.'+ag.id+'.'+k)} disabled={ex} />
+                <input type="checkbox" defaultChecked={iVDu} {...form.register('du.' + ag.id + '.' + k)} disabled={ex} />
             </GridCol>
 
             <GridCol span={2}>
                 <input
                     type="number"
                     className='w-24'
-                    {...form.register('wc.'+ag.id+'.'+k)}
+                    {...form.register('wc.' + ag.id + '.' + k,
+                        {
+                            min: 0,
+                            max: 999,
+                            required: false,
+                        }
+                    )}
                     defaultValue={iV?.diverAgeGroupScore || ''}
                     onKeyDown={handleKeyDown}
                     disabled={!du}
+                    step={0.01}
                 />
             </GridCol>
         </Grid>

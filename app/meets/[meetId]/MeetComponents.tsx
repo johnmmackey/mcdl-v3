@@ -75,11 +75,11 @@ export const AgeGroupGrid = ({
                                 <GridCol span={1} className='font-bold text-xl'>{ageGroup.name}</GridCol>
                             </Grid>
                             <GroupHeader />
-                            <Filler>
+                            <Placeholder>
                                 {
                                     renderContent(ageGroup)
                                 }
-                            </Filler>
+                            </Placeholder>
                         </div>
                     )
                 })
@@ -88,7 +88,7 @@ export const AgeGroupGrid = ({
     )
 }
 
-const Filler = ({
+const Placeholder = ({
     children
 }: Readonly<{
     children?: any
@@ -103,7 +103,6 @@ const Filler = ({
             </Grid>
     )
 }
-
 
 const team = (teams: Team[], poolcode: string | null) => teams.find(e => e.poolcode === poolcode);
 
