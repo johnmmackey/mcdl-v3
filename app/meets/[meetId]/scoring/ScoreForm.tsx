@@ -9,7 +9,21 @@ import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
 
 type Inputs = Record<string, any>
-type EntryWithResult = Entry & { result: DiverScore | null }
+type EntryWithResult = Entry & { result: DiverScore | null };
+
+const errorMatrix: Record<string, any> = {
+    score: {
+        max: '< 999',
+        min: '>= 0',
+        pattern: 'Max 2 decimal places',
+    },
+    wc: {
+        max: '< 999',
+        min: '>= 0',
+        pattern: '<= 2 decimal places',
+        lessThanScore: '<= Score',
+    }
+}
 
 export default ({
     ageGroups,
@@ -71,6 +85,9 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
     const iV = entry.result;
     const errors = (form.formState.errors?.f as unknown as Array<any>)?.[ag.id]?.[k];
 
+    if (ag.id === 1 && k === 0)
+        console.log(errors)
+
     const iVEx = !!iV?.exhibition;
     const iVDu = !!(iV && (iV.ageGroupId !== ag.id));
 
@@ -109,16 +126,16 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                     className={`${styles.scoreInput} ${errors?.score ? styles.scoreError : ''}`}
                     {...form.register(fName(ag.id, k, 'score'),
                         {
-                            min: { value: 0, message: 'Must be > 0 or blank' },
-                            max: { value: 999, message: 'Max Score is 999' },
-                            pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: 'Max 2 decimal places' },
+                            min: 0,
+                            max: 999, 
+                            pattern: /^\d{1,3}(\.\d{1,2})?$/, 
                             required: false,
                         }
                     )}
                     defaultValue={iV?.score || ''}
                 />
                 {errors?.score &&
-                    <div className='text-red-500'>{errors.score.message}</div>
+                    <div className='text-red-500'>{errorMatrix['score'][errors.score.type]}</div>
                 }
             </GridCol>
 
@@ -136,6 +153,9 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                             max: { value: 999, message: 'Max Score is 999' },
                             pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: 'Max 2 decimal places' },
                             required: false,
+                            validate: {
+                                lessThanScore: v => v <= form.getValues(fName(ag.id, k, 'score'))
+                            }
                         }
                     )}
                     defaultValue={iV?.diverAgeGroupScore || ''}
@@ -143,7 +163,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                     step={0.01}
                 />
                 {errors?.wc &&
-                    <div className='text-red-500'>{errors.wc.message}</div>
+                    <div className='text-red-500'>{errorMatrix['wc'][errors.wc.type]}</div>
                 }
             </GridCol>
         </Grid>
