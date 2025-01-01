@@ -1,9 +1,6 @@
-import { Grid, GridCol } from '@mantine/core';
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups, fetchMeetResults } from '@/app/lib/data';
-import strcmp from '@/app/lib/strcmp'
-import { Entry } from '@/app/lib/definitions'
-import WrappedScoreForm from './WrappedScoreForm';
-import { MeetHeading, AgeGroupIterator, IGroupElement, IGroupHeader } from '@/app/meets/[meetId]/MeetComponents'
+import ScoreForm from './WrappedScoreForm';
+import { MeetHeading} from '@/app/meets/[meetId]/MeetComponents'
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
     const params = await props.params;
@@ -18,13 +15,9 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
         ]
     );
     return (
-
         <div style={{ maxWidth: '800px' }}>
             <MeetHeading meet={meet} teams={teams}>Meet Scoring</MeetHeading>
-            
-            <WrappedScoreForm ageGroups={ageGroups} meet={meet} teams={teams} meetEntries={meetEntries} meetResults={meetResults}/>
-
-
+            <ScoreForm ageGroups={ageGroups} meetEntries={meetEntries} meetResults={meetResults}/>
         </div>
     )
 }

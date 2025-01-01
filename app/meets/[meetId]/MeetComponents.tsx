@@ -55,68 +55,56 @@ export const MeetScore = ({
     </div>
 )
 
-export interface IGroupHeader {
-    meet: Meet
-}
-export interface IGroupElement {
-    meet: Meet
-    ag: AgeGroup
-    e: any,
-    eProps: any
-}
-
-export const AgeGroupIterator = ({
+export const AgeGroupGrid = ({
     ageGroups,
-    meet,
-    iteree,
-    field,
     GroupHeader,
-    GroupElement,
-    groupSort,
-    eProps
+    renderContent,
 }: Readonly<{
     ageGroups: AgeGroup[],
-    meet: Meet,
-    iteree: any[],
-    field: string,
-    GroupHeader: React.FC<IGroupHeader>,
-    GroupElement: React.FC<IGroupElement>,
-    groupSort: (a: any, b: any) => number,
-    eProps?: any
-}>) => (
-    <>
-        {
-            ageGroups.map((ag, k) =>
-                <div key={k} className='my-8'>
-                    <Grid columns={1}>
-                        <GridCol span={1} className='font-bold text-xl'>{ag.name}</GridCol>
-                    </Grid>
+    GroupHeader: React.FC,
+    renderContent: any,
+}>) => {
+    return (
+        <>
+            {
+                ageGroups.map((ageGroup, k1) => {
+                    return (
+                        <div key={k1} className='my-8'>
+                            {/* Preset an age group title */}
+                            <Grid columns={1}>
+                                <GridCol span={1} className='font-bold text-xl'>{ageGroup.name}</GridCol>
+                            </Grid>
+                            <div className='ml-4'>
+                                <GroupHeader />
+                                <Placeholder>
+                                    {
+                                        renderContent(ageGroup)
+                                    }
+                                </Placeholder>
+                            </div>
+                        </div>
+                    )
+                })
+            }
+        </>
+    )
+}
 
-                    {!iteree
-                        .filter(e => e[field] === ag.id)
-                        .length
-                        ? <Grid>
-                            <GridCol span={4} offset={1}>
-                                <em>No Divers In This Age Group</em>
-                            </GridCol>
-                        </Grid>
-
-                        : <>
-                            <GroupHeader meet={meet} />
-                            {iteree
-                                .filter(e => e[field] === ag.id)
-                                .sort(groupSort)
-                                .map((e, k1) =>
-                                    <GroupElement key={k1} meet={meet} e={e} ag={ag} eProps={eProps}/>
-                                )
-                            }
-                        </>
-                    }
-                </div>
-            )
-        }
-    </>
-)
+const Placeholder = ({
+    children
+}: Readonly<{
+    children?: any
+}>) => {
+    return (
+        (children instanceof Array ? children.length : children)
+            ? children
+            : <Grid>
+                <GridCol span="auto" offset={1}>
+                    <em>No Divers In This Age Group</em>
+                </GridCol>
+            </Grid>
+    )
+}
 
 const team = (teams: Team[], poolcode: string | null) => teams.find(e => e.poolcode === poolcode);
 
