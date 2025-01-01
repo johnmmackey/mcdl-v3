@@ -74,12 +74,14 @@ export const AgeGroupGrid = ({
                             <Grid columns={1}>
                                 <GridCol span={1} className='font-bold text-xl'>{ageGroup.name}</GridCol>
                             </Grid>
-                            <GroupHeader />
-                            <Placeholder>
-                                {
-                                    renderContent(ageGroup)
-                                }
-                            </Placeholder>
+                            <div className='ml-4'>
+                                <GroupHeader />
+                                <Placeholder>
+                                    {
+                                        renderContent(ageGroup)
+                                    }
+                                </Placeholder>
+                            </div>
                         </div>
                     )
                 })
@@ -97,7 +99,7 @@ const Placeholder = ({
         (children instanceof Array ? children.length : children)
             ? children
             : <Grid>
-                <GridCol span={4} offset={1}>
+                <GridCol span="auto" offset={1}>
                     <em>No Divers In This Age Group</em>
                 </GridCol>
             </Grid>

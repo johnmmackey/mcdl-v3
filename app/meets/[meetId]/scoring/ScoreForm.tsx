@@ -6,6 +6,7 @@ import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form
 import { AgeGroupGrid, } from '../MeetComponents';
 import { AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
 import strcmp from '@/app/lib/strcmp'
+import styles from './scoreForm.module.css';
 
 type Inputs = Record<string, any>
 type EntryWithResult = Entry & { result: DiverScore | null }
@@ -20,24 +21,16 @@ export default ({
     meetResults: DiverScore[]
 }>) => {
 
-    const form = useForm();
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        console.log(data);
-        let diverIds = data.diverId.flat();
-        let scores = data.score.flat();
-        let ex = data.ex.flat();
-        let du = data.du.flat();
-        let wc = data.wc.flat();
+    const form = useForm({ mode: 'onBlur', reValidateMode: 'onBlur' });
 
-        let results = diverIds.map((d: number, k: number) => ({ diverId: d, score: scores[k], ex: ex[k], du: du[k], wc: wc[k] }));
-        console.log(results);
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
+        let results = data.f.flat();
+        console.log('Results:', results);
     }
 
     const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
         ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.id) || null })
     );
-
-    console.log(form.formState.errors);
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
@@ -65,81 +58,83 @@ export default ({
 
 const ScoringHeader = () => (
     <Grid className='font-semibold' columns={10}>
-        <GridCol span={1}>Pool</GridCol>
+        <GridCol span={1} className="text-center">Pool</GridCol>
         <GridCol span={3}>Diver</GridCol>
-        <GridCol span={1}>EX</GridCol>
-        <GridCol span={2}>Score</GridCol>
-        <GridCol span={1}>DiveUp</GridCol>
-        <GridCol span={2}>Wildcard</GridCol>
+        <GridCol span={1} className="text-center">EX</GridCol>
+        <GridCol span={2} className="text-center">Score</GridCol>
+        <GridCol span={1} className="text-center">DiveUp</GridCol>
+        <GridCol span={2} className="text-center">Wildcard</GridCol>
     </Grid>
 )
 
 const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn }) => {
     const iV = entry.result;
+    const errors = (form.formState.errors?.f as unknown as Array<any>)?.[ag.id]?.[k];
 
     const iVEx = !!iV?.exhibition;
     const iVDu = !!(iV && (iV.ageGroupId !== ag.id));
 
     let ex = useWatch({
         control: form.control,
-        name: entry.id.toString() + '-ex',
+        name: fName(ag.id, k, 'ex'),
         defaultValue: iVEx
     });
 
     let du = useWatch({
         control: form.control,
-        name: entry.id.toString() + '-du',
+        name: fName(ag.id, k, 'du'),
         defaultValue: iVDu
     });
 
     useEffect(() => {
         if (ex)
-            form.setValue('du.' + ag.id + '.' + k, false);
+            form.setValue(fName(ag.id, k, 'du'), false);
         if (ex || !du)
-            form.setValue('wc.' + ag.id + '.' + k, '');
+            form.setValue(fName(ag.id, k, 'wc'), '');
     }, [form, ex, du]);
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
-            <GridCol span={1} className='mt-2'>{entry.poolcode}</GridCol>
-            <GridCol span={3} className='mt-2'><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
+            <GridCol span={1} className='text-center'>{entry.poolcode}</GridCol>
+            <GridCol span={3} className=''><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
 
-            <GridCol span={1} className='mt-2'>
-                <input type="hidden" {...form.register('diverId.' + ag.id + '.' + k)} value={entry.id.toString()} />
-                <input type="checkbox" defaultChecked={iVEx} {...form.register('ex.' + ag.id + '.' + k)} />
+            <GridCol span={1} className='text-center'>
+                <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.id.toString()} />
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} />
             </GridCol>
 
-            <GridCol span={2}>
+            <GridCol span={2} className='text-center'>
                 <input
                     type="number"
-                    className="w-24"
-                    {...form.register('score.' + ag.id + '.' + k,
+                    className={`${styles.scoreInput} ${errors?.score ? styles.scoreError : ''}`}
+                    {...form.register(fName(ag.id, k, 'score'),
                         {
-                            min: { value: 0, message: 'no negs' },
-                            max: { value: 999, message: 'max 999' },
-                            pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: '2 digit' },
+                            min: { value: 0, message: 'Must be > 0 or blank' },
+                            max: { value: 999, message: 'Max Score is 999' },
+                            pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: 'Max 2 decimal places' },
                             required: false,
                         }
                     )}
                     defaultValue={iV?.score || ''}
                 />
-                {(form.formState.errors.score)?.[ag.id]?.[k] &&
-                    <span className='text-red-500'>{form.formState.errors.score?.[ag.id]?.[k].message}</span>
+                {errors?.score &&
+                    <div className='text-red-500'>{errors.score.message}</div>
                 }
             </GridCol>
 
-            <GridCol span={1} className='mt-2'>
-                <input type="checkbox" defaultChecked={iVDu} {...form.register('du.' + ag.id + '.' + k)} disabled={ex} />
+            <GridCol span={1} className='text-center'>
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex} />
             </GridCol>
 
-            <GridCol span={2}>
+            <GridCol span={2} className='text-center'>
                 <input
                     type="number"
-                    className='w-24'
-                    {...form.register('wc.' + ag.id + '.' + k,
+                    className={`${styles.scoreInput} ${errors?.wc ? styles.scoreError : ''}`}
+                    {...form.register(fName(ag.id, k, 'wc'),
                         {
-                            min: 0,
-                            max: 999,
+                            min: { value: 0, message: 'Must be > 0 or blank' },
+                            max: { value: 999, message: 'Max Score is 999' },
+                            pattern: { value: /^\d{1,3}(\.\d{1,2})?$/, message: 'Max 2 decimal places' },
                             required: false,
                         }
                     )}
@@ -147,8 +142,12 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                     disabled={!du}
                     step={0.01}
                 />
+                {errors?.wc &&
+                    <div className='text-red-500'>{errors.wc.message}</div>
+                }
             </GridCol>
         </Grid>
     )
 }
 
+const fName = (agId: number, k: number, cat: string): string => `f.${agId}.${k}.${cat}`
