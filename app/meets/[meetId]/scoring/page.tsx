@@ -17,7 +17,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     return (
         <div style={{ maxWidth: '800px' }}>
             <MeetHeading meet={meet} teams={teams}>Meet Scoring</MeetHeading>
-            <ScoreForm ageGroups={ageGroups} meetEntries={meetEntries} meetResults={meetResults}/>
+            <ScoreForm meet={meet} ageGroups={ageGroups} meetEntries={meetEntries} meetResults={meetResults}/>
         </div>
     )
 }

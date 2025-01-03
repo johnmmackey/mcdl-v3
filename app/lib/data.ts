@@ -1,5 +1,8 @@
+"use server"
+
 import { auth } from "@/auth"
 import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGroup } from "./definitions";
+
 import jwt from "jsonwebtoken";
 
 
@@ -52,6 +55,19 @@ export async function fetchDivers({ seasonId, poolcode }: { seasonId: number, po
         }
     )).json();
 }
+
+
+export async function scoreMeet(meetId: number, data: Array<any>): Promise<undefined> {
+    console.log(`Saving scores...`)
+    await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
+        method: 'POST',
+        body:JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json",
+          },
+     });
+}
+
 
 const delay = (ms: number) => {
     return new Promise( resolve => {

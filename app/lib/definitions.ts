@@ -41,12 +41,6 @@ export type Meet = {
     meetsPools: MeetPool[]
 }
 
-/*
-export type MeetResults = {
-        [id: number]: DiverScore[]
-}
-        */
-
 export type Entry = {
         id: number,
         firstName: string,
@@ -59,13 +53,6 @@ export type Entry = {
         registrationDate: string,
         lateRegistration: boolean
 }
-
-/*
-
-export type MeetEntries = {
-    [id: number]: Entry[]
-}
-    */
 
 export type AgeGroup = {
     id: number,
@@ -132,12 +119,13 @@ export type Diver = {
     id: number,
     firstName: string,
     lastName: string,
-    birthdate: string,
+    birthdate?: string,
     sex: string,
     poolcode: string,
     createDate: string,
     ageGroupId: number,
-    firstYear: boolean,
+    firstYear: boolean | null,
+    inactive: boolean | null,
     registrationDate: string
 }
 

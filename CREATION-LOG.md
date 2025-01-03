@@ -166,3 +166,5 @@ session object
   "expires":"2024-12-29T15:44:06.060Z"
 }
 ```
+# Sanity integration
+https://www.sanity.io/learn/course/day-one-with-sanity-studio/bringing-content-to-a-next-js-front-end

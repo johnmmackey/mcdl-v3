@@ -1,10 +1,11 @@
 "use client";
 
-import React, { RefObject, useEffect, useRef } from 'react';
+import React, { useEffect, } from 'react';
 import { Grid, GridCol } from '@mantine/core';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
 import { AgeGroupGrid, } from '../MeetComponents';
-import { AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
+import { Meet, AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
+import { scoreMeet } from '@/app/lib/data'
 import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
 
@@ -26,10 +27,12 @@ const errorMatrix: Record<string, any> = {
 }
 
 export default ({
+    meet,
     ageGroups,
     meetEntries,
     meetResults
 }: Readonly<{
+    meet: Meet,
     ageGroups: AgeGroup[],
     meetEntries: Entry[],
     meetResults: DiverScore[]
@@ -38,8 +41,16 @@ export default ({
     const form = useForm({ mode: 'onBlur', reValidateMode: 'onBlur' });
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        let results = data.f.flat();
-        console.log('Results:', results);
+        let results = data.f.flat().map((e:any) => ({
+            diverId: Number(e.diverId),
+            ex: e.ex,
+            score: e.score === '' ? null : Number(e.score),
+            du: e.du,
+            wc: e.wc === '' ? null : Number(e.wc)
+        }));
+
+        //console.log('Results:', results);
+        return scoreMeet(meet.id, results);
     }
 
     const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
@@ -85,9 +96,6 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
     const iV = entry.result;
     const errors = (form.formState.errors?.f as unknown as Array<any>)?.[ag.id]?.[k];
 
-    if (ag.id === 1 && k === 0)
-        console.log(errors)
-
     const iVEx = !!iV?.exhibition;
     const iVDu = !!(iV && (iV.ageGroupId !== ag.id));
 
@@ -117,6 +125,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
 
             <GridCol span={1} className='text-center'>
                 <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.id.toString()} />
+                <input type="hidden" {...form.register(fName(ag.id, k, 'ageGroupId'))} value={ag.id} />
                 <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} />
             </GridCol>
 
