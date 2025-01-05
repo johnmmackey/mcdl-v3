@@ -168,3 +168,5 @@ session object
 ```
 # Sanity integration
 https://www.sanity.io/learn/course/day-one-with-sanity-studio/bringing-content-to-a-next-js-front-end
+https://icons.sanity.build/all?scheme=light
+https://www.sanity.io/docs/ids

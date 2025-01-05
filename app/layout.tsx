@@ -8,7 +8,7 @@ import MyAppShell from '@/app/ui/AppShell'
 import '@mantine/core/styles.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 
-import { HeaderMenu } from "@/app/ui/HeaderMenu";
+import { SanityLive } from "@/sanity/live";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,6 +43,7 @@ export default async function RootLayout({
             {children}
           </MyAppShell>
         </MantineProvider>
+        <SanityLive />
       </body>
     </html>
   );
