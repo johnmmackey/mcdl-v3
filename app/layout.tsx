@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { auth } from "@/auth"
 import "@/app/globals.css";
-import { fetchCurrentSeason } from "./lib/data";
 import MyAppShell from '@/app/ui/AppShell'
 
 import '@mantine/core/styles.css';
@@ -24,8 +23,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  const currentSeason = await fetchCurrentSeason();
-
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -49,13 +46,3 @@ export default async function RootLayout({
   );
 }
 
-/*
-          <div className="max-w-screen-lg mx-auto">
-            <HeaderMenu session={session} currentSeasonId={currentSeason.id} />
-            <div className="mx-2 flex">
-              <div className="grow">
-                {children}
-              </div>
-            </div>
-          </div>
-          */

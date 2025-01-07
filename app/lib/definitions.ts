@@ -56,10 +56,11 @@ export type Entry = {
 
 export type AgeGroup = {
     id: number,
-    gender: string,
+    sex: string,
     name: string,
     min: number,
-    max: number
+    max: number,
+    nextGroup: number
 }
 
 export type DiverScore = {

@@ -1,4 +1,4 @@
-import { fetchStandings, fetchCurrentSeason } from '@/app/lib/data';
+import { fetchStandings, fetchCurrentSeasonId } from '@/app/lib/data';
 import { Fragment } from 'react';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
 import { notFound } from 'next/navigation';
@@ -8,9 +8,9 @@ import {SeasonSelector} from '@/app/ui/SeasonSelector';
 
 export default async function Page(props: { searchParams: Promise<{ 'season-id': number }> }) {
   const searchParams = await props.searchParams;
-  const currentSeason = await fetchCurrentSeason();
+  const currentSeasonId = await fetchCurrentSeasonId();
 
-  const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeason.id;
+  const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
   const standings = await fetchStandings(selectedSeasonId);
   if (!standings) {
     notFound();
@@ -62,37 +62,3 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
   )
 }
 
-
-/* 
-      {Object.entries(standings).map(([div, divResults]) =>
-        <div key={div} className={styles['standings-container']}>
-          <div className='col-span-8 text-left text-2xl pt-6 pb-2'>
-            Division {div}
-          </div>
-          <div className="">Pool</div>
-          <div className="text-center text-nowrap">Seed</div>
-          <div className="text-center text-nowrap">Dual Meets</div>
-          <div className="text-center text-nowrap">Div Meets</div>
-          <div className="text-center text-nowrap">Dual Rank Points</div>
-          <div className="text-center text-nowrap">Div Meet Score</div>
-          <div className="text-center text-nowrap">Rank Points</div>
-          <div className="text-center text-nowrap">Total</div>
-
-          {divResults.map((t, k) =>
-            <>
-              <div className='text-nowrap'>{t.teamName}</div>
-              <div className='text-center '>{t.seed}</div>
-              <div className='text-center text-nowrap'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</div>
-              <div className='text-center text-nowrap'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</div>
-              <div className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</div>
-              <div className='text-right'>{fmt(t.divMeetScore, 1)}</div>
-              <div className='text-center'>{fmt(t.divMeetRank.rankPoints)}</div>
-              <div className='text-center'>
-                {fmt(t.sumDualDivRankPoints) + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
-              </div>
-            </>
-          )}
-        </div>
-      )
-      }
-      */

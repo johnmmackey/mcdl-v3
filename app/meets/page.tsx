@@ -5,7 +5,7 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Grid, GridCol } from '@mantine/core';
-import { fetchTeams, fetchMeets, fetchCurrentSeason } from '@/app/lib/data';
+import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
@@ -17,9 +17,9 @@ export default async function Page(props: {
 }) {
 
     const searchParams = await props.searchParams;
-    const currentSeason = await fetchCurrentSeason();
+    const currentSeasonId = await fetchCurrentSeasonId();
 
-    const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeason.id;
+    const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
 
     return (
         <>

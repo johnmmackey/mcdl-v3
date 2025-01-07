@@ -149,7 +149,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
             </GridCol>
 
             <GridCol span={1} className='text-center'>
-                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex} />
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex || !ag.nextGroup} />
             </GridCol>
 
             <GridCol span={2} className='text-center'>
@@ -168,7 +168,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                         }
                     )}
                     defaultValue={iV?.diverAgeGroupScore || ''}
-                    disabled={!du}
+                    disabled={!du || !ag.nextGroup}
                     step={0.01}
                 />
                 {errors?.wc &&
