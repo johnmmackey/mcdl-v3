@@ -46,9 +46,9 @@ async function Meets(props: {
             return '';
         if (m.meetsPools.length > 2)
             return 'Results';
-        return m.meetsPools.find(e => e.poolcode === m.visitingPool)?.score
+        return (m.meetsPools.find(e => e.poolcode === m.visitingPool)?.score || 0)
             + ' - '
-            + m.meetsPools.find(e => e.poolcode === m.hostPool)?.score;
+            + ((m.meetsPools.find(e => e.poolcode === m.hostPool)?.score)|| 0);
     }
 
     return (
@@ -67,7 +67,7 @@ async function Meets(props: {
                     {meets.map((m, k2) =>
                         <Link key={k2} href={`/meets/${m.id}/scoring`}>
                             <Grid key={k2} className='hover:bg-slate-200' columns={5} >
-                                <GridCol span={1} className='text-center'>{m.division || 'NDM'}</GridCol>
+                                <GridCol span={1} className='text-center'>{m.division && m.division < 99 ? m.division : 'NDM'}</GridCol>
                                 <GridCol span={3} className=''>
                                     <div>{meetName(m)}</div>
                                 </GridCol>

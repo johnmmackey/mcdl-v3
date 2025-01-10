@@ -65,7 +65,7 @@ export default ({
                 renderContent={(ag: AgeGroup) => {
                     return (
                         entriesWithResults
-                            .filter(e => e.ageGroupId === (ag as AgeGroup).id)
+                            .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
                                 <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} />
@@ -167,7 +167,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                             }
                         }
                     )}
-                    defaultValue={iV?.diverAgeGroupScore || ''}
+                    defaultValue={iV?.scoreAgeGroup || ''}
                     disabled={!du || !ag.nextGroup}
                     step={0.01}
                 />
