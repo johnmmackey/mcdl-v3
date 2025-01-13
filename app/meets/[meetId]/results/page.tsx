@@ -68,7 +68,7 @@ const ResultsHeaderHOC = (meetType: string) =>
 const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType: string, ag: AgeGroup }) => {
     return (
         <Grid columns={8} className='hover:bg-slate-200'>
-            <GridCol span={1} className='py-1'>{result.diver.poolcode}</GridCol>
+            <GridCol span={1} className='py-1'>{result.poolcode}</GridCol>
             <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{result.diver.lastName}</span>, {result.diver.firstName}</GridCol>
             <GridCol span={1} className='py-1 text-right'>{result.score.toFixed(2)}</GridCol>
             <GridCol span={1} className="py-1 text-center">
@@ -78,8 +78,14 @@ const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType
                 {result.exhibition ? 'EX' : ''}
             </GridCol>
             <GridCol span={2} className='py-1'>
-                {result.diver.diverSeason.ageGroupId !== ag.id && ' ** Dive Up **'}
-                {result.scoreAgeGroup && ` (${result.scoreAgeGroup})`}
+                {result.ageGroupId !== result.diverAgeGroupId &&
+                    <>
+                        {` ** Dive Up ** `}
+                        { result.scoreAgeGroup > 0 &&
+                            `(${result.scoreAgeGroup.toFixed(2)})`
+                        }
+                    </>
+                }
             </GridCol>
         </Grid>
     )

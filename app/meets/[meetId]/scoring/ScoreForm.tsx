@@ -41,20 +41,25 @@ export default ({
     const form = useForm({ mode: 'onBlur', reValidateMode: 'onBlur' });
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        let results = data.f.flat().map((e:any) => ({
+        console.log(data.f.flat().length)
+        let results = data
+        .f
+        .flat()
+        .filter( (e: any) => e.score !== '')
+        .map((e:any) => ({
             diverId: Number(e.diverId),
             ex: e.ex,
-            score: e.score === '' ? null : Number(e.score),
+            score: Number(e.score),
             du: e.du,
-            wc: e.wc === '' ? null : Number(e.wc)
-        }));
+            wc: e.wc === '' ? 0 : Number(e.wc)
+        }))
 
-        //console.log('Results:', results);
+        console.log('Results:', results.length);
         return scoreMeet(meet.id, results);
     }
 
     const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
-        ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.id) || null })
+        ({ ...e, result: meetResults?.find((r: DiverScore) => r.diverId === e.diverId) || null })
     );
 
     return (
@@ -68,7 +73,7 @@ export default ({
                             .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
-                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} />
+                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} meet={meet}/>
                             )
                     )
                 }}
@@ -92,7 +97,7 @@ const ScoringHeader = () => (
     </Grid>
 )
 
-const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn }) => {
+const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, meet: Meet }) => {
     const iV = entry.result;
     const errors = (form.formState.errors?.f as unknown as Array<any>)?.[ag.id]?.[k];
 
@@ -124,9 +129,8 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
             <GridCol span={3} className=''><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
 
             <GridCol span={1} className='text-center'>
-                <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.id.toString()} />
-                <input type="hidden" {...form.register(fName(ag.id, k, 'ageGroupId'))} value={ag.id} />
-                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} />
+                <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.diverId.toString()} />
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} disabled={ meet.meetType !== 'Dual'} />
             </GridCol>
 
             <GridCol span={2} className='text-center'>
@@ -135,9 +139,9 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                     className={`${styles.scoreInput} ${errors?.score ? styles.scoreError : ''}`}
                     {...form.register(fName(ag.id, k, 'score'),
                         {
-                            min: 0,
+                            min: -1,
                             max: 999, 
-                            pattern: /^\d{1,3}(\.\d{1,2})?$/, 
+                            pattern: /^\-?\d{1,3}(\.\d{1,2})?$/, 
                             required: false,
                         }
                     )}
@@ -149,7 +153,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
             </GridCol>
 
             <GridCol span={1} className='text-center'>
-                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex || !ag.nextGroup} />
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex || !ag.nextGroup || meet.meetType !== 'Dual'} />
             </GridCol>
 
             <GridCol span={2} className='text-center'>
@@ -168,7 +172,7 @@ const ScoringElement = ({ ag, entry, k, form }: { ag: AgeGroup, entry: EntryWith
                         }
                     )}
                     defaultValue={iV?.scoreAgeGroup || ''}
-                    disabled={!du || !ag.nextGroup}
+                    disabled={!du || !ag.nextGroup || meet.meetType !== 'Dual'}
                     step={0.01}
                 />
                 {errors?.wc &&
