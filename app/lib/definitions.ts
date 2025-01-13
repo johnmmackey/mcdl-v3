@@ -42,41 +42,48 @@ export type Meet = {
 }
 
 export type Entry = {
-        id: number,
-        firstName: string,
-        lastName: string,
-        sex: string,
-        poolcode: string,
-        createDate: string,
-        ageGroupId: 6,
+    diverId: number,
+    firstName: string,
+    lastName: string,
+    sex: string,
+    poolcode: string,
+    createDate: string,
+    diverSeason: {
+        ageGroupId: number,
         firstYear: boolean,
+        inactive: boolean,
         registrationDate: string,
-        lateRegistration: boolean
+    }
+    lateRegistration: boolean
 }
 
 export type AgeGroup = {
     id: number,
-    gender: string,
+    sex: string,
     name: string,
     min: number,
-    max: number
+    max: number,
+    nextGroup: number
 }
 
 export type DiverScore = {
-    ageGroupId: number,
-    scoreId: number,
-    diverId: number,
-    firstName: string,
-    lastName: string,
-    exhibition: number | null,
-    agRank: {
-        rank: number | null,
-        rankPoints: number | null
-    },
+    id: number,
     score: number,
-    diverAgeGroupScore: number | null,
+    ageGroupId: number,
     diverAgeGroupId: number,
-    team: string
+    meetId: number,
+    diverId: number,
+    place: number,
+    points: number,
+    scoreAgeGroup: number,
+    exhibition: boolean,
+    poolcode: string,
+    diver: {
+        firstName: string,
+        lastName: string,
+        sex: string,
+        createDate: string
+    }
 }
 
 export type Rank = {
@@ -124,8 +131,8 @@ export type Diver = {
     poolcode: string,
     createDate: string,
     ageGroupId: number,
-    firstYear: boolean | null,
-    inactive: boolean | null,
+    firstYear: boolean,
+    inactive: boolean,
     registrationDate: string
 }
 

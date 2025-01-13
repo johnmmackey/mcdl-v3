@@ -29,7 +29,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
 
                     return (
                         meetEntries
-                            .filter(e => e.ageGroupId === (ag as AgeGroup).id)
+                            .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
                                 <EntriesElement key={k} entry={entry} />
@@ -54,7 +54,7 @@ export const EntriesElement = ({entry}: {entry: Entry}) => {
     return (
         <Grid columns={8} className='hover:bg-slate-200'>
             <GridCol span={1} className='py-1'>{entry.poolcode}</GridCol>
-            <GridCol span={3} className='py-1'>{entry.firstName} {entry.lastName}</GridCol>
+            <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
         </Grid>
     )
 }

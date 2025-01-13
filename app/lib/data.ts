@@ -6,8 +6,8 @@ import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGrou
 import jwt from "jsonwebtoken";
 
 
-export async function fetchCurrentSeason(): Promise<Season> {
-    return (await fetch(`${process.env.DATA_URL}/currentseason`, { next: { revalidate: 30 } })).json();
+export async function fetchCurrentSeasonId(): Promise<number> {
+    return (await fetch(`${process.env.DATA_URL}/current-season-id`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchSeasons(): Promise<Season[]> {
