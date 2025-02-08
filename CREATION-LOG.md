@@ -170,3 +170,47 @@ session object
 https://www.sanity.io/learn/course/day-one-with-sanity-studio/bringing-content-to-a-next-js-front-end
 https://icons.sanity.build/all?scheme=light
 https://www.sanity.io/docs/ids
+
+
+## Meet views:
+* entries list (implicit and explicit)
+* diver entry input
+* blank scoring worksheet
+* labels
+* scoring
+* results preview
+* results (published)
+
+# Meet Groups Thinking - Deferred pending MCDL decision
+
+## Database
+* meet table is reduced. visiting pool info removed. score info removed. meet_type? div?
+* match table
+** index
+** meet_id
+** meet_type
+* meets_pools becomes matches_pools
+* new meets_pools just to contain who is attending the meet (e.g entries list)
+
+Scores remain linked to meet.
+
+For a dual meet:
+* one meet record
+* two meets_pools record
+* one match record
+* two matches_pools records (one per team), created at scoring time
+
+For a tri meet:
+* one meet records
+* three meets_pools records
+* three match records (A-B, B-C, A-C)
+* six matches_pools records one per team per match (A score in A-B, A score in A-C, etc.)
+
+Scoring is by Match
+* get all scores for the match via the meets record
+* granular to age Group
+
+
+
+
+

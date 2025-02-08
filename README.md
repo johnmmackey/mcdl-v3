@@ -55,3 +55,7 @@ Inputs to action list:
 - meet status - published / unpublished
 
 ## Permissions Flow
+
+## Obscure
+Mantine Appshell scroll padding issue
+https://github.com/orgs/mantinedev/discussions/3588

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.741.0",
     "@mantine/core": "^7.15.0",
     "@mantine/hooks": "^7.15.0",
     "@sanity/image-url": "^1.1.0",

@@ -4,6 +4,8 @@ import { auth } from "@/auth"
 import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGroup } from "./definitions";
 
 import jwt from "jsonwebtoken";
+import { revalidateTag } from "next/cache";
+import { delay } from "./delay";
 
 
 export async function fetchCurrentSeasonId(): Promise<number> {
@@ -25,24 +27,24 @@ export async function fetchAgeGroups(): Promise<AgeGroup[]> {
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
     console.log(`Delaying fetch by ${process.env.FETCH_DELAY || 0} ms...`)
     await delay(Number(process.env.FETCH_DELAY) || 0);
-    return await (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30 } })).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30, tags: ['meets'] } })).json();
 }
 
 export async function fetchMeet(meetId: number): Promise<Meet> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30 } })).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
 export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30 } })).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
 export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/entries`, { next: { revalidate: 30 } })).json();
+    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/entries`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
 export async function fetchStandings(seasonId: number): Promise<GroupedStandings> {
     console.log(`Fetching standings...`)
-    return (await fetch(`${process.env.DATA_URL}/standings/${seasonId}`, { next: { revalidate: 30 } })).json();
+    return (await fetch(`${process.env.DATA_URL}/standings/${seasonId}`, { next: { revalidate: 30, tags: ['meets'] } })).json();
 }
 
 export async function fetchDivers({ seasonId, poolcode }: { seasonId: number, poolcode: string }): Promise<Diver[]> {
@@ -66,11 +68,10 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
             "Content-Type": "application/json",
           },
      });
+
+     //invalidate the cache for this meet
+     revalidateTag(`meet:${meetId}`);
+     revalidateTag(`meets`);
 }
 
 
-const delay = (ms: number) => {
-    return new Promise( resolve => {
-        setTimeout(resolve, ms);
-    });
-}

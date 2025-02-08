@@ -18,8 +18,8 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
         ]
     );
     return (
+        <>
 
-        <div style={{ maxWidth: '800px' }}>
             <MeetHeading meet={meet} teams={teams}>Meet Entries</MeetHeading>
 
             <AgeGroupGrid
@@ -37,7 +37,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                     )
                 }}
             />
-        </div>
+        </>
     )
 }
 

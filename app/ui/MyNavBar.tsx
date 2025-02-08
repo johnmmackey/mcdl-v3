@@ -29,7 +29,7 @@ const data = [
     { link: '/meets', label: 'Meets', icon: IconDiver },
     { link: '/standings', label: 'Standings', icon: IconChartBarPopular },
     { link: '/resources', label: 'Resources', icon: IconFiles },
-    { link: '', label: 'SSH Keys', icon: IconKey },
+    { link: '/users', label: 'Users', icon: IconKey },
     { link: '', label: 'Databases', icon: IconDatabaseImport },
     { link: '', label: 'Authentication', icon: Icon2fa },
     { link: '', label: 'Other Settings', icon: IconSettings },

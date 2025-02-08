@@ -13,7 +13,7 @@ export const MeetHeading = ({
     teams: Team[],
     children?: React.ReactNode
 }>) => (
-    <>
+    <div className="sticky top-0 z-50 bg-white">
         <h1 className="text-center text-2xl text-bold pt-2">
             {
                 meet.name
@@ -27,7 +27,7 @@ export const MeetHeading = ({
         <h2 className="text-center text-2xl text-bold py-4">
             {children}
         </h2>
-    </>
+    </div>
 )
 
 
