@@ -58,7 +58,6 @@ export async function fetchDivers({ seasonId, poolcode }: { seasonId: number, po
     )).json();
 }
 
-
 export async function scoreMeet(meetId: number, data: Array<any>): Promise<undefined> {
     console.log(`Saving scores...`)
     await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
@@ -74,4 +73,16 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
      revalidateTag(`meets`);
 }
 
+export async function publishMeet(meetId: number): Promise<undefined> {
+    await fetch(`${process.env.DATA_URL}/meets/${meetId}/publish`, {
+        method: 'POST',
+        body:JSON.stringify({}),
+        headers: {
+            "Content-Type": "application/json",
+          },
+     });
 
+     //invalidate the cache for this meet
+     revalidateTag(`meet:${meetId}`);
+     revalidateTag(`meets`);
+}

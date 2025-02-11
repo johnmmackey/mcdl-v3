@@ -1,7 +1,8 @@
-import { Grid, GridCol } from '@mantine/core';
+import { Grid, GridCol, } from '@mantine/core';
 import { fetchTeams, fetchMeet, fetchMeetResults, fetchAgeGroups } from '@/app/lib/data';
 import { MeetHeading, MeetScore, AgeGroupGrid } from '@/app/meets/[meetId]/MeetComponents';
 import { DiverScore, AgeGroup } from '@/app/lib/definitions'
+import { PublishButton } from './PublishButton';
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
     const params = await props.params;
@@ -16,7 +17,6 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     );
 
     return (
-
         <div style={{ maxWidth: '800px' }}>
             <MeetHeading meet={meet} teams={teams}>
                 {!meet.scoresPublished &&
@@ -25,11 +25,14 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                 Meet Results
             </MeetHeading>
 
-            {/* Team Score */}
-            {meet.scoresPublished && meet.meetType != 'Star' &&
-                <MeetScore meet={meet} teams={teams} />
+            {!meet.scoresPublished &&
+                <PublishButton meet={meet} />
             }
 
+            {/* Team Score */}
+            {meet.meetType != 'Star' &&
+                <MeetScore meet={meet} teams={teams} />
+            }
 
             <AgeGroupGrid
                 GroupHeader={ResultsHeaderHOC(meet.meetType)}
@@ -81,7 +84,7 @@ const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType
                 {result.ageGroupId !== result.diverAgeGroupId &&
                     <>
                         {` ** Dive Up ** `}
-                        { result.scoreAgeGroup > 0 &&
+                        {result.scoreAgeGroup > 0 &&
                             `(${result.scoreAgeGroup.toFixed(2)})`
                         }
                     </>
