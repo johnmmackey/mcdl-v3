@@ -73,10 +73,10 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
      revalidateTag(`meets`);
 }
 
-export async function publishMeet(meetId: number): Promise<undefined> {
-    await fetch(`${process.env.DATA_URL}/meets/${meetId}/publish`, {
+export async function setPublishedStatus(meetId: number, status: boolean): Promise<undefined> {
+    await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
-        body:JSON.stringify({}),
+        body:JSON.stringify({status}),
         headers: {
             "Content-Type": "application/json",
           },

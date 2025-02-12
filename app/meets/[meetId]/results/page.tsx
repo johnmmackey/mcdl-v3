@@ -25,9 +25,8 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                 Meet Results
             </MeetHeading>
 
-            {!meet.scoresPublished &&
-                <PublishButton meet={meet} />
-            }
+            {/* Fix: authorization issue here */}
+            <PublishButton meet={meet} />
 
             {/* Team Score */}
             {meet.meetType != 'Star' &&
