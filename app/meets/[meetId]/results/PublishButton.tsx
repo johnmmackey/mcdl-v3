@@ -1,6 +1,6 @@
 "use client"
 import { useState, useOptimistic, useTransition, use } from 'react';
-import { Modal, Button, Loader } from '@mantine/core'
+import { Modal, Button, Loader, Alert, Notification } from '@mantine/core'
 import { Meet } from '@/app/lib/definitions';
 import { setPublishedStatus } from '@/app/lib/data';
 import { useRouter } from 'next/navigation';
@@ -10,27 +10,44 @@ import { useDisclosure } from '@mantine/hooks';
 
 export const PublishButton = (props: { meet: Meet }) => {
     const [isPending, startTransition] = useTransition();
+    const [opened, { open, close }] = useDisclosure(false);
+    const router = useRouter();
 
-    console.log('rendering')
+    console.log('rendering publishbutton')
 
     const togglePublished = async () => {
+        close();
         startTransition(async () => {
+
             await setPublishedStatus(props.meet.id, !props.meet.scoresPublished)
+                .then(() => console.log('published status set'))
                 .catch((err) => {
                     //updateMeet(!omeet.scoresPublished);
                     alert(`WARNING: Meet status did not update. Error: ${err.message} Reload the page.`)
                 });
         });
-
     }
 
     return (
-        <Button onClick={togglePublished} disabled={isPending}>
-            {props.meet.scoresPublished ? 'UnPublish' : 'Publish'}
+        <>
             {isPending &&
-                <span>&nbsp; in progress...</span>
+            <Notification loading title="Please Wait">Update in progress</Notification>
             }
-        </Button>
+            {!false &&
+                <Button onClick={open} disabled={isPending}>
+                    {props.meet.scoresPublished ? 'UnPublish' : 'Publish'}
+                    {isPending &&
+                        <span>&nbsp; in progress...</span>
+                    }
+                </Button>
+            }
+            <Modal opened={opened} onClose={close} title="Authentication" centered size="md">
+                Are You Sure?
+                <div>
+                    <Button onClick={togglePublished}>Yes</Button>
+                </div>
+            </Modal>
+        </>
     )
 }
 
@@ -48,7 +65,7 @@ export const PublishButton2 = (props: { meet: Meet }) => {
 
 
     return (
-        <Button onClick={publishAction} disabled={ false}>
+        <Button onClick={publishAction} disabled={false}>
             {published ? 'UnPublish' : 'Publish'}
         </Button>
     )
