@@ -5,6 +5,8 @@ import { DiverScore, AgeGroup } from '@/app/lib/definitions'
 import { PublishButton } from './PublishButton';
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
+
+    console.log('meet page')
     const params = await props.params;
 
     const [teams, meet, ageGroups, meetResults] = await Promise.all(

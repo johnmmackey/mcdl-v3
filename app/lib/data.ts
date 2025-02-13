@@ -1,4 +1,4 @@
-"use server"
+'use server'
 
 import { auth } from "@/auth"
 import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGroup } from "./definitions";
@@ -74,7 +74,7 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
 }
 
 export async function setPublishedStatus(meetId: number, status: boolean): Promise<undefined> {
-    await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
+    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
         body:JSON.stringify({status}),
         headers: {
@@ -82,7 +82,10 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
           },
      });
 
+     if(!r.ok)
+        throw new Error(r.statusText);
+
      //invalidate the cache for this meet
-     revalidateTag(`meet:${meetId}`);
-     revalidateTag(`meets`);
+    revalidateTag(`meet:${meetId}`);
+    revalidateTag(`meets`);
 }
