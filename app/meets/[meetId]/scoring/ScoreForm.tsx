@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, } from 'react';
-import { Grid, GridCol } from '@mantine/core';
+import { useRouter } from 'next/navigation';
+import { Grid, GridCol, Button } from '@mantine/core';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
 import { AgeGroupGrid, } from '../MeetComponents';
 import { Meet, AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
@@ -39,23 +40,26 @@ export default ({
 }>) => {
 
     const form = useForm({ mode: 'onBlur', reValidateMode: 'onBlur' });
+    const router = useRouter();
 
     const onSubmit: SubmitHandler<Inputs> = (data) => {
+        console.log('*** in submit handler')
         console.log(data.f.flat().length)
         let results = data
-        .f
-        .flat()
-        .filter( (e: any) => e.score !== '')
-        .map((e:any) => ({
-            diverId: Number(e.diverId),
-            ex: e.ex,
-            score: Number(e.score),
-            du: e.du,
-            wc: e.wc === '' ? 0 : Number(e.wc)
-        }))
+            .f
+            .flat()
+            .filter((e: any) => e.score !== '')
+            .map((e: any) => ({
+                diverId: Number(e.diverId),
+                ex: e.ex,
+                score: Number(e.score),
+                du: e.du,
+                wc: e.wc === '' ? 0 : Number(e.wc)
+            }))
 
         console.log('Results:', results.length);
-        return scoreMeet(meet.id, results);
+        return scoreMeet(meet.id, results)
+            .then(() => router.push(`/meets/${meet.id}/results`))
     }
 
     const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
@@ -73,15 +77,15 @@ export default ({
                             .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
                             .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
                             .map((entry, k) =>
-                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} meet={meet}/>
+                                <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} meet={meet} />
                             )
                     )
                 }}
             />
 
-            <button type="submit" disabled={false}>
+            <Button type="submit" disabled={false}>
                 Submit
-            </button>
+            </Button>
         </form>
     )
 }
@@ -130,7 +134,7 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
 
             <GridCol span={1} className='text-center'>
                 <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.diverId.toString()} />
-                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} disabled={ meet.meetType !== 'Dual'} />
+                <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} disabled={meet.meetType !== 'Dual' && meet.meetType !== 'Multidual'} />
             </GridCol>
 
             <GridCol span={2} className='text-center'>
@@ -140,8 +144,8 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
                     {...form.register(fName(ag.id, k, 'score'),
                         {
                             min: -1,
-                            max: 999, 
-                            pattern: /^\-?\d{1,3}(\.\d{1,2})?$/, 
+                            max: 999,
+                            pattern: /^\-?\d{1,3}(\.\d{1,2})?$/,
                             required: false,
                         }
                     )}

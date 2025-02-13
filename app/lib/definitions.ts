@@ -26,6 +26,7 @@ export type Meet = {
     id: number,
     seasonId: number,
     name: string | null,
+    parentMeet: number | null,
     meetDate: string,
     entryDeadline: string | null,
     hostPool: string | null,
