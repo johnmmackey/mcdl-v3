@@ -35,6 +35,7 @@ export async function fetchMeet(meetId: number): Promise<Meet> {
 }
 
 export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
+    console.log('fetch meet results')
     return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
@@ -74,6 +75,7 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
 }
 
 export async function setPublishedStatus(meetId: number, status: boolean): Promise<undefined> {
+    console.log('setting published status to', status)
     let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
         body:JSON.stringify({status}),

@@ -8,7 +8,7 @@ import { meetPermissions } from '@/app/lib/userCan';
 import { useDisclosure } from '@mantine/hooks';
 
 
-export const PublishButton = (props: { meet: Meet }) => {
+export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
     const [isPending, startTransition] = useTransition();
     const [opened, { open, close }] = useDisclosure(false);
     const router = useRouter();
@@ -20,7 +20,10 @@ export const PublishButton = (props: { meet: Meet }) => {
         startTransition(async () => {
 
             await setPublishedStatus(props.meet.id, !props.meet.scoresPublished)
-                .then(() => console.log('published status set'))
+                .then(() => {
+                    console.log('published status set')
+                    props.onClick && props.onClick();
+                })
                 .catch((err) => {
                     //updateMeet(!omeet.scoresPublished);
                     alert(`WARNING: Meet status did not update. Error: ${err.message} Reload the page.`)
@@ -31,7 +34,7 @@ export const PublishButton = (props: { meet: Meet }) => {
     return (
         <>
             {isPending &&
-            <Notification loading title="Please Wait">Update in progress</Notification>
+                <Notification loading title="Please Wait">Update in progress</Notification>
             }
             {!false &&
                 <Button onClick={open} disabled={isPending}>
