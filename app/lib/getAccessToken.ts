@@ -1,17 +1,8 @@
-import {  defaultOptions } from "@auth/upstash-redis-adapter"
-import { upStashOpt } from '@/auth'
-
-import { Redis } from "@upstash/redis"
+import { defaultOptions } from "@auth/upstash-redis-adapter"
+import { redis, upStashOpt } from '@/auth'
 import { logger } from "@/app/lib/logger"
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_URL!,
-  token: process.env.UPSTASH_REDIS_TOKEN!,
-})
-
-
-
-interface Account extends Record<string, unknown> {
+interface Account extends Record<string, string | number> {
   access_token: string,
   id_token: string,
   refresh_token: string,
@@ -24,60 +15,74 @@ interface Account extends Record<string, unknown> {
   id: string
 }
 
-interface RefreshResponse extends Record<string, unknown> {
+interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
   access_token: string,
   expires_in: number,
   token_type: string
 }
 
-// only want to do one refresh for a user
-interface ActiveRefresh extends Record<string, unknown> {
-  id: string,
-  p: Promise<string>
+interface ActiveRefresh extends Record<string, string | Promise<string>> {
+  userId: string,
+  promiseOfToken: Promise<string>
 }
+
+interface OpenIDConfig extends Record<string, string | string[] | number> {
+  authorization_endpoint: string,
+  end_session_endpoint: string,
+  id_token_signing_alg_values_supported: string[],
+  issuer: string,
+  jwks_uri: string,
+  response_types_supported: string[],
+  revocation_endpoint: string,
+  scopes_supported: string[],
+  subject_types_supported: string[],
+  token_endpoint: string,
+  token_endpoint_auth_methods_supported: string[],
+  userinfo_endpoint: string
+}
+
 
 // list of active refreshes
+// only want to do one refresh for a user, so we keep a static list
 let activeRefreshes: ActiveRefresh[] = [];
 
-export const getAccessToken = async (id: string): Promise<string | null> => {
-  const start = Date.now();
+// IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
+export const getAccessToken = async (userId: string): Promise<string | null> => {
   const opt = { ...defaultOptions, ...upStashOpt };
-  const client = redis;
 
-  const accountKey = await client.get<string>(opt.baseKeyPrefix + opt.accountByUserIdPrefix + id)
+  const accountKey = await redis.get<string>(opt.baseKeyPrefix + opt.accountByUserIdPrefix + userId);
+  if (!accountKey)
+    throw new Error('Account Key not found')
 
-  if (!accountKey) return null
-  let account = (await client.get<Account>(accountKey)) as Account;
+  let account = (await redis.get<Account>(accountKey)) as Account;
 
-  logger.debug(`got access token in ${Date.now() - start} ms`)
+  logger.debug(`Obtained Access Token. Expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
 
-  logger.debug(`Access Token expires at ${(new Date(account.expires_at * 1000)).toISOString()}`)
-  if (account.expires_at * 1000 - Date.now() < 5 * 60 * 1000) { // if the token is (nearly) expired
-    logger.debug('refreshing token');
-    // if there is already one active, use it.
-
-    const existingRefresh = activeRefreshes.find(e => e.id === id);
-    if (existingRefresh) {
-      logger.debug('short circuiting duplicate refresh')
-      return existingRefresh.p;
-    }
-
-    // new one, so lets start it and save
-    const p = refreshTokens(accountKey, account);
-    activeRefreshes.push({ id, p });
-    const newAccessToken = await p;
-    activeRefreshes = activeRefreshes.filter(e => e.id !== id);
-    logger.debug('refresh complete')
-    return newAccessToken;
-  } else {
+  if (account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
     return account.access_token;
+
+  // we need to refresh the token
+  logger.debug('Refreshing token...');
+  // if there is already one active, use it.
+
+  const existingRefresh = activeRefreshes.find(e => e.userId === userId);
+  if (existingRefresh) {
+    logger.debug('short circuiting duplicate refresh')
+    return existingRefresh.promiseOfToken;
   }
+
+  // new one, so lets start it and save
+  const promiseOfToken = getRefreshedToken(accountKey, account);
+  activeRefreshes.push({ userId, promiseOfToken });
+  const newAccessToken = await promiseOfToken;
+  activeRefreshes = activeRefreshes.filter(e => e.userId !== userId);
+  logger.debug('refresh complete')
+  return newAccessToken;
 }
 
 
-const refreshTokens = async (accountKey: string, account: Account): Promise<string> => {
-  const client = redis;
+const getRefreshedToken = async (accountKey: string, account: Account): Promise<string> => {
   let openIdConfig = await getOpenIdConfig();
 
   let response = await fetch(`${openIdConfig.token_endpoint}`, {
@@ -99,17 +104,11 @@ const refreshTokens = async (accountKey: string, account: Account): Promise<stri
   let newTokens: RefreshResponse = await response.json();
   let newAccount = { ...account, id_token: newTokens.id_token, access_token: newTokens.access_token, expires_at: Math.floor(Date.now() / 1000) + newTokens.expires_in }
 
-  await client.set(accountKey, JSON.stringify(newAccount));
+  await redis.set(accountKey, JSON.stringify(newAccount));
   return newTokens.access_token;
 }
 
-
-
-
-interface OpenIDConfig extends Record<string, unknown> {
-  token_endpoint: string
-}
-// open ID config never should change in a run, so get it once
+// open ID config never should not change, so get it once
 let openIdConfig: OpenIDConfig | null = null;
 
 const getOpenIdConfig = async (): Promise<OpenIDConfig> => {

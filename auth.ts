@@ -4,11 +4,6 @@ import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter"
 import { Adapter, } from "@auth/core/adapters"
 import { Redis } from "@upstash/redis"
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_URL!,
-  token: process.env.UPSTASH_REDIS_TOKEN!,
-})
-
 type Profile = {
   familyName: string,
   givenName: string,
@@ -25,7 +20,12 @@ declare module "next-auth" {
   }
 }
 
-export const upStashOpt = { baseKeyPrefix: 'mcdl-v3-7:' }
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_URL!,
+  token: process.env.UPSTASH_REDIS_TOKEN!,
+})
+
+export const upStashOpt = { baseKeyPrefix: process.env.UPSTASH_BASE_KEY_PREFIX }
 
 export const {
   handlers: { GET, POST },
@@ -37,8 +37,9 @@ export const {
     Cognito({
       profile(profile) {
         return {
-          email: profile.email,
+
           profile: {
+            email: profile.email,
             givenName: profile.given_name,
             familyName: profile.family_name,
             zoneinfo: profile.zoneinfo,
@@ -47,7 +48,6 @@ export const {
         }
       },
     })
-
     //Cognito
   ],
   pages: {
@@ -71,7 +71,7 @@ export const {
     },
 
     async jwt({ token, user, account, profile, isNewUser }) {
-      //console.log('*** In jwt callback', JSON.stringify({token, user, account, profile, isNewUser}, null, 4));
+      console.log('*** In jwt callback', JSON.stringify({token, user, account, profile, isNewUser}, null, 4));
       if (profile) {
         // user logged in and we have cognito profile
         token.profile = {

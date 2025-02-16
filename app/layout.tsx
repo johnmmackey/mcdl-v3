@@ -25,9 +25,12 @@ export default async function RootLayout({
 }>) {
   const session = await auth();
 
-  const t = session?.user && await getAccessToken(session.user.id as string)
-
-  console.log(`root layout: token length: ${t ? t.length : '0'}`)
+  if(session?.user) {
+    console.log('session', session)
+    const start = Date.now();
+    const accessToken = await getAccessToken(session.user.id as string);
+    console.log(`Got access token in ${Date.now() - start} ms`)
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
