@@ -12,6 +12,7 @@ export default function MyAppShell({
     session: Session | null
 }>) {
     const [opened, { toggle }] = useDisclosure();
+
     return (
         <AppShell
             header={{ height: 80, }}

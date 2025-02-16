@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { auth } from "@/auth"
+import { getAccessToken } from "@/app/lib/getAccessToken"
 import "@/app/globals.css";
 import MyAppShell from '@/app/ui/AppShell'
 
@@ -23,6 +24,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+
+  const t = session?.user && await getAccessToken(session.user.id as string)
+
+  console.log(`root layout: token length: ${t ? t.length : '0'}`)
 
   return (
     <html lang="en" suppressHydrationWarning>
