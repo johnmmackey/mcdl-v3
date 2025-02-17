@@ -71,7 +71,7 @@ export function MyNavBar({ session, toggle }: { session: Session | null, toggle:
 
                         <div className={classes.link} onClick={(event) => signOut()}>
                             <Avatar color="cyan" radius="xl" className="mr-2">
-                                { (session.user.profile?.givenName[0] + session.user.profile?.familyName[0]) 
+                                { (session.user.givenName[0] + session.user.familyName[0] ) 
                                     || (session.user.email && session.user.email[0].toUpperCase())
                                 }
                             </Avatar>

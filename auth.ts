@@ -1,61 +1,55 @@
 import NextAuth from "next-auth"
 import Cognito from "next-auth/providers/cognito"
-import { UpstashRedisAdapter } from "@auth/upstash-redis-adapter"
-import { Adapter, } from "@auth/core/adapters"
-import { Redis } from "@upstash/redis"
-
-type Profile = {
-  familyName: string,
-  givenName: string,
-  groups: string[],
-  zoneinfo: string
-}
+import { storeAccount } from "./app/lib/accessTokens"
+import { loggerFactory } from '@/app/lib/logger'
+const logger = loggerFactory({module: 'auth', level: 'debug'})
 
 declare module "next-auth" {
   interface User {
-    /** The user's postal address. */
-    //address: string,
-    //email: string | undefined | null,
-    profile: Profile
+    id?: string | undefined,
+    email?: string | null | undefined,
+    name?: string | null | undefined,
+    sub: string,
+    givenName: string,
+    familyName: string,
+    zoneinfo?: string,
+    groups?: string[],
+    serializedGroups?: string,
   }
 }
-
-export const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_URL!,
-  token: process.env.UPSTASH_REDIS_TOKEN!,
-})
-
-export const upStashOpt = { baseKeyPrefix: process.env.UPSTASH_BASE_KEY_PREFIX }
 
 export const {
   handlers: { GET, POST },
   auth,
 } = NextAuth({
-  adapter: UpstashRedisAdapter(redis, upStashOpt) as Adapter,
+  //adapter: UpstashRedisAdapter(redis, upStashOpt) as Adapter,
   debug: false,
   providers: [
+    
     Cognito({
       profile(profile) {
+        logger.debug(profile, 'in cognito callback')
         return {
-
-          profile: {
-            email: profile.email,
-            givenName: profile.given_name,
-            familyName: profile.family_name,
-            zoneinfo: profile.zoneinfo,
-            groups: profile["cognito:groups"]
-          }
+          id: profile.sub, // required by the db adapter, ignored if JWT
+          sub: profile.sub,
+          email: profile.email, // required by db adapter
+          name: profile.given_name + ' ' + profile.family_name,
+          givenName: profile.given_name,
+          familyName: profile.family_name,
+          zoneinfo: profile.zoneinfo,
+          groups: profile["cognito:groups"],
+          serializedGroups: profile["custom:serialized_groups"],
         }
       },
     })
-    //Cognito
+
+//    Cognito
   ],
   pages: {
     signIn: '/auth/signin',
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      //console.log('*** In signin callback', JSON.stringify({user, account, profile, email, credentials}, null, 4));
       return true
     },
     async redirect({ url, baseUrl }) {
@@ -63,24 +57,32 @@ export const {
     },
 
     async session({ session, user, token }) {
-      //console.log('*** In session callback', JSON.stringify({session, user, token}, null, 4) );
-      // session.user.profile = <Profile>token.profile; 
-      //session.tokens = { accessToken: 'at', refreshToken: 'rt'}
-      //session.profile = {test: 1}
+      // session in a basic session, user comes from the db adapter (if present), token comes from the jwt callback below
+      // copy all the user details in the token to the session user prop
+      // logger.debug({session, user, token}, 'in session callback')
+      session.user.id = token.id as string;
+      session.user.sub = token.sub as string;
+      session.user.givenName = token.givenName as string;
+      session.user.familyName = token.familyName as string;
+      session.user.groups = token.groups as string[];
+      session.user.zoneinfo = token.zoneinfo as string;
+      session.user.serializedGroups = token.serializedGroups as string;
+
       return session
     },
 
     async jwt({ token, user, account, profile, isNewUser }) {
-      console.log('*** In jwt callback', JSON.stringify({token, user, account, profile, isNewUser}, null, 4));
-      if (profile) {
-        // user logged in and we have cognito profile
-        token.profile = {
-          familyName: profile.family_name,
-          givenName: profile.given_name,
-          groups: profile['cognito:groups'],
-          //accessToken: account?.access_token
-        }
-      }
+      // token is a basic token
+      // user is what is returned by cognito profile callback above (on login)
+      // account is the cognito return, with the tokens
+      // profile is the cognito profile
+      if(user)
+        logger.debug({token, user, account, profile, isNewUser}, 'in jwt callback')
+      // expose all the Cognito user profile to the token.
+      if(user?.id && account)
+        await storeAccount(user.id, account);
+      if (user)
+        token = { ...token, ...user }
       return token
     }
   }

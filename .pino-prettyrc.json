@@ -1,0 +1,5 @@
+{
+    "messageFormat": "[{module}] {msg}",
+    "ignore": "module",
+    "singleLine": true
+}

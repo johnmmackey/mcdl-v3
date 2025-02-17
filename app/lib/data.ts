@@ -6,6 +6,10 @@ import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, Diver, AgeGrou
 import jwt from "jsonwebtoken";
 import { revalidateTag } from "next/cache";
 import { delay } from "./delay";
+import { getAccessToken } from "@/app/lib/accessTokens"
+
+import { loggerFactory } from '@/app/lib/logger'
+const logger = loggerFactory({module: 'data', level: 'debug'})
 
 
 export async function fetchCurrentSeasonId(): Promise<number> {
@@ -50,24 +54,32 @@ export async function fetchStandings(seasonId: number): Promise<GroupedStandings
 
 export async function fetchDivers({ seasonId, poolcode }: { seasonId: number, poolcode: string }): Promise<Diver[]> {
     const session = await auth();
-    const token = jwt.sign({ sub: session?.user?.email, groups: session?.user?.profile?.groups }, 'secret')
     return (await fetch(
         `${process.env.DATA_URL}/divers/${seasonId}/${poolcode}`,
         {
-            headers: { Authorization: "Bearer " + token }
+            headers: { Authorization: "Bearer " + "later gator" }
         }
     )).json();
 }
 
 export async function scoreMeet(meetId: number, data: Array<any>): Promise<undefined> {
-    console.log(`Saving scores...`)
-    await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
+    logger.debug(`Saving scores...`)
+    const session = await auth();
+    if(!session || !session.user)
+        throw new Error('Cant score meet if there is no session')
+
+    const accessToken = await getAccessToken(session.user.id as string);
+    let response = await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
         method: 'POST',
         body:JSON.stringify(data),
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + accessToken
           },
      });
+
+     if(!response.ok)
+        throw new Error('Error posting scores')
 
      //invalidate the cache for this meet
      revalidateTag(`meet:${meetId}`);

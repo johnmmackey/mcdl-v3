@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { auth } from "@/auth"
-import { getAccessToken } from "@/app/lib/getAccessToken"
-import "@/app/globals.css";
-import MyAppShell from '@/app/ui/AppShell'
-
-import '@mantine/core/styles.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 
 import { SanityLive } from "@/sanity/live";
+
+import { auth, } from "@/auth"
+import MyAppShell from '@/app/ui/AppShell'
+import { loggerFactory } from '@/app/lib/logger'
+const logger = loggerFactory({module: 'rootLayout', level: 'debug'})
+
+import '@mantine/core/styles.css';
+import "@/app/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,13 +26,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-
-  if(session?.user) {
-    console.log('session', session)
-    const start = Date.now();
-    const accessToken = await getAccessToken(session.user.id as string);
-    console.log(`Got access token in ${Date.now() - start} ms`)
-  }
+  logger.debug(session, 'session is')
 
   return (
     <html lang="en" suppressHydrationWarning>

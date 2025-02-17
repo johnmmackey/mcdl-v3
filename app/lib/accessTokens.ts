@@ -1,26 +1,12 @@
-import { defaultOptions } from "@auth/upstash-redis-adapter"
-import { logger } from "@/app/lib/logger"
+import { Account } from "@auth/core/types"
 import { Redis } from "@upstash/redis"
-
+import { loggerFactory } from '@/app/lib/logger'
+const logger = loggerFactory({ module: 'AccessTokens', level: 'debug' })
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_URL!,
   token: process.env.UPSTASH_REDIS_TOKEN!,
 })
-
-
-interface Account extends Record<string, string | number> {
-  access_token: string,
-  id_token: string,
-  refresh_token: string,
-  expires_at: number,
-  token_type: string,
-  providerAccountId: string,
-  provider: string,
-  type: string,
-  userId: string,
-  id: string
-}
 
 interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
@@ -50,19 +36,27 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
 }
 
 
+export const storeAccount = async (userId: string, account: Account): Promise<void> => {
+  logger.debug({userId},`storing account`)
+  await redis.set(
+    process.env.UPSTASH_BASE_KEY_PREFIX + userId,
+    JSON.stringify(account),
+    { exat: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60) }
+  );
+}
+
 // list of active refreshes
 // only want to do one refresh for a user, so we keep a static list
 let activeRefreshes: ActiveRefresh[] = [];
 
 
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
-export const getAccessToken = async (userId: string): Promise<string | null> => {
+export const getAccessToken = async (userId: string): Promise<string | undefined> => {
 
   let account = (await redis.get<Account>(process.env.UPSTASH_BASE_KEY_PREFIX + userId)) as Account;
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
-
-  if (account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
+  if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
     return account.access_token;
 
   // we need to refresh the token
@@ -75,6 +69,8 @@ export const getAccessToken = async (userId: string): Promise<string | null> => 
   }
 
   // new one, so lets start it
+  if (!account.refresh_token)
+    throw new Error('no refresh token available')
   const promiseOfRefreshedTokens = getRefreshedTokens(account.refresh_token);
   activeRefreshes.push({ userId, promiseOfRefreshedTokens });
 
