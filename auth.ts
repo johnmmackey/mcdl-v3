@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import Cognito from "next-auth/providers/cognito"
 import { storeAccount } from "./app/lib/accessTokens"
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'auth', level: 'debug'})
+const logger = loggerFactory({module: 'auth', level: 'error'})
 
 declare module "next-auth" {
   interface User {

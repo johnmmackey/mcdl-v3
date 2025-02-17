@@ -1,12 +1,20 @@
 import { Account } from "@auth/core/types"
 import { Redis } from "@upstash/redis"
+//import { createClient } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'AccessTokens', level: 'debug' })
+
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_URL!,
   token: process.env.UPSTASH_REDIS_TOKEN!,
 })
+
+/*
+const redis = createClient({
+  url: process.env.REDIS_URL
+});
+*/
 
 interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
