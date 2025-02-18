@@ -53,8 +53,8 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     )
 }
 
-const ResultsHeaderHOC = (meetType: string) =>
-    () => {
+const ResultsHeaderHOC = (meetType: string) => {
+    const Header = () => {
         return (
             <Grid columns={8}>
                 <GridCol span={1} className='font-semibold'>Pool</GridCol>
@@ -68,6 +68,8 @@ const ResultsHeaderHOC = (meetType: string) =>
             </Grid>
         )
     }
+    return Header;
+}
 
 const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType: string, ag: AgeGroup }) => {
     return (

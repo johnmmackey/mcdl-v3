@@ -2,5 +2,18 @@
   "extends": [
     "next/core-web-vitals",
     "next/typescript"
-  ]
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "off",
+    "prefer-const": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "alt-text": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-wrapper-object-types": "off",
+    "exhaustive-deps": "off",
+    "no-anonymous-default-export": "off",
+    "display-name": "off",
+    "@next/next/no-img-element": "off",
+    "no-var": "off"
+  }
 }

@@ -30,12 +30,12 @@ export default function Page(props: { params: Promise<{ meetId: number }> }) {
                 //const [teams, meet, ageGroups, meetResults] = d;
             })
 
-    }, []);
+    }, [params.meetId]);
 
     const handlePublish = () => {
         console.log('handling publish')
         fetchMeetResults(params.meetId)
-        .then (r => setMeetResults(r));
+            .then(r => setMeetResults(r));
     }
 
 
@@ -51,7 +51,7 @@ export default function Page(props: { params: Promise<{ meetId: number }> }) {
                     </MeetHeading>
 
                     {/* Fix: authorization issue here */}
-                    <PublishButton meet={meet} onClick={handlePublish}/>
+                    <PublishButton meet={meet} onClick={handlePublish} />
 
                     {/* Team Score */}
                     {meet.meetType != 'Star' &&
@@ -79,8 +79,8 @@ export default function Page(props: { params: Promise<{ meetId: number }> }) {
     )
 }
 
-const ResultsHeaderHOC = (meetType: string) =>
-    () => {
+const ResultsHeaderHOC = (meetType: string) => {
+    const Header = () => {
         return (
             <Grid columns={8}>
                 <GridCol span={1} className='font-semibold'>Pool</GridCol>
@@ -94,6 +94,8 @@ const ResultsHeaderHOC = (meetType: string) =>
             </Grid>
         )
     }
+    return Header;
+}
 
 const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType: string, ag: AgeGroup }) => {
     return (

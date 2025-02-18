@@ -11,9 +11,9 @@ const permissions: Permissions = {
 }
 
 export function meetPermissions(session: Session | null, meet: Meet) {
-    if (session?.user?.profile?.groups?.includes('admin'))
+    if (session?.user?.groups?.includes('admin'))
         return (['viewRoster', 'enterScores'])
-    if (session?.user?.profile?.groups?.includes(meet.hostPool || ''))
+    if (session?.user?.groups?.includes(meet.hostPool || ''))
         return (['viewRoster', 'enterScores'])
     if (session?.user)
         return (['viewRoster'])
@@ -24,7 +24,7 @@ export function userCan(targetType: string, target: any,  op: string, session: S
     let roles = {};
     const loggedIn = !!(session?.user);
 
-    session?.user?.profile?.groups?.forEach(g => {
+    session?.user?.groups?.forEach(g => {
         let tokens = g.split(':');
         Object.assign(roles, { [tokens[0]]: tokens.length > 1 ? tokens[1] : null });
     });

@@ -3,6 +3,7 @@ import { AppShell, Group, Burger, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { MyNavBar } from '@/app/ui/MyNavBar'
 import { Session } from 'next-auth';
+import Image from 'next/image'
 
 export default function MyAppShell({
     children,
@@ -31,7 +32,7 @@ export default function MyAppShell({
                         hiddenFrom="sm"
                         size="md"
                     />
-                    <img style={{ borderRadius: '30px' }} src='/diver.png' />
+                    <Image style={{ borderRadius: '30px' }} src='/diver.png' alt="diver" width={55} height={55}/>
                     <span className='text-2xl font-semibold'>MCDL</span>
                 </Group>
             </AppShell.Header>

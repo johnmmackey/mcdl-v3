@@ -41,7 +41,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     )
 }
 
-export const EntriesHeader = () => {
+const EntriesHeader = () => {
     return (
         <Grid columns={8}>
             <GridCol span={1} className='font-semibold'>Pool</GridCol>
@@ -50,7 +50,7 @@ export const EntriesHeader = () => {
     )
 }
 
-export const EntriesElement = ({entry}: {entry: Entry}) => {
+const EntriesElement = ({entry}: {entry: Entry}) => {
     return (
         <Grid columns={8} className='hover:bg-slate-200'>
             <GridCol span={1} className='py-1'>{entry.poolcode}</GridCol>

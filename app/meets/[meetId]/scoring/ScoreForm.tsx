@@ -27,7 +27,7 @@ const errorMatrix: Record<string, any> = {
     }
 }
 
-export default ({
+const ScoreForm = ({
     meet,
     ageGroups,
     meetEntries,
@@ -125,7 +125,7 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
             form.setValue(fName(ag.id, k, 'du'), false);
         if (ex || !du)
             form.setValue(fName(ag.id, k, 'wc'), '');
-    }, [form, ex, du]);
+    }, [form, ex, du, ag.id, k]);
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
@@ -188,3 +188,5 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
 }
 
 const fName = (agId: number, k: number, cat: string): string => `f.${agId}.${k}.${cat}`
+
+export default ScoreForm

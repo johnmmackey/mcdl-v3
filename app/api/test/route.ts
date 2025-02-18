@@ -1,8 +1,9 @@
 import { revalidatePath } from "next/cache"
 
-const GET = async function() {
+const GET = async function(req: any) {
+    console.log(req)
     revalidatePath('/standings/[seasonId]', 'page');
-    return Response.json({});
+    return Response.json({"a": 'b'});
 }
 
 export { GET }

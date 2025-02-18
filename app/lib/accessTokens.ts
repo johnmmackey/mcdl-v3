@@ -5,6 +5,14 @@ import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'AccessTokens', level: 'debug' })
 
 
+console.log('************************************ Loading accessTokens.ts ***********************************************')
+
+declare global {
+  var idflag: number
+}
+
+console.log('globalThis.idflag', globalThis.idflag)
+console.log('setting', globalThis.idflag = Date.now())
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_URL!,
   token: process.env.UPSTASH_REDIS_TOKEN!,
