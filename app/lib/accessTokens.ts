@@ -2,17 +2,11 @@ import { Account } from "@auth/core/types"
 import { Redis } from "@upstash/redis"
 //import { createClient } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({ module: 'AccessTokens', level: 'debug' })
 
 
-console.log('************************************ Loading accessTokens.ts ***********************************************')
+const id = Date.now();
+const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
 
-declare global {
-  var idflag: number
-}
-
-console.log('globalThis.idflag', globalThis.idflag)
-console.log('setting', globalThis.idflag = Date.now())
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_URL!,
   token: process.env.UPSTASH_REDIS_TOKEN!,
@@ -68,7 +62,7 @@ let activeRefreshes: ActiveRefresh[] = [];
 
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (userId: string): Promise<string | undefined> => {
-
+  logger.debug({userId},`getting access token`)
   let account = (await redis.get<Account>(process.env.UPSTASH_BASE_KEY_PREFIX + userId)) as Account;
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);

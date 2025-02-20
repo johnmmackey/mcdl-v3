@@ -1,8 +1,11 @@
 import NextAuth from "next-auth"
 import Cognito from "next-auth/providers/cognito"
+import { Account } from "@auth/core/types"
 import { storeAccount } from "./app/lib/accessTokens"
+import { Redis } from "@upstash/redis"
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'auth', level: 'error'})
+
+const logger = loggerFactory({module: 'auth'})
 
 declare module "next-auth" {
   interface User {
@@ -25,7 +28,6 @@ export const {
   //adapter: UpstashRedisAdapter(redis, upStashOpt) as Adapter,
   debug: false,
   providers: [
-    
     Cognito({
       profile(profile) {
         logger.debug(profile, 'in cognito callback')

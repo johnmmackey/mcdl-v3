@@ -7,7 +7,7 @@ import { SanityLive } from "@/sanity/live";
 import { auth, } from "@/auth"
 import MyAppShell from '@/app/ui/AppShell'
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'rootLayout', level: 'debug'})
+const logger = loggerFactory({module: 'rootLayout'})
 
 import '@mantine/core/styles.css';
 import "@/app/globals.css";

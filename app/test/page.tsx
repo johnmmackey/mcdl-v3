@@ -11,6 +11,9 @@ export default async function Home() {
       <h1>Hello.</h1>
       <pre>Session: {JSON.stringify(session, null, 2)}</pre>
       <div>{`Got ${menus.length} menus`}</div>
+      <pre>
+          {JSON.stringify(process.env, null, 4)}
+      </pre>
     </div>
   );
 }

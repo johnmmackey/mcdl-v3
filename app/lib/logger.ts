@@ -1,27 +1,18 @@
 import pino from 'pino';
-import chalk from 'chalk';
+import config from '@/loggerConfig.json'
 
 export const logger = pino(
-    {
-      level: process.env.PINO_LOG_LEVEL || 'info',
-      timestamp: pino.stdTimeFunctions.isoTime
-    },
-    //transport
-  );
+  {
+    level: process.env.PINO_LOG_LEVEL || config.main || 'info',
+    timestamp: pino.stdTimeFunctions.isoTime,
+  },
+);
 
-export const loggerFactory = ({module, level}: {module: string, level: string | undefined}) => {
-  let childLogger = logger.child({module});
-  if(level)
-    childLogger.level = level;
+export const loggerFactory = ({ module, subModule }: { module: string, subModule?: string }) => {
+  let childLogger = logger.child({ module, subModule });
+
+  if ((<any>config)[module])
+    childLogger.level = (<any>config)[module];
   return childLogger;
 }
-/*
-  const logger = pino(pino.destination({
-    sync: true // Asynchronous logging
-  }))
-*/
-export const chalkInfo = chalk.bold.blue, chalkPass = chalk.bold.green, chalkFail = chalk.bold.red, chalkImportant = chalk.bold, chalkWarn = chalk.yellow;
 
-export {
-    //chalkInfo, chalkPass, chalkFail, chalkImportant, chalkWarn, chalk
-}

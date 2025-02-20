@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
                 'pino-pretty',
                 '@axiomhq/pino',
         ],
+ 
 }
 
 export default nextConfig;

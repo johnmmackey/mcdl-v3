@@ -9,7 +9,7 @@ import { delay } from "./delay";
 import { getAccessToken } from "@/app/lib/accessTokens"
 
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'data', level: 'debug'})
+const logger = loggerFactory({module: 'data'})
 
 
 export async function fetchCurrentSeasonId(): Promise<number> {
