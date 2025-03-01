@@ -1,7 +1,7 @@
 import { Session } from "next-auth"
 
 export type Team = {
-    poolcode: string,
+    id: string,
     name: string | null,
     clubName: string | null,
     teamName: string | null,
@@ -11,10 +11,10 @@ export type Team = {
     url: string | null
 }
 
-export type MeetPool = {
+export type MeetTeam = {
     id: number,
     meetId: number,
-    poolcode: string,
+    teamId: string,
     score: number,
     meetRank: number,
     meetRankPeers: number,
@@ -31,36 +31,47 @@ export type Meet = {
     entryDeadline: string | null,
     hostPool: string | null,
     visitingPool: string | null,
-    visitingPool2: string | null,
     coordinatorPool: string | null,
     meetType: string,
     division: number | null,
     week: number | null,
-    minAge: number | null,
-    maxAge: number | null,
     scoresPublished: string | null,
-    meetsPools: MeetPool[]
+    teams: MeetTeam[]
 }
 
-export type Entry = {
+export type DiverSeason = {
+    id: number,
     diverId: number,
+    seasonId: number,
+    ageGroupId: number,
+    firstYear: boolean,
+    inactive: boolean,
+    registrationDate: string
+}
+
+export type DiverBase = {
+    id: number,
     firstName: string,
     lastName: string,
-    sex: string,
-    poolcode: string,
+    birthdate?: string,
+    gender: string,
+    teamId: string,
     createDate: string,
-    diverSeason: {
-        ageGroupId: number,
-        firstYear: boolean,
-        inactive: boolean,
-        registrationDate: string,
-    }
+}
+
+export type DiverWithSeason = DiverBase & { seasons: DiverSeason[]}
+
+export type Entry = {
+    id: number | null,
+    meetId: number,
+    diverId: number,
+    diver: DiverWithSeason,
     lateRegistration: boolean
 }
 
 export type AgeGroup = {
     id: number,
-    sex: string,
+    gender: string,
     name: string,
     min: number,
     max: number,
@@ -78,11 +89,11 @@ export type DiverScore = {
     points: number,
     scoreAgeGroup: number,
     exhibition: boolean,
-    poolcode: string,
+    teamId: string,
     diver: {
         firstName: string,
         lastName: string,
-        sex: string,
+        gender: string,
         createDate: string
     }
 }
@@ -96,19 +107,24 @@ export type Rank = {
 
 export type Standing = {
     season: number,
-    team: string,
+    teamId: string,
     division: number,
     seed: number,
     teamName: string,
-    dualRecord: {
-        W: number, L: number, T: number, dW: number, dL: number, dT: number
-    },
-    dualMeetSeasonRank: Rank,
-    divMeetScore: number,
-    divMeetRank: Rank,
-    dualMeetSeasonPoints: number,
-    sumDualDivRankPoints: number,
-    fullSeasonRank: Rank
+    dualW?: number,
+    dualL?: number,
+    dualT?: number,
+    dualDw?: number,
+    dualDl?: number,
+    dualDt?: number
+    dualMeetSeasonRank?: number,
+    divisionalScore?: number,
+    divisionalRank?: number,
+    divisionalPoints?: number,
+    dualPoints?: number,
+    fsTotalPoints?: number,
+    fsRank?: number,
+    tieBreaker?: number
 };
 
 export type GroupedStandings = {
@@ -123,19 +139,6 @@ export type Season = {
     endDate: string
 }
 
-export type Diver = {
-    id: number,
-    firstName: string,
-    lastName: string,
-    birthdate?: string,
-    sex: string,
-    poolcode: string,
-    createDate: string,
-    ageGroupId: number,
-    firstYear: boolean,
-    inactive: boolean,
-    registrationDate: string
-}
 
 export type GraphQLPosts = {
     data: {

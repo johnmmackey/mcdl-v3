@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack ",
+    "dev-pretty": "next dev --turbopack | pino-pretty",
     "build": "next build",
     "start": "next start",
+    "start-pretty": "next start | pino-pretty",
     "lint": "next lint"
   },
   "dependencies": {
@@ -25,6 +27,7 @@
     "next": "15.1.7",
     "next-auth": "^5.0.0-beta.25",
     "next-sanity": "^9.8.57",
+    "node-redis": "^0.1.7",
     "pino": "^9.6.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "react": "^19.0.0",

@@ -12,11 +12,12 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
 
   const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
   const standings = await fetchStandings(selectedSeasonId);
+
   if (!standings) {
     notFound();
   }
   const nStars = (n: number): string => Array(n + 1).join('*')
-  const fmt = (a: number | null, places?: number): string => a === null ? '' : (places ? a.toFixed(places) : a.toString());
+  const fmt = (a: number | null | undefined, places?: number): string => typeof a !== 'number' ? ' ' : (places ? a.toFixed(places) : a.toString());
 
   return (
     <>
@@ -43,15 +44,15 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
           <TableTbody>
             {divResults.map((t, k) =>
               <TableTr key={k} className="hover:bg-slate-400 hover:text-white">
-                <TableTd className='text-nowrap'>{t.teamName}</TableTd>
+                <TableTd className='text-nowrap'>{t.teamId}</TableTd>
                 <TableTd className='text-center'>{t.seed}</TableTd>
-                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualRecord.W)}-${fmt(t.dualRecord.L)}-${fmt(t.dualRecord.T)}`}</TableTd>
-                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualRecord.dW)}-${fmt(t.dualRecord.dL)}-${fmt(t.dualRecord.dT)}`}</TableTd>
-                <TableTd className='text-center'>{fmt(t.dualMeetSeasonRank.rankPoints)}</TableTd>
-                <TableTd className='text-right pr-10'>{fmt(t.divMeetScore, 1)}</TableTd>
-                <TableTd className='text-center'>{fmt(t.divMeetRank.rankPoints)}</TableTd>
+                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualW)}-${fmt(t.dualL)}-${fmt(t.dualT)}`}</TableTd>
+                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualDw)}-${fmt(t.dualDl)}-${fmt(t.dualDt)}`}</TableTd>
+                <TableTd className='text-center'>{fmt(t.dualPoints)}</TableTd>
+                <TableTd className='text-right pr-10'>{fmt(t.divisionalScore, 1)}</TableTd>
+                <TableTd className='text-center'>{fmt(t.divisionalPoints)}</TableTd>
                 <TableTd className='text-center'>
-                  {fmt(t.sumDualDivRankPoints) + ' ' + nStars(t.fullSeasonRank.tieBreakerLevel || 0)}
+                  {fmt(t.fsTotalPoints) + ' ' + nStars(t.tieBreaker || 0)}
                 </TableTd>
               </TableTr>
             )}

@@ -29,8 +29,8 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
 
                     return (
                         meetEntries
-                            .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
-                            .sort((a: Entry, b: Entry) => strcmp(a.poolcode + a.lastName + a.firstName, b.poolcode + b.lastName + b.firstName))
+                            .filter(e => e.diver.seasons![0].ageGroupId === (ag as AgeGroup).id)
+                            .sort((a: Entry, b: Entry) => strcmp(a.diver.teamId + a.diver.lastName + a.diver.firstName, b.diver.teamId + b.diver.lastName + b.diver.firstName))
                             .map((entry, k) =>
                                 <EntriesElement key={k} entry={entry} />
                             )
@@ -53,8 +53,8 @@ const EntriesHeader = () => {
 const EntriesElement = ({entry}: {entry: Entry}) => {
     return (
         <Grid columns={8} className='hover:bg-slate-200'>
-            <GridCol span={1} className='py-1'>{entry.poolcode}</GridCol>
-            <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
+            <GridCol span={1} className='py-1'>{entry.diver.teamId}</GridCol>
+            <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</GridCol>
         </Grid>
     )
 }

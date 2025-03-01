@@ -42,12 +42,12 @@ export const MeetScore = ({
 }>) => (
     <div style={{ maxWidth: '300px' }} className="border-solid border-2 p-4">
         {meet
-            .meetsPools
+            .teams
             .sort((a, b) => b.score - a.score)
             .map((ts, k) =>
                 <Grid key={k} columns={4}>
                     <GridCol span={3} className='text-left font-semibold'>
-                        {team(teams, ts.poolcode)?.name}</GridCol>
+                        {team(teams, ts.teamId)?.name}</GridCol>
                     <GridCol span={1} className='text-right font-semibold'>{ts.score.toFixed(1)}</GridCol>
                 </Grid>
             )
@@ -106,5 +106,5 @@ const Placeholder = ({
     )
 }
 
-const team = (teams: Team[], poolcode: string | null) => teams.find(e => e.poolcode === poolcode);
+const team = (teams: Team[], teamId: string | null) => teams.find(e => e.id === teamId);
 

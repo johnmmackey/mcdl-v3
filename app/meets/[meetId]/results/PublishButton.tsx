@@ -13,7 +13,7 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
     const [opened, { open, close }] = useDisclosure(false);
     const router = useRouter();
 
-    console.log('rendering publishbutton')
+    //console.log('rendering publishbutton')
 
     const togglePublished = async () => {
         close();
@@ -21,7 +21,7 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
 
             await setPublishedStatus(props.meet.id, !props.meet.scoresPublished)
                 .then(() => {
-                    console.log('published status set')
+                    //console.log('published status set')
                     props.onClick && props.onClick();
                 })
                 .catch((err) => {

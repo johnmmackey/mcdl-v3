@@ -6,7 +6,6 @@ import { PublishButton } from './PublishButton';
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
 
-    console.log('meet page')
     const params = await props.params;
 
     const [teams, meet, ageGroups, meetResults] = await Promise.all(
@@ -74,7 +73,7 @@ const ResultsHeaderHOC = (meetType: string) => {
 const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType: string, ag: AgeGroup }) => {
     return (
         <Grid columns={8} className='hover:bg-slate-200'>
-            <GridCol span={1} className='py-1'>{result.poolcode}</GridCol>
+            <GridCol span={1} className='py-1'>{result.teamId}</GridCol>
             <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{result.diver.lastName}</span>, {result.diver.firstName}</GridCol>
             <GridCol span={1} className='py-1 text-right'>{result.score.toFixed(2)}</GridCol>
             <GridCol span={1} className="py-1 text-center">

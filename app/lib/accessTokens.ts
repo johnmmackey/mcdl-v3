@@ -1,22 +1,23 @@
 import { Account } from "@auth/core/types"
-import { Redis } from "@upstash/redis"
-//import { createClient } from '@redis/client';
+import { createClient } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
-
 
 const id = Date.now();
 const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_URL!,
-  token: process.env.UPSTASH_REDIS_TOKEN!,
-})
+const client = createClient({
+  username: process.env.REDIS_USERNAME!,
+  password: process.env.REDIS_PASSWORD!,
+  socket: {
+    host: process.env.REDIS_HOST!,
+    port: parseInt(process.env.REDIS_PORT!),
+  },
 
-/*
-const redis = createClient({
-  url: process.env.REDIS_URL
 });
-*/
+
+client.on('error', err => logger.error({ err }, 'Redis Client Error'));
+logger.debug('creating REDIS client...')
+await client.connect();
 
 interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
@@ -47,11 +48,14 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
 
 
 export const storeAccount = async (userId: string, account: Account): Promise<void> => {
-  logger.debug({userId},`storing account`)
-  await redis.set(
+  logger.debug({ userId }, `storing account`);
+
+  await client.set(
     process.env.UPSTASH_BASE_KEY_PREFIX + userId,
     JSON.stringify(account),
-    { exat: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60) }
+    {
+      EXAT: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60)
+    }
   );
 }
 
@@ -62,8 +66,9 @@ let activeRefreshes: ActiveRefresh[] = [];
 
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (userId: string): Promise<string | undefined> => {
-  logger.debug({userId},`getting access token`)
-  let account = (await redis.get<Account>(process.env.UPSTASH_BASE_KEY_PREFIX + userId)) as Account;
+  logger.debug({ userId }, `getting access token`);
+  let account:Account = JSON.parse(await client.get(process.env.UPSTASH_BASE_KEY_PREFIX + userId) as string);
+  logger.debug({ userId }, `access token found`); 
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
   if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
@@ -88,7 +93,7 @@ export const getAccessToken = async (userId: string): Promise<string | undefined
   const newTokens = await promiseOfRefreshedTokens;
 
   const newAccount = { ...account, id_token: newTokens.id_token, access_token: newTokens.access_token, expires_at: Math.floor(Date.now() / 1000) + newTokens.expires_in };
-  await redis.set(process.env.UPSTASH_BASE_KEY_PREFIX + userId, JSON.stringify(newAccount));
+  await storeAccount(process.env.UPSTASH_BASE_KEY_PREFIX + userId, newAccount);
 
   // all cleaned up with new kv in redis, so can allow new token refreshes
   // race condition potential here, but I believe this works

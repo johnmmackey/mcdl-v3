@@ -9,7 +9,7 @@ import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
-import { Meet, MeetPool } from '@/app/lib/definitions'
+import { Meet, MeetTeam } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 
 export default async function Page(props: {
@@ -35,20 +35,20 @@ async function Meets(props: {
     season: number
 }) {
     const teams = await fetchTeams();
-    const kteams = keyBy(teams, 'poolcode');
+    const kteams = keyBy(teams, 'id');
     const meets = await fetchMeets(props.season);
     const smeets = sortBy(meets, ['meetDate', 'division']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
     const meetName = (m: Meet) => m.name || (m.hostPool && m.visitingPool && `${kteams[m.visitingPool].name} at ${kteams[m.hostPool].name}`);
     const scoreStr = (m: Meet) => {
-        if (!m.scoresPublished || !m.meetsPools.length)
+        if (!m.scoresPublished || !m.teams.length)
             return '';
-        if (m.meetsPools.length > 2)
+        if (m.teams.length > 2)
             return 'Results';
-        return (m.meetsPools.find(e => e.poolcode === m.visitingPool)?.score || 0)
+        return (m.teams.find(e => e.teamId === m.visitingPool)?.score || 0)
             + ' - '
-            + ((m.meetsPools.find(e => e.poolcode === m.hostPool)?.score)|| 0);
+            + ((m.teams.find(e => e.teamId === m.hostPool)?.score)|| 0);
     }
 
     return (

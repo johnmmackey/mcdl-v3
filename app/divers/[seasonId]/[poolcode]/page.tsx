@@ -6,7 +6,7 @@ import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@manti
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchAgeGroups, fetchDivers } from '@/app/lib/data';
 
-export default async function Page(props: { params: Promise<{ seasonId: number, poolcode: string }> }) {
+export default async function Page(props: { params: Promise<{ seasonId: number, teamId: string }> }) {
     const params = await props.params;
 
     const divers = await fetchDivers(params);

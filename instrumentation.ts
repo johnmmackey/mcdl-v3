@@ -1,5 +1,4 @@
  
 export async function register() {
-    console.log('registering')
-    process.env.REGISTER_TEST="it works"
+    console.log('No instrumentation registration')
 }
