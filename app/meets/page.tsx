@@ -4,8 +4,8 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Grid, GridCol } from '@mantine/core';
-import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
+import { Grid, GridCol, Button } from '@mantine/core';
+import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
@@ -21,9 +21,23 @@ export default async function Page(props: {
 
     const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
 
+
     return (
         <>
-            <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
+            <Grid>
+                <GridCol span={3}>
+                    <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
+                </GridCol>
+
+                <GridCol span={3}>
+                    <Link href={"/meets/new"}><Button>Add New</Button></Link>
+                </GridCol>
+            </Grid>
+            
+            
+
+
+
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
                 <Meets season={selectedSeasonId} />
             </Suspense>

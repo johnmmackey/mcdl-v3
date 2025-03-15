@@ -44,7 +44,7 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
                     }
                 </Button>
             }
-            <Modal opened={opened} onClose={close} title="Authentication" centered size="md">
+            <Modal opened={opened} onClose={close} title="Confirm" centered size="md">
                 Are You Sure?
                 <div>
                     <Button onClick={togglePublished}>Yes</Button>

@@ -40,7 +40,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                     <br />
                     <Link href={`/meets/${meet.id}/results`}>
                         <Button>
-                            Go to Parent
+                            Go to Results
                         </Button>
                     </Link>
                 </div>

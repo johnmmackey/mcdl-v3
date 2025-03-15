@@ -114,17 +114,21 @@ export type Standing = {
     dualW?: number,
     dualL?: number,
     dualT?: number,
-    dualDw?: number,
-    dualDl?: number,
-    dualDt?: number
-    dualMeetSeasonRank?: number,
-    divisionalScore?: number,
-    divisionalRank?: number,
-    divisionalPoints?: number,
-    dualPoints?: number,
+    dualDW?: number,
+    dualDL?: number,
+    dualDT?: number,
+
+    dualWLTPoints?: number,
+    dualRank?: number,
+    dualRankPoints?: number,
+
+    divScore?: number,
+    divRank?: number,
+    divRankPoints?: number,
+
     fsTotalPoints?: number,
     fsRank?: number,
-    tieBreaker?: number
+    fsTieBreaker?: number
 };
 
 export type GroupedStandings = {
@@ -137,6 +141,31 @@ export type Season = {
     registerDate: string,
     startDate: string,
     endDate: string
+}
+
+export type TeamSeason = {
+    id: number,
+    teamId: string,
+    seasonId: number,
+    divisionId: number,
+    seed: number,
+    dualW: number,
+    dualL: number,
+    dualT: number,
+    dualDW: number,
+    dualDL: number,
+    dualDT: number,
+    dualWLTPoints: number,
+    dualRank: number,
+    dualRankPoints: number,
+    divScore: number,
+    divRank: number,
+    divRankPoints: number,
+    fsTotalPoints: number,
+    fsRank: number,
+    fsTieBreaker: number,
+    tsCsAcceptedBy: string,
+    tsCsAcceptedAt: string
 }
 
 

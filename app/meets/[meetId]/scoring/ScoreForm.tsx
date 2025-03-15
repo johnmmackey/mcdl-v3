@@ -74,8 +74,8 @@ const ScoreForm = ({
                 renderContent={(ag: AgeGroup) => {
                     return (
                         entriesWithResults
-                            .filter(e => e.diverSeason.ageGroupId === (ag as AgeGroup).id)
-                            .sort((a: Entry, b: Entry) => strcmp(a.teamId + a.lastName + a.firstName, b.teamId + b.lastName + b.firstName))
+                            .filter(e => e.diver.seasons[0].ageGroupId === (ag as AgeGroup).id)
+                            .sort((a: Entry, b: Entry) => strcmp(a.diver.teamId + a.diver.lastName + a.diver.firstName, b.diver.teamId + b.diver.lastName + b.diver.firstName))
                             .map((entry, k) =>
                                 <ScoringElement key={k} k={k} ag={ag} entry={entry} form={form} meet={meet} />
                             )
@@ -129,8 +129,8 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
 
     return (
         <Grid columns={10} className='hover:bg-slate-200'>
-            <GridCol span={1} className='text-center'>{entry.teamId}</GridCol>
-            <GridCol span={3} className=''><span className="text-lg font-semibold">{entry.lastName}</span>, {entry.firstName}</GridCol>
+            <GridCol span={1} className='text-center'>{entry.diver.teamId}</GridCol>
+            <GridCol span={3} className=''><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</GridCol>
 
             <GridCol span={1} className='text-center'>
                 <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.diverId.toString()} />

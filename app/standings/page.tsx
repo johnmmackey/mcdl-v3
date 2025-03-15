@@ -47,12 +47,12 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
                 <TableTd className='text-nowrap'>{t.teamId}</TableTd>
                 <TableTd className='text-center'>{t.seed}</TableTd>
                 <TableTd className='text-center text-nowrap'>{`${fmt(t.dualW)}-${fmt(t.dualL)}-${fmt(t.dualT)}`}</TableTd>
-                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualDw)}-${fmt(t.dualDl)}-${fmt(t.dualDt)}`}</TableTd>
-                <TableTd className='text-center'>{fmt(t.dualPoints)}</TableTd>
-                <TableTd className='text-right pr-10'>{fmt(t.divisionalScore, 1)}</TableTd>
-                <TableTd className='text-center'>{fmt(t.divisionalPoints)}</TableTd>
+                <TableTd className='text-center text-nowrap'>{`${fmt(t.dualDW)}-${fmt(t.dualDL)}-${fmt(t.dualDT)}`}</TableTd>
+                <TableTd className='text-center'>{fmt(t.dualRankPoints)}</TableTd>
+                <TableTd className='text-right pr-10'>{fmt(t.divScore, 1)}</TableTd>
+                <TableTd className='text-center'>{fmt(t.divRankPoints)}</TableTd>
                 <TableTd className='text-center'>
-                  {fmt(t.fsTotalPoints) + ' ' + nStars(t.tieBreaker || 0)}
+                  {fmt(t.fsTotalPoints) + ' ' + nStars(t.fsTieBreaker || 0)}
                 </TableTd>
               </TableTr>
             )}

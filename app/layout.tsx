@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import '@mantine/dates/styles.css';
 
 import { SanityLive } from "@/sanity/live";
 
