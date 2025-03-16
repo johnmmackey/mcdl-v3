@@ -21,7 +21,6 @@ export default async function Page(props: {
     const currentSeasonId = await fetchCurrentSeasonId();
 
     const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
-
     const teamSeasons = await fetchTeamSeasons(selectedSeasonId);
 
     return (

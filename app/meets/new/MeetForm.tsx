@@ -1,38 +1,22 @@
 "use client";
 
-import Link from 'next/link';
-import { auth } from '@/auth';
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
-import keyBy from 'lodash/keyBy';
-import { format } from 'date-fns';
 import { Grid, GridCol, Button, } from '@mantine/core';
-//import { TextInput } from '@mantine/form'
-import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
-import { userCan } from '@/app/lib/userCan';
-import { SeasonSelector } from '@/app/ui/SeasonSelector';
-import Loading from '@/app/ui/Loading'
+
 import { Meet, MeetTeam, TeamSeason } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 
 import React, { useEffect, } from 'react';
-import { Form, useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
+import { Form, Control, useForm, SubmitHandler, useWatch, UseFormReturn, Controller } from "react-hook-form"
 import { DevTool } from "@hookform/devtools";
 
-import { TextInput, Select, DateTimePicker, Checkbox } from "react-hook-form-mantine"
+import { TextInput, NumberInput, Select, DateTimePicker, Checkbox, DatePickerInput } from "react-hook-form-mantine"
+import { TeamSelect } from './teamSelect';
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const schema = z.object({
-    meetName: z.string().nullable(),
-    meetDate: z.date(),
-    meetType: z.string(),
-    divisionId: z.number().nullable(),
-    teams: z.string().array()
-});
 
-type FormSchemaType = z.infer<typeof schema>;
 
 export const MeetForm = ({
     seasonId,
@@ -42,17 +26,23 @@ export const MeetForm = ({
     teamSeasons: TeamSeason[]
 }>) => {
 
-    /*
-        const form = useForm({ mode: 'onBlur', reValidateMode: 'onBlur' });
-        const router = useRouter();
-    */
-    const onSubmit: SubmitHandler<any> = (data) => {
+    const schema = z.object({
+        meetName: z.string(),
+        meetDate: z.date(),
+        meetType: z.string(),
+        //divisionId: z.coerce.number().nullable()
+        divisionId: z.coerce.number().nullable()
+    });
+
+    type FormSchemaType = z.infer<typeof schema>;
+
+    const onSubmit: SubmitHandler<FormSchemaType> = (data) => {
 
         console.log('in submit handler', data)
     }
 
 
-    const { control } = useForm<FormSchemaType>({
+    const { register, control, handleSubmit, formState: { errors } } = useForm<FormSchemaType>({
         resolver: zodResolver(schema),
         defaultValues: {
             meetName: '',
@@ -65,56 +55,79 @@ export const MeetForm = ({
         <>
             <Form
                 control={control}
-                onSubmit={(e) => onSubmit(e)}
-                onError={(e) => console.log(e)}
+                onSubmit={(e) => console.log('data', e.data)}
+                onError={(e) => console.log('error', e)}
+
+            //onSubmit={handleSubmit(onSubmit)}
             >
+                {/*
+                <Controller
+                    name="meetName"
+                    control={control}
+                    render={({ field }) =>
+                        <TextInput
+                            className="my-4"
+                            label="Meet Name"
+                            placeholder="Meet Name"
+                            {...field}
+                        />
+                    }
+                />
+*/}
                 <TextInput
+                    name="meetName"
                     className="my-4"
                     label="Meet Name"
                     placeholder="Meet Name"
-                    name={"meetName"}
                     control={control}
                 />
+
+
 
                 <DateTimePicker
+                    name="meetDate"
                     label="Meet Date"
                     placeholder="Pick date and time"
-                    control={control}
-                    name="meetDate"
                     className="my-4"
+                    control={control}
                 />
 
                 <Select
+                    name="divisionId"
                     label="Division"
                     className="my-4"
-                    data={["1", "2", "3", "4", "5"]}
-                    name="divisionId"
+                    data={[
+                        { value: "", label: "Non-divisional Meet" },
+                        { value: "1", label: "1" },
+                        { value: "2", label: "2" },
+                        { value: "3", label: "3" },
+                        { value: "4", label: "4" },
+                        { value: "5", label: "5" }
+                    ]}
                     control={control}
                 />
 
                 <Select
+                    name="meetType"
                     label="Meet Type"
                     className="my-4"
                     data={['Dual', 'Qual', 'Div', 'Star']}
-                    name="meetType"
                     control={control}
                 />
 
+                <TeamSelect teams={teamSeasons.map(e => e.teamId)} />
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
                 </Button>
 
-                {teamSeasons.map((ts, k) =>
-                    <Checkbox
-                        key={k}
-                        name="teams"
-                        control={control}
-                        label={ts.teamId}
-                    />
 
-                )}
             </Form>
-            <DevTool control={control} placement="top-left" />
+            {/*
+            <DevTool control={control} placement="top-right" />
+            */}
+            <div>
+                {JSON.stringify(errors)}
+            </div>
         </>
     )
 }
