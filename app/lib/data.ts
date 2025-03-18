@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason } from "./definitions";
+import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdate, MeetTeamUpdate } from "./definitions";
 
 import jwt from "jsonwebtoken";
 import { revalidateTag } from "next/cache";
@@ -10,7 +10,6 @@ import { getAccessToken } from "@/app/lib/accessTokens"
 
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({module: 'data'})
-
 
 export async function fetchCurrentSeasonId(): Promise<number> {
     return (await fetch(`${process.env.DATA_URL}/current-season-id`, { next: { revalidate: 30 } })).json();
@@ -39,7 +38,16 @@ export async function fetchMeets(seasonId: number): Promise<Meet[]> {
 }
 
 export async function fetchMeet(meetId: number): Promise<Meet> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
+    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } });
+    if(!r.ok)
+        throw new Error(`Error retrieving meet ${meetId}: ${r.statusText}`);
+
+    const meet: Meet = await r.json();
+    //rehydrate
+    return ({
+        ...meet,
+        meetDate: new Date(meet.meetDate)
+    })
 }
 
 export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
@@ -88,10 +96,27 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
      revalidateTag(`meets`);
 }
 
-export async function setPublishedStatus(meetId: number, status: boolean): Promise<undefined> {
+export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
     let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
         body:JSON.stringify({status}),
+        headers: {
+            "Content-Type": "application/json",
+          },
+     });
+
+     if(!r.ok)
+        throw new Error(r.statusText);
+
+     //invalidate the cache for this meet
+    revalidateTag(`meet:${meetId}`);
+    revalidateTag(`meets`);
+}
+
+export async function editMeet(meetId: number, meet: MeetUpdate, meetTeams: string[]): Promise<void> {
+    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
+        method: 'POST',
+        body:JSON.stringify({meet, meetTeams}),
         headers: {
             "Content-Type": "application/json",
           },

@@ -4,13 +4,15 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Grid, GridCol, Button } from '@mantine/core';
+import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem } from '@mantine/core';
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
 import { Meet, MeetTeam } from '@/app/lib/definitions'
 import { Suspense } from 'react';
+
+import { IconChevronRight, IconPlus, IconX, IconSettings, IconChevronDown, IconPencil, IconTag, IconFileSpreadsheet, IconLogin2, IconClipboardData, IconDotsVertical } from '@tabler/icons-react';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -30,13 +32,9 @@ export default async function Page(props: {
                 </GridCol>
 
                 <GridCol span={3}>
-                    <Link href={"/meets/new"}><Button>Add New</Button></Link>
+                    <Link href={"/meets/0/edit"}><Button>Add New</Button></Link>
                 </GridCol>
             </Grid>
-            
-            
-
-
 
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
                 <Meets season={selectedSeasonId} />
@@ -62,7 +60,7 @@ async function Meets(props: {
             return 'Results';
         return (m.teams.find(e => e.teamId === m.visitingPool)?.score || 0)
             + ' - '
-            + ((m.teams.find(e => e.teamId === m.hostPool)?.score)|| 0);
+            + ((m.teams.find(e => e.teamId === m.hostPool)?.score) || 0);
     }
 
     return (
@@ -72,24 +70,64 @@ async function Meets(props: {
 
                     <div className="mb-4 font-bold">{dt}</div>
 
-                    <Grid columns={5}>
+                    <Grid columns={6}>
                         <GridCol span={1} className='text-center font-semibold'>Division</GridCol>
                         <GridCol span={3} className='text-center font-semibold'>Meet Name</GridCol>
                         <GridCol span={1} className='text-center font-semibold'>Score</GridCol>
                     </Grid>
 
                     {meets.map((m, k2) =>
-                        <Link key={k2} href={`/meets/${m.id}/${m.scoresPublished ? 'results' : 'scoring'}`}>
-                            <Grid key={k2} className='hover:bg-slate-200' columns={5} >
-                                <GridCol span={1} className='text-center'>{m.division && m.division < 99 ? m.division : 'NDM'}</GridCol>
+                            <Grid key={k2} className='group hover:bg-slate-200' columns={6} >
+                                <GridCol span={1} className='text-center'>{m.divisionId && m.divisionId < 99 ? m.divisionId : 'NDM'}</GridCol>
                                 <GridCol span={3} className=''>
                                     <div>{meetName(m)}</div>
                                 </GridCol>
                                 <GridCol span={1} className='text-center'>
                                     <div>{scoreStr(m)}</div>
                                 </GridCol>
+                                <GridCol span={1} className='text-center'>
+                                        <Menu shadow="md" width={200}>
+                                            <MenuTarget>
+                                                <IconDotsVertical className="text-white group-hover:text-black"/>
+                                            </MenuTarget>
+
+                                            <MenuDropdown>
+                                                <Link href={`/meets/${m.id}/enter`}>
+                                                    <MenuItem leftSection={<IconLogin2 size={14} />}>
+                                                        Enter Divers
+                                                    </MenuItem>
+                                                </Link>
+                                                <Link href={`/meets/${m.id}/scoring`}>
+                                                    <MenuItem leftSection={<IconClipboardData size={14} />} >
+                                                        Enter Scores
+                                                    </MenuItem>
+                                                </Link>
+                                                <Link href={`/meets/${m.id}/roster`}>
+                                                    <MenuItem leftSection={<IconPlus size={14} />}>
+                                                        Roster
+                                                    </MenuItem>
+                                                </Link>
+                                                <Link href={`/meets/${m.id}/labels`}>
+                                                    <MenuItem leftSection={<IconTag size={14} />} >
+                                                        Print Labels
+                                                    </MenuItem>
+                                                </Link>
+                                                <Link href={`/meets/${m.id}/results`}>
+                                                    <MenuItem leftSection={<IconFileSpreadsheet size={14} />} >
+                                                        View Results
+                                                    </MenuItem>
+                                                </Link>
+                                                <Link href={`/meets/${m.id}/edit`}>
+                                                    <MenuItem leftSection={<IconPencil size={14} />} >
+                                                        Edit Meet
+                                                    </MenuItem>
+                                                </Link>
+                                            </MenuDropdown>
+                                        </Menu>
+
+                                </GridCol>
                             </Grid>
-                        </Link>
+
                     )}
                 </div>
             )}

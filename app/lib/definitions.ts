@@ -22,21 +22,45 @@ export type MeetTeam = {
 }
 
 
+export type MeetTeamUpdate = {
+    meetId?: number,
+    teamId?: string,
+    score?: number,
+    meetRank?: number,
+    meetRankPeers?: number,
+    meetRankPoints?: number
+}
+
 export type Meet = {
     id: number,
     seasonId: number,
     name: string | null,
     parentMeet: number | null,
-    meetDate: string,
+    meetDate: Date,
     entryDeadline: string | null,
     hostPool: string | null,
-    visitingPool: string | null,
+    visitingPool?: string | null,
     coordinatorPool: string | null,
     meetType: string,
-    division: number | null,
-    week: number | null,
+    divisionId: number | null,
+    week?: number | null,
     scoresPublished: string | null,
     teams: MeetTeam[]
+}
+
+export type MeetUpdate = {
+    seasonId?: number,
+    name?: string | null,
+    parentMeet?: number | null,
+    meetDate?: Date,
+    entryDeadline?: string | null,
+    hostPool?: string | null,
+    visitingPool?: string | null,
+    coordinatorPool?: string | null,
+    meetType?: string,
+    divisionId?: number | null,
+    week?: number | null,
+    scoresPublished?: string | null
 }
 
 export type DiverSeason = {
