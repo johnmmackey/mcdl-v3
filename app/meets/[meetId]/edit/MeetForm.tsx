@@ -3,7 +3,7 @@ import React, { useState, } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, } from '@mantine/core';
 
-import { Form, useForm } from "react-hook-form"
+import { Form, useForm, useWatch } from "react-hook-form"
 import { DevTool } from "@hookform/devtools";
 import { TextInput, Select, DateTimePicker } from "react-hook-form-mantine"
 
@@ -15,13 +15,13 @@ import { Meet, MeetTeam, TeamSeason, MeetUpdateInput, MeetCreateInput, Season } 
 import { TeamSelect } from './teamSelect';
 import { updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
-const nullToEmptyStr = (v:number|string|null|undefined) => v ?? '';
-const numToStr = (v:number) => v.toString();
+const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
+const numToStr = (v: number) => v.toString();
 
-const toFormStr = (v:number|string|null|undefined) => {
-    if(typeof v === "number")
+const toFormStr = (v: number | string | null | undefined) => {
+    if (typeof v === "number")
         return v.toString();
-    if(typeof v === "string")
+    if (typeof v === "string")
         return v;
     return '';
 };
@@ -42,19 +42,28 @@ export const MeetForm = ({
     seasons: Season[]
 }>) => {
 
-    console.log(JSON.stringify(meet))
-
     const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s.toString());
 
     const inSchema = z.object({
-        seasonId: z.coerce.string().nullish().transform(toFormStr),
-        name: z.string().nullish().transform(toFormStr),
+        seasonId: z.coerce.string().default('2025'),
+        name: z.string().default(''),
         meetDate: z.date().default(new Date()),
         entryDeadline: z.date().default(new Date()),
         meetType: z.string().default('Dual'),
-        divisionId: z.coerce.string().nullish().transform(toFormStr),
-        hostPool: z.string().nullish().transform(toFormStr),
-        coordinatorPool: z.string().nullish().transform(toFormStr)
+        divisionId: z.coerce.string().default(''),
+        hostPool: z.string().default(''),
+        coordinatorPool: z.string().default('')
+    });
+
+    const validationSchema = z.object({
+        seasonId: z.string(),
+        name: z.string(),
+        meetDate: z.date().nullish(),
+        entryDeadline: z.date().nullish(),
+        meetType: z.string(),
+        divisionId: z.string(),
+        hostPool: z.string(),
+        coordinatorPool: z.string()
     });
 
     const outSchema = z.object({
@@ -68,23 +77,16 @@ export const MeetForm = ({
         coordinatorPool: z.string().nullable()
     })
 
-    const validationSchema = z.object({
-        seasonId: z.string(),
-        name: z.string(),
-        meetDate: z.date(),
-        entryDeadline: z.date(),
-        meetType: z.string(),
-        divisionId: z.string(),
-        hostPool: z.string(),
-        coordinatorPool: z.string()
-    });
-
     type FormSchemaType = z.infer<typeof validationSchema>;
 
-    const { register, control, formState: { errors } } = useForm<FormSchemaType>({
+    const { register, watch, control, formState: { errors } } = useForm<FormSchemaType>({
         resolver: zodResolver(validationSchema),
         defaultValues: inSchema.parse(meet || {})
     });
+
+    //const watcher = useWatch({ control, name: 'meetType' });
+    //console.log('watcher', watcher);
+    const watcher = watch('meetType');
 
     const [mTeams, setMTeams] = useState<string[]>(teams);
     const router = useRouter();
@@ -135,13 +137,25 @@ export const MeetForm = ({
                     className="my-4"
                     control={control}
                 />
-                <DateTimePicker
-                    name="entryDeadline"
-                    label="Entry Deadline"
-                    placeholder="Pick date and time"
+
+                <Select
+                    name="meetType"
+                    label="Meet Type"
                     className="my-4"
+                    data={['Dual', 'Qual', 'Div', 'Star']}
                     control={control}
                 />
+
+                {(watcher === 'Div' || watcher === 'Star') &&
+                    <DateTimePicker
+                        name="entryDeadline"
+                        label="Entry Deadline"
+                        placeholder="Pick date and time"
+                        className="my-4"
+                        control={control}
+                    />
+                }
+
                 <Select
                     name="divisionId"
                     label="Division"
@@ -158,20 +172,13 @@ export const MeetForm = ({
                 />
 
                 <Select
-                    name="meetType"
-                    label="Meet Type"
-                    className="my-4"
-                    data={['Dual', 'Qual', 'Div', 'Star']}
-                    control={control}
-                />
-
-                <Select
                     name="hostPool"
                     label="Host Pool"
                     className="my-4"
                     data={teamSeasons.map(e => e.teamId).sort()}
                     control={control}
                 />
+
                 <Select
                     name="coordinatorPool"
                     label="Coordinator Pool"
@@ -196,7 +203,7 @@ export const MeetForm = ({
             <DevTool control={control} placement="top-right" />
             */}
             <div>
-                {JSON.stringify(errors)}
+                {JSON.stringify(errors)}{JSON.stringify(control)}
             </div>
         </>
     )
