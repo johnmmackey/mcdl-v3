@@ -1,62 +1,108 @@
 "use client";
-import React, {useState,  } from 'react';
+import React, { useState, } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, } from '@mantine/core';
 
 import { Form, useForm } from "react-hook-form"
 import { DevTool } from "@hookform/devtools";
-import { TextInput, Select, DateTimePicker} from "react-hook-form-mantine"
+import { TextInput, Select, DateTimePicker } from "react-hook-form-mantine"
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Meet, MeetUpdate, MeetTeam, TeamSeason, MeetTeamUpdate } from '@/app/lib/definitions'
+import { Meet, MeetTeam, TeamSeason, MeetUpdateInput, MeetCreateInput, Season } from '@/app/lib/definitions'
+
 import { TeamSelect } from './teamSelect';
-import { editMeet } from '@/app/lib/data';
+import { updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
+
+const nullToEmptyStr = (v:number|string|null|undefined) => v ?? '';
+const numToStr = (v:number) => v.toString();
+
+const toFormStr = (v:number|string|null|undefined) => {
+    if(typeof v === "number")
+        return v.toString();
+    if(typeof v === "string")
+        return v;
+    return '';
+};
 
 export const MeetForm = ({
     seasonId,
     teamSeasons,
-    meet
+    meet,
+    meetId,
+    teams,
+    seasons
 }: Readonly<{
     seasonId: number
     teamSeasons: TeamSeason[],
-    meet: Meet
+    meet: Meet | null,
+    meetId: number | null,
+    teams: string[],
+    seasons: Season[]
 }>) => {
 
-    const schema = z.object({
+    console.log(JSON.stringify(meet))
+
+    const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s.toString());
+
+    const inSchema = z.object({
+        seasonId: z.coerce.string().nullish().transform(toFormStr),
+        name: z.string().nullish().transform(toFormStr),
+        meetDate: z.date().default(new Date()),
+        entryDeadline: z.date().default(new Date()),
+        meetType: z.string().default('Dual'),
+        divisionId: z.coerce.string().nullish().transform(toFormStr),
+        hostPool: z.string().nullish().transform(toFormStr),
+        coordinatorPool: z.string().nullish().transform(toFormStr)
+    });
+
+    const outSchema = z.object({
+        seasonId: z.coerce.number(),
         name: z.string().nullable(),
         meetDate: z.date(),
+        entryDeadline: z.date().nullable(),
         meetType: z.string(),
-        divisionId: z.coerce.number().transform( v => v > 0 ? v : null),
-        hostPool: z.string().transform(v => v.length ? v : null)
+        divisionId: z.coerce.number().nullable(),
+        hostPool: z.string().nullable(),
+        coordinatorPool: z.string().nullable()
+    })
+
+    const validationSchema = z.object({
+        seasonId: z.string(),
+        name: z.string(),
+        meetDate: z.date(),
+        entryDeadline: z.date(),
+        meetType: z.string(),
+        divisionId: z.string(),
+        hostPool: z.string(),
+        coordinatorPool: z.string()
     });
 
-    type FormSchemaType = z.infer<typeof schema>;
+    type FormSchemaType = z.infer<typeof validationSchema>;
 
     const { register, control, formState: { errors } } = useForm<FormSchemaType>({
-        resolver: zodResolver(schema),
-        defaultValues: meet
+        resolver: zodResolver(validationSchema),
+        defaultValues: inSchema.parse(meet || {})
     });
 
-    const [mTeams, setMTeams] = useState<string[]>(meet.teams.map(e => e.teamId));
+    const [mTeams, setMTeams] = useState<string[]>(teams);
     const router = useRouter();
 
     const handleSubmit = ({ data }: { data: FormSchemaType }) => {
+        console.log(data)
+        const outData = outSchema.parse(data);
 
-        console.log('in submit handler', data)
-        console.log('meet teams', mTeams);
+        return (meetId ? updateMeet(meetId, outData, mTeams) : createMeet(outData, mTeams))
+            //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
+            .then(() => router.push(`/meets`));
+    }
 
-        const newMeet: MeetUpdate = {
-            seasonId: seasonId,
-            parentMeet: null,
-            entryDeadline: null,
-            coordinatorPool: null,
-            ...data,
-        };
-
-        return editMeet(meet.id, newMeet, mTeams)
-            .then(() => router.push(`/meets`))
+    const handleDelete = () => {
+        if (meetId)
+            deleteMeet(meetId)
+                //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
+                .then(() => router.push(`/meets`));
     }
 
     return (
@@ -65,6 +111,14 @@ export const MeetForm = ({
                 control={control}
                 onSubmit={handleSubmit}
             >
+                <Select
+                    name="seasonId"
+                    label="Season"
+                    className="my-4"
+                    data={sortedSeasons}
+                    control={control}
+                    disabled={!!meetId}
+                />
 
                 <TextInput
                     name="name"
@@ -81,7 +135,13 @@ export const MeetForm = ({
                     className="my-4"
                     control={control}
                 />
-
+                <DateTimePicker
+                    name="entryDeadline"
+                    label="Entry Deadline"
+                    placeholder="Pick date and time"
+                    className="my-4"
+                    control={control}
+                />
                 <Select
                     name="divisionId"
                     label="Division"
@@ -112,12 +172,24 @@ export const MeetForm = ({
                     data={teamSeasons.map(e => e.teamId).sort()}
                     control={control}
                 />
+                <Select
+                    name="coordinatorPool"
+                    label="Coordinator Pool"
+                    className="my-4"
+                    data={teamSeasons.map(e => e.teamId).sort()}
+                    control={control}
+                />
 
                 <TeamSelect teams={teamSeasons.map(e => e.teamId)} mTeams={mTeams} setMTeams={setMTeams} />
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
                 </Button>
 
+                {meetId &&
+                    <Button className={'mt-4'} disabled={false} variant='danger' onClick={handleDelete}>
+                        Delete Meet
+                    </Button>
+                }
 
             </Form>
             {/*

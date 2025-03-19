@@ -23,6 +23,7 @@ export const TeamSelect = ({
 
 
     const handlemTeamsSelect = (val: string) => {
+        combobox.closeDropdown();
         setMTeams((current) =>
             current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
         );

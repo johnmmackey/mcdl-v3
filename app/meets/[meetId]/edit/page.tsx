@@ -5,44 +5,33 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Grid, GridCol, Button } from '@mantine/core';
-import { fetchMeet, fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons } from '@/app/lib/data';
+import { fetchMeet, fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons, fetchSeasons } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
-import { Meet, MeetTeam } from '@/app/lib/definitions'
+import { Meet, MeetCreateInput, MeetTeam } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 
 import { MeetForm } from './MeetForm'
 
-export default async function Page(props: {params: Promise<{ meetId: string }> }) {
+export default async function Page(props: {
+    params: Promise<{ meetId: string }>,
+    searchParams: Promise<{ 'season-id': number }>
+}) {
     const params = await props.params;
-    const meetId = parseInt(params.meetId);
+    const searchParams = await props.searchParams;
+
+    const seasons = await fetchSeasons();
     const currentSeasonId = await fetchCurrentSeasonId();
-
-    const meet = meetId
-        ? await fetchMeet(meetId)
-        : {
-            id: 0,
-            seasonId: currentSeasonId,
-            parentMeet: null,
-            name: '',
-            meetDate: new Date(),
-            entryDeadline: null,
-            hostPool: '',
-            meetType: '',
-            divisionId: 1,
-            coordinatorPool: null,
-            scoresPublished: null,
-            teams:[]
-        }
-
-    //const searchParams = await props.searchParams;
-
-    const selectedSeasonId = currentSeasonId; //searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
+    const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
     const teamSeasons = await fetchTeamSeasons(selectedSeasonId);
+    const meetId: number | null = parseInt(params.meetId) || null;
+
+    const existingMeet = meetId ? await fetchMeet(meetId) : null;
+    const formTeams = existingMeet ? existingMeet.teams.map(t => t.teamId) : [];
 
     return (
-        <MeetForm seasonId={currentSeasonId} teamSeasons={teamSeasons} meet={meet}></MeetForm>
+        <MeetForm seasonId={selectedSeasonId} teamSeasons={teamSeasons} meet={existingMeet} teams={formTeams} meetId={meetId} seasons={seasons} />
     )
 }
 

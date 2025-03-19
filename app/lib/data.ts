@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdate, MeetTeamUpdate } from "./definitions";
+import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, } from "./definitions";
 
 import jwt from "jsonwebtoken";
 import { revalidateTag } from "next/cache";
@@ -9,7 +9,7 @@ import { delay } from "./delay";
 import { getAccessToken } from "@/app/lib/accessTokens"
 
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'data'})
+const logger = loggerFactory({ module: 'data' })
 
 export async function fetchCurrentSeasonId(): Promise<number> {
     return (await fetch(`${process.env.DATA_URL}/current-season-id`, { next: { revalidate: 30 } })).json();
@@ -32,21 +32,20 @@ export async function fetchAgeGroups(): Promise<AgeGroup[]> {
 }
 
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
-    console.log(`Delaying fetch by ${process.env.FETCH_DELAY || 0} ms...`)
-    await delay(Number(process.env.FETCH_DELAY) || 0);
     return await (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30, tags: ['meets'] } })).json();
 }
 
 export async function fetchMeet(meetId: number): Promise<Meet> {
-    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } });
-    if(!r.ok)
+    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } });
+    if (!r.ok)
         throw new Error(`Error retrieving meet ${meetId}: ${r.statusText}`);
 
     const meet: Meet = await r.json();
     //rehydrate
     return ({
         ...meet,
-        meetDate: new Date(meet.meetDate)
+        meetDate: new Date(meet.meetDate),
+        entryDeadline: meet.entryDeadline ? new Date(meet.entryDeadline) : null
     })
 }
 
@@ -75,57 +74,107 @@ export async function fetchDivers({ seasonId, teamId }: { seasonId: number, team
 export async function scoreMeet(meetId: number, data: Array<any>): Promise<undefined> {
     logger.debug(`Saving scores...`)
     const session = await auth();
-    if(!session || !session.user)
+    if (!session || !session.user)
         throw new Error('Cant score meet if there is no session')
 
     const accessToken = await getAccessToken(session.user.id as string);
-    let response = await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
+    const response = await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
         method: 'POST',
-        body:JSON.stringify(data),
+        body: JSON.stringify(data),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + accessToken
-          },
-     });
+        },
+    });
 
-     if(!response.ok)
+    if (!response.ok)
         throw new Error('Error posting scores')
 
-     //invalidate the cache for this meet
-     revalidateTag(`meet:${meetId}`);
-     revalidateTag(`meets`);
-}
-
-export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
-    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
-        method: 'POST',
-        body:JSON.stringify({status}),
-        headers: {
-            "Content-Type": "application/json",
-          },
-     });
-
-     if(!r.ok)
-        throw new Error(r.statusText);
-
-     //invalidate the cache for this meet
+    //invalidate the cache for this meet
     revalidateTag(`meet:${meetId}`);
     revalidateTag(`meets`);
 }
 
-export async function editMeet(meetId: number, meet: MeetUpdate, meetTeams: string[]): Promise<void> {
-    let r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
+export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
+    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
-        body:JSON.stringify({meet, meetTeams}),
+        body: JSON.stringify({ status }),
         headers: {
             "Content-Type": "application/json",
-          },
-     });
+        },
+    });
 
-     if(!r.ok)
+    if (!r.ok)
         throw new Error(r.statusText);
 
-     //invalidate the cache for this meet
+    //invalidate the cache for this meet
     revalidateTag(`meet:${meetId}`);
+    revalidateTag(`meets`);
+}
+
+export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({meet, teams}),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!r.ok)
+        throw new Error(r.statusText);
+
+    //invalidate the cache for this meet
+    revalidateTag(`meet:${meetId}`);
+    revalidateTag(`meets`);
+    return await(r.json());
+}
+
+export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+    const r = await fetch(`${process.env.DATA_URL}/meets`, {
+        method: 'POST',
+        body: JSON.stringify({meet, teams}),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!r.ok)
+        throw new Error(r.statusText);
+
+    //invalidate the cache for this meet
+    revalidateTag(`meets`);
+    return await(r.json());
+}
+
+export async function updateMeetTeams(meetId: number, meetTeams: string[]): Promise<void> {
+    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/teams`, {
+        method: 'PATCH',
+        body: JSON.stringify(meetTeams),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!r.ok)
+        throw new Error(r.statusText);
+
+    //invalidate the cache for this meet
+    revalidateTag(`meet:${meetId}`);
+    revalidateTag(`meets`);
+}
+
+export async function deleteMeet(meetId: number): Promise<void> {
+    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!r.ok)
+        throw new Error(r.statusText);
+
+    //invalidate the cache for this meet
     revalidateTag(`meets`);
 }

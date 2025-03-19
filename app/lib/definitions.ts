@@ -22,7 +22,7 @@ export type MeetTeam = {
 }
 
 
-export type MeetTeamUpdate = {
+export type MeetTeamUpdateInput = {
     meetId?: number,
     teamId?: string,
     score?: number,
@@ -37,7 +37,7 @@ export type Meet = {
     name: string | null,
     parentMeet: number | null,
     meetDate: Date,
-    entryDeadline: string | null,
+    entryDeadline: Date | null,
     hostPool: string | null,
     visitingPool?: string | null,
     coordinatorPool: string | null,
@@ -48,19 +48,34 @@ export type Meet = {
     teams: MeetTeam[]
 }
 
-export type MeetUpdate = {
+export type MeetCreateInput = {
+    seasonId: number,
+    name?: string | null,
+    parentMeet?: number | null,
+    meetDate?: Date,
+    entryDeadline?: Date | null,
+    hostPool?: string | null,
+    //visitingPool?: string | null,
+    coordinatorPool?: string | null,
+    meetType?: string,
+    divisionId?: number | null,
+    //week?: number | null,
+    //scoresPublished?: string | null
+}
+
+export type MeetUpdateInput = {
     seasonId?: number,
     name?: string | null,
     parentMeet?: number | null,
     meetDate?: Date,
-    entryDeadline?: string | null,
+    entryDeadline?: Date | null,
     hostPool?: string | null,
-    visitingPool?: string | null,
+    //visitingPool?: string | null,
     coordinatorPool?: string | null,
     meetType?: string,
     divisionId?: number | null,
-    week?: number | null,
-    scoresPublished?: string | null
+    //week?: number | null,
+    //scoresPublished?: string | null
 }
 
 export type DiverSeason = {

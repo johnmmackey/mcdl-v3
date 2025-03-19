@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem } from '@mantine/core';
+import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, MenuLabel } from '@mantine/core';
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
@@ -32,7 +32,7 @@ export default async function Page(props: {
                 </GridCol>
 
                 <GridCol span={3}>
-                    <Link href={"/meets/0/edit"}><Button>Add New</Button></Link>
+                    <Link href={"/meets/_/edit"}><Button>Add New</Button></Link>
                 </GridCol>
             </Grid>
 
@@ -117,11 +117,14 @@ async function Meets(props: {
                                                         View Results
                                                     </MenuItem>
                                                 </Link>
+                                                <MenuDivider />
+                                                <MenuLabel>Admin</MenuLabel>
                                                 <Link href={`/meets/${m.id}/edit`}>
                                                     <MenuItem leftSection={<IconPencil size={14} />} >
                                                         Edit Meet
                                                     </MenuItem>
                                                 </Link>
+
                                             </MenuDropdown>
                                         </Menu>
 
