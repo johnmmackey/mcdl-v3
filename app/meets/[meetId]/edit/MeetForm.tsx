@@ -5,7 +5,7 @@ import { Button, } from '@mantine/core';
 
 import { Form, useForm, useWatch } from "react-hook-form"
 import { DevTool } from "@hookform/devtools";
-import { TextInput, Select, DateTimePicker } from "react-hook-form-mantine"
+import { TextInput, Select, DateTimePicker, MultiSelect } from "react-hook-form-mantine"
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,25 @@ const toFormStr = (v: number | string | null | undefined) => {
     return '';
 };
 
+class zx {
+    static string(): z.ZodEffects<z.ZodString, string, unknown> {
+      return z.preprocess((arg) => {
+        if (arg === null || arg === undefined) {
+          return "";
+        }
+  
+        if (typeof arg === "string") {
+          return arg;
+        }
+        if (typeof arg === "number") {
+          return arg.toString();
+        }
+  
+        return "";
+      }, z.string());
+    }
+  }
+
 export const MeetForm = ({
     meet,
     meetId,
@@ -40,13 +59,14 @@ export const MeetForm = ({
 
     const inSchema = z.object({
         seasonId: z.coerce.string().default('2025'),
-        name: z.string().default(''),
+        name: zx.string(),
         meetDate: z.date().default(new Date()),
-        entryDeadline: z.date().default(new Date()),
+        entryDeadline: z.date().nullable().default(new Date()),
         meetType: z.string().default('Dual'),
-        divisionId: z.coerce.string().default(''),
-        hostPool: z.string().default(''),
-        coordinatorPool: z.string().default('')
+        divisionId: zx.string(),
+        hostPool: zx.string(),
+        coordinatorPool: zx.string(),
+        teams: z.object({teamId: z.string()}).array().transform(ts => ts.map(t => t.teamId)).default([])
     });
 
     const validationSchema = z.object({
@@ -57,18 +77,19 @@ export const MeetForm = ({
         meetType: z.string(),
         divisionId: z.string(),
         hostPool: z.string(),
-        coordinatorPool: z.string()
+        coordinatorPool: z.string(),
+        teams: z.string().array()
     });
 
     const outSchema = z.object({
         seasonId: z.coerce.number(),
-        name: z.string().nullable(),
+        name: z.string(),
         meetDate: z.date(),
         entryDeadline: z.date().nullable(),
         meetType: z.string(),
-        divisionId: z.coerce.number().nullable(),
-        hostPool: z.string().nullable(),
-        coordinatorPool: z.string().nullable()
+        divisionId: z.coerce.number(),
+        hostPool: z.string(),
+        coordinatorPool: z.string()
     })
 
     type FormSchemaType = z.infer<typeof validationSchema>;
@@ -79,8 +100,8 @@ export const MeetForm = ({
     });
 
     const showEntryDeadline = ['Div', 'Star'].includes(watch('meetType'));
-
     const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         console.log('fetching teams for ', watch('seasonId'))
@@ -88,18 +109,13 @@ export const MeetForm = ({
             .then(r => {
                 const ts = r.map(r => r.teamId).sort()
                 setActiveTeamIds(ts);
-                console.log('resetting host and coordinator pool values')
                 if(!ts.includes(getValues('hostPool')))
                     setValue('hostPool', '');
                 if(!ts.includes(getValues('coordinatorPool')))
                     setValue('coordinatorPool', '');
-                setMTeams(mTeams.filter(e => ts.includes(e)));
+                setValue('teams', getValues('teams').filter(e => ts.includes(e)));
             });
     }, [watch('seasonId')]);
-
-
-    const [mTeams, setMTeams] = useState<string[]>(meet?.teams.map(mt => mt.teamId) || []);
-    const router = useRouter();
 
     const handleSubmit = ({ data }: { data: FormSchemaType }) => {
         console.log(data)
@@ -197,7 +213,13 @@ export const MeetForm = ({
                     control={control}
                 />
 
-                <TeamSelect teams={activeTeamIds} mTeams={mTeams} setMTeams={setMTeams} />
+                <MultiSelect
+                    name="teams"
+                    label="Teams"
+                    className="my-4"
+                    data={activeTeamIds}
+                    control={control}
+                />
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
                 </Button>

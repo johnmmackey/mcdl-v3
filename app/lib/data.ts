@@ -147,6 +147,7 @@ export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promis
     return await(r.json());
 }
 
+/*
 export async function updateMeetTeams(meetId: number, meetTeams: string[]): Promise<void> {
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/teams`, {
         method: 'PATCH',
@@ -163,6 +164,7 @@ export async function updateMeetTeams(meetId: number, meetTeams: string[]): Prom
     revalidateTag(`meet:${meetId}`);
     revalidateTag(`meets`);
 }
+*/
 
 export async function deleteMeet(meetId: number): Promise<void> {
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
