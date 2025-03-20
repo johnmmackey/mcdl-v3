@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, } from '@mantine/core';
 
@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Meet, MeetTeam, TeamSeason, MeetUpdateInput, MeetCreateInput, Season } from '@/app/lib/definitions'
 
 import { TeamSelect } from './teamSelect';
-import { updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
+import { fetchTeamSeasons, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
 const numToStr = (v: number) => v.toString();
@@ -27,18 +27,12 @@ const toFormStr = (v: number | string | null | undefined) => {
 };
 
 export const MeetForm = ({
-    seasonId,
-    teamSeasons,
     meet,
     meetId,
-    teams,
     seasons
 }: Readonly<{
-    seasonId: number
-    teamSeasons: TeamSeason[],
     meet: Meet | null,
     meetId: number | null,
-    teams: string[],
     seasons: Season[]
 }>) => {
 
@@ -79,16 +73,32 @@ export const MeetForm = ({
 
     type FormSchemaType = z.infer<typeof validationSchema>;
 
-    const { register, watch, control, formState: { errors } } = useForm<FormSchemaType>({
+    const { setValue, getValues, watch, control, formState: { errors } } = useForm<FormSchemaType>({
         resolver: zodResolver(validationSchema),
-        defaultValues: inSchema.parse(meet || {})
+        defaultValues: inSchema.parse(meet ?? {})
     });
 
-    //const watcher = useWatch({ control, name: 'meetType' });
-    //console.log('watcher', watcher);
-    const watcher = watch('meetType');
+    const showEntryDeadline = ['Div', 'Star'].includes(watch('meetType'));
 
-    const [mTeams, setMTeams] = useState<string[]>(teams);
+    const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        console.log('fetching teams for ', watch('seasonId'))
+        fetchTeamSeasons(parseInt(watch('seasonId')))
+            .then(r => {
+                const ts = r.map(r => r.teamId).sort()
+                setActiveTeamIds(ts);
+                console.log('resetting host and coordinator pool values')
+                if(!ts.includes(getValues('hostPool')))
+                    setValue('hostPool', '');
+                if(!ts.includes(getValues('coordinatorPool')))
+                    setValue('coordinatorPool', '');
+                setMTeams(mTeams.filter(e => ts.includes(e)));
+            });
+    }, [watch('seasonId')]);
+
+
+    const [mTeams, setMTeams] = useState<string[]>(meet?.teams.map(mt => mt.teamId) || []);
     const router = useRouter();
 
     const handleSubmit = ({ data }: { data: FormSchemaType }) => {
@@ -146,7 +156,7 @@ export const MeetForm = ({
                     control={control}
                 />
 
-                {(watcher === 'Div' || watcher === 'Star') &&
+                {showEntryDeadline &&
                     <DateTimePicker
                         name="entryDeadline"
                         label="Entry Deadline"
@@ -175,7 +185,7 @@ export const MeetForm = ({
                     name="hostPool"
                     label="Host Pool"
                     className="my-4"
-                    data={teamSeasons.map(e => e.teamId).sort()}
+                    data={[{value: '', label: '<none>'}].concat(activeTeamIds.map(e => ({label: e, value: e})))}
                     control={control}
                 />
 
@@ -183,11 +193,11 @@ export const MeetForm = ({
                     name="coordinatorPool"
                     label="Coordinator Pool"
                     className="my-4"
-                    data={teamSeasons.map(e => e.teamId).sort()}
+                    data={[{value: '', label: '<none>'}].concat(activeTeamIds.map(e => ({label: e, value: e})))}
                     control={control}
                 />
 
-                <TeamSelect teams={teamSeasons.map(e => e.teamId)} mTeams={mTeams} setMTeams={setMTeams} />
+                <TeamSelect teams={activeTeamIds} mTeams={mTeams} setMTeams={setMTeams} />
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
                 </Button>
@@ -203,7 +213,7 @@ export const MeetForm = ({
             <DevTool control={control} placement="top-right" />
             */}
             <div>
-                {JSON.stringify(errors)}{JSON.stringify(control)}
+                {JSON.stringify(errors)}
             </div>
         </>
     )

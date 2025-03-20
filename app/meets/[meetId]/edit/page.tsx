@@ -19,19 +19,12 @@ export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number }>
 }) {
     const params = await props.params;
-    const searchParams = await props.searchParams;
-
     const seasons = await fetchSeasons();
-    const currentSeasonId = await fetchCurrentSeasonId();
-    const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
-    const teamSeasons = await fetchTeamSeasons(selectedSeasonId);
     const meetId: number | null = parseInt(params.meetId) || null;
-
     const existingMeet = meetId ? await fetchMeet(meetId) : null;
-    const formTeams = existingMeet ? existingMeet.teams.map(t => t.teamId) : [];
 
     return (
-        <MeetForm seasonId={selectedSeasonId} teamSeasons={teamSeasons} meet={existingMeet} teams={formTeams} meetId={meetId} seasons={seasons} />
+        <MeetForm meet={existingMeet}  meetId={meetId} seasons={seasons} />
     )
 }
 
