@@ -81,7 +81,7 @@ export const MeetForm = ({
         teams: z.string().array()
     });
 
-    const outSchema = z.object({
+    const outMeetSchema = z.object({
         seasonId: z.coerce.number(),
         name: z.string(),
         meetDate: z.date(),
@@ -90,7 +90,12 @@ export const MeetForm = ({
         divisionId: z.coerce.number(),
         hostPool: z.string(),
         coordinatorPool: z.string()
-    })
+    });
+
+    // flatten teams to a simgple array of strings
+    const outTeamsSchema = z.object({
+        teams: z.string().array()
+    }).transform(ts => ts.teams);
 
     type FormSchemaType = z.infer<typeof validationSchema>;
 
@@ -119,9 +124,10 @@ export const MeetForm = ({
 
     const handleSubmit = ({ data }: { data: FormSchemaType }) => {
         console.log(data)
-        const outData = outSchema.parse(data);
+        const outMeetData = outMeetSchema.parse(data);
+        const outTeamsData = outTeamsSchema.parse(data);
 
-        return (meetId ? updateMeet(meetId, outData, mTeams) : createMeet(outData, mTeams))
+        return (meetId ? updateMeet(meetId, outMeetData, outTeamsData) : createMeet(outMeetData, outTeamsData))
             //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
             .then(() => router.push(`/meets`));
     }

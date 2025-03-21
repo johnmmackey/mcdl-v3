@@ -20,7 +20,7 @@ export default async function Page(props: {
 }) {
     const params = await props.params;
     const seasons = await fetchSeasons();
-    const meetId: number | null = parseInt(params.meetId) || null;
+    const meetId = parseInt(params.meetId) || null;
     const existingMeet = meetId ? await fetchMeet(meetId) : null;
 
     return (
