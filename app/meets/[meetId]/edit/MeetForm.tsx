@@ -79,7 +79,15 @@ export const MeetForm = ({
         hostPool: z.string(),
         coordinatorPool: z.string(),
         teams: z.string().array()
-    });
+    }).superRefine((val, ctx) => {
+        if (val.meetType === 'Dual' && val.teams.length !== 2 ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['teams'],
+            message: `Dual Meets must have 2 teams`,
+          });
+        }
+      });;
 
     const outMeetSchema = z.object({
         seasonId: z.coerce.number(),
@@ -237,12 +245,6 @@ export const MeetForm = ({
                 }
 
             </Form>
-            {/*
-            <DevTool control={control} placement="top-right" />
-            */}
-            <div>
-                {JSON.stringify(errors)}
-            </div>
         </>
     )
 }

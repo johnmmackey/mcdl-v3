@@ -45,7 +45,7 @@ export type Meet = {
     divisionId: number | null,
     week?: number | null,
     scoresPublished: string | null,
-    teams?: MeetTeam[]
+    teams: MeetTeam[]
 }
 
 export type MeetCreateInput = {
