@@ -15,7 +15,7 @@ const client = createClient({
 
 });
 
-client.on('error', err => logger.error({ err }, 'Redis Client Error'));
+client.on('error', err => logger.error('Redis Client Error'));
 logger.debug('creating REDIS client...')
 await client.connect();
 
@@ -48,7 +48,7 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
 
 
 export const storeAccount = async (userId: string, account: Account): Promise<void> => {
-  logger.debug({ userId }, `storing account`);
+  logger.debug(`storing account`);
 
   await client.set(
     process.env.UPSTASH_BASE_KEY_PREFIX + userId,
@@ -66,9 +66,9 @@ let activeRefreshes: ActiveRefresh[] = [];
 
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (userId: string): Promise<string | undefined> => {
-  logger.debug({ userId }, `getting access token`);
+  logger.debug(`getting access token`);
   let account:Account = JSON.parse(await client.get(process.env.UPSTASH_BASE_KEY_PREFIX + userId) as string);
-  logger.debug({ userId }, `access token found`); 
+  logger.debug(`access token found`); 
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
   if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life

@@ -11,6 +11,18 @@ import { getAccessToken } from "@/app/lib/accessTokens"
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'data' })
 
+
+
+async function accessToken(): Promise<string> {
+    const session = await auth();
+    if (!session || !session.user)
+        throw new Error('Cant score meet if there is no session')
+    const t = await getAccessToken(session.user.id as string);
+    if(!t)
+        throw new Error('Cant get access token');
+    return t;
+}
+
 export async function fetchCurrentSeasonId(): Promise<number> {
     return (await fetch(`${process.env.DATA_URL}/current-season-id`, { next: { revalidate: 30 } })).json();
 }
@@ -73,17 +85,14 @@ export async function fetchDivers({ seasonId, teamId }: { seasonId: number, team
 
 export async function scoreMeet(meetId: number, data: Array<any>): Promise<undefined> {
     logger.debug(`Saving scores...`)
-    const session = await auth();
-    if (!session || !session.user)
-        throw new Error('Cant score meet if there is no session')
 
-    const accessToken = await getAccessToken(session.user.id as string);
+    const t = await accessToken();
     const response = await fetch(`${process.env.DATA_URL}/scores/${meetId}`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + accessToken
+            "Authorization": "Bearer " + t
         },
     });
 
@@ -96,11 +105,14 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
 }
 
 export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
+    const t = await accessToken();
+
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/set-published-status`, {
         method: 'POST',
         body: JSON.stringify({ status }),
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
         },
     });
 
@@ -113,11 +125,13 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
 }
 
 export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+    const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
         method: 'PATCH',
         body: JSON.stringify({meet, teams}),
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
         },
     });
 
@@ -131,11 +145,13 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: s
 }
 
 export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+    const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets`, {
         method: 'POST',
         body: JSON.stringify({meet, teams}),
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
         },
     });
 
@@ -147,30 +163,13 @@ export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promis
     return await(r.json());
 }
 
-/*
-export async function updateMeetTeams(meetId: number, meetTeams: string[]): Promise<void> {
-    const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}/teams`, {
-        method: 'PATCH',
-        body: JSON.stringify(meetTeams),
-        headers: {
-            "Content-Type": "application/json",
-        },
-    });
-
-    if (!r.ok)
-        throw new Error(r.statusText);
-
-    //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`);
-    revalidateTag(`meets`);
-}
-*/
-
 export async function deleteMeet(meetId: number): Promise<void> {
+    const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
         method: 'DELETE',
         headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
         },
     });
 
@@ -180,3 +179,5 @@ export async function deleteMeet(meetId: number): Promise<void> {
     //invalidate the cache for this meet
     revalidateTag(`meets`);
 }
+
+

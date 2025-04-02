@@ -49,10 +49,16 @@ async function Meets(props: {
     const teams = await fetchTeams();
     const kteams = keyBy(teams, 'id');
     const meets = await fetchMeets(props.season);
-    const smeets = sortBy(meets, ['meetDate', 'division']);
+    const smeets = sortBy(meets, ['meetDate', 'divisionId']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
-    const meetName = (m: Meet) => m.name || (m.hostPool && m.visitingPool && `${kteams[m.visitingPool].name} at ${kteams[m.hostPool].name}`);
+    const meetName = (m: Meet) => {
+        if(m.name)
+            return m.name;
+
+        const visitingTeams = m.teams.filter(e => e.teamId !== m.hostPool).map(t => kteams[t.teamId].name);
+        return visitingTeams.join(', ') + (m.hostPool ? ' @ ' + kteams[m.hostPool!].name : '' );
+    } 
     const scoreStr = (m: Meet) => {
         if (!m.scoresPublished || !m.teams.length)
             return '';

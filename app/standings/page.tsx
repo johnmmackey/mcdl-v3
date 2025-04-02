@@ -3,21 +3,22 @@ import { Fragment } from 'react';
 import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
 import { notFound } from 'next/navigation';
 
-import {SeasonSelector} from '@/app/ui/SeasonSelector';
+import { SeasonSelector } from '@/app/ui/SeasonSelector';
 
 
-export default async function Page(props: { searchParams: Promise<{ 'season-id': number }> }) {
+export default async function Page(props: { searchParams: Promise<{ 'season-id'?: string, debug?: string }> }) {
   const searchParams = await props.searchParams;
   const currentSeasonId = await fetchCurrentSeasonId();
 
   const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
+  const debug = !!searchParams['debug']
   const standings = await fetchStandings(selectedSeasonId);
 
   if (!standings) {
     notFound();
   }
   const nStars = (n: number): string => Array(n + 1).join('*')
-  const fmt = (a: number | null | undefined, places?: number): string => typeof a !== 'number' ? ' ' : (places ? a.toFixed(places) : a.toString());
+  const fmt = (a: number, places?: number): string => (places ? a.toFixed(places) : a.toString());
 
   return (
     <>
@@ -43,17 +44,24 @@ export default async function Page(props: { searchParams: Promise<{ 'season-id':
           </TableThead>
           <TableTbody>
             {divResults.map((t, k) =>
-              <TableTr key={k} className="hover:bg-slate-400 hover:text-white">
+              <TableTr key={k} >
                 <TableTd className='text-nowrap'>{t.teamId}</TableTd>
                 <TableTd className='text-center'>{t.seed}</TableTd>
                 <TableTd className='text-center text-nowrap'>{`${fmt(t.dualW)}-${fmt(t.dualL)}-${fmt(t.dualT)}`}</TableTd>
                 <TableTd className='text-center text-nowrap'>{`${fmt(t.dualDW)}-${fmt(t.dualDL)}-${fmt(t.dualDT)}`}</TableTd>
-                <TableTd className='text-center'>{fmt(t.dualRankPoints)}</TableTd>
-                <TableTd className='text-right pr-10'>{fmt(t.divScore, 1)}</TableTd>
-                <TableTd className='text-center'>{fmt(t.divRankPoints)}</TableTd>
-                <TableTd className='text-center'>
-                  {fmt(t.fsTotalPoints) + ' ' + nStars(t.fsTieBreaker || 0)}
-                </TableTd>
+                {t.seasonComplete || debug
+                  ? <>
+                    <TableTd className='text-center'>{fmt(t.dualRankPoints)}</TableTd>
+                    <TableTd className='text-right pr-10'>{fmt(t.divScore, 1)}</TableTd>
+                    <TableTd className='text-center'>{fmt(t.divRankPoints)}</TableTd>
+                    <TableTd className='text-center'>
+                      {fmt(t.fsTotalPoints) + ' ' + nStars(t.fsTieBreaker || 0)}
+                    </TableTd>
+                  </>
+                  : <>
+                    <TableTd className='text-center' colSpan={5}></TableTd>
+                  </>
+                }
               </TableTr>
             )}
           </TableTbody>

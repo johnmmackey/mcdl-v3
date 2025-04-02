@@ -150,24 +150,26 @@ export type Standing = {
     division: number,
     seed: number,
     teamName: string,
-    dualW?: number,
-    dualL?: number,
-    dualT?: number,
-    dualDW?: number,
-    dualDL?: number,
-    dualDT?: number,
+    dualW: number,
+    dualL: number,
+    dualT: number,
+    dualDW: number,
+    dualDL: number,
+    dualDT: number,
 
-    dualWLTPoints?: number,
-    dualRank?: number,
-    dualRankPoints?: number,
+    dualWLTPoints: number,
+    dualRank: number,
+    dualRankPoints: number,
 
-    divScore?: number,
-    divRank?: number,
-    divRankPoints?: number,
+    divScore: number,
+    divRank: number,
+    divRankPoints: number,
 
-    fsTotalPoints?: number,
-    fsRank?: number,
-    fsTieBreaker?: number
+    fsTotalPoints: number,
+    fsRank: number,
+    fsTieBreaker: number,
+
+    seasonComplete: boolean
 };
 
 export type GroupedStandings = {
