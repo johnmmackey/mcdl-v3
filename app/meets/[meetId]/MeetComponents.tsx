@@ -17,7 +17,7 @@ export const MeetHeading = ({
         <h1 className="text-center text-2xl text-bold pt-2">
             {
                 meet.name
-                || (meet.meetType === 'Dual' && `${team(teams, meet.visitingPool)?.name} (${meet.visitingPool}) at ${team(teams, meet.hostPool)?.name} (${meet.hostPool})`)
+                || (meet.meetType === 'Dual' && `${team(teams, meet.visitingPool || null)?.name} (${meet.visitingPool}) at ${team(teams, meet.hostPool)?.name} (${meet.hostPool})`)
                 || `Meet ID ${meet.id}`
             }
         </h1>

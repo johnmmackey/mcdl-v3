@@ -16,7 +16,9 @@ const client = createClient({
 });
 
 client.on('error', err => logger.error('Redis Client Error'));
-logger.debug('creating REDIS client...')
+logger.debug('creating REDIS client...');
+logger.debug({a:1, b:2});
+logger.debug({a:1, b:2}, 'combo messsage')
 await client.connect();
 
 interface RefreshResponse extends Record<string, string | number> {

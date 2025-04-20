@@ -13,9 +13,10 @@ export default async function Page(props: { params: Promise<{ seasonId: number, 
     const ageGroups = await fetchAgeGroups();
 
     const sDivers = sortBy(divers, ['lastName', 'firstName']);
-    const gDivers = groupBy(sDivers, e => e.ageGroupId);
+    //const gDivers = groupBy(sDivers, e => e.ageGroupId);
 
     return (
+        {/*
         ageGroups.map((ag, k) =>
             <div key={k} className='my-8'>
                 <Table striped>
@@ -46,6 +47,8 @@ export default async function Page(props: { params: Promise<{ seasonId: number, 
                 </Table>
             </div>
         )
+            */}
+            
     )
 }
 
