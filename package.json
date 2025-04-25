@@ -13,6 +13,7 @@
   "dependencies": {
     "@auth/upstash-redis-adapter": "^2.8.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.787.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^5.0.1",
     "@mantine/core": "^7.17.4",
     "@mantine/dates": "^7.17.4",

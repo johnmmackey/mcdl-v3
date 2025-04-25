@@ -207,6 +207,16 @@ export type TeamSeason = {
     fsTieBreaker: number,
     tsCsAcceptedBy: string,
     tsCsAcceptedAt: string
+    team: {
+        id: string,
+        name: string,
+        clubName: string,
+        teamName: string,
+        address1: string,
+        address2: string,
+        phone: string,
+        url: string
+    }
 }
 
 

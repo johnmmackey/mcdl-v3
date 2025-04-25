@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Meet, MeetTeam, TeamSeason, MeetUpdateInput, MeetCreateInput, Season } from '@/app/lib/definitions'
 
 import { TeamSelect } from './teamSelect';
-import { fetchTeamSeasons, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
+import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
 const numToStr = (v: number) => v.toString();
@@ -118,7 +118,7 @@ export const MeetForm = ({
 
     useEffect(() => {
         console.log('fetching teams for ', watch('seasonId'))
-        fetchTeamSeasons(parseInt(watch('seasonId')))
+        fetchTeamsForSeason(parseInt(watch('seasonId')))
             .then(r => {
                 const ts = r.map(r => r.teamId).sort()
                 setActiveTeamIds(ts);

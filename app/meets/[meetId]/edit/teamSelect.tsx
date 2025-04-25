@@ -3,8 +3,6 @@ import { ActionIcon, Button, CheckIcon, Combobox, Grid, GridCol, Group, Menu, Me
 import { IconChevronRight, IconPlus, IconX, IconSettings, IconChevronDown, IconSelector} from '@tabler/icons-react';
 import classes from "./teamselect.module.css"
 
-import { Team, TeamSeason } from '@/app/lib/definitions';
-
 export const TeamSelect = ({
     teams,
     mTeams,

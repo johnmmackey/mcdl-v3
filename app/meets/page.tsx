@@ -5,7 +5,7 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, MenuLabel } from '@mantine/core';
-import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamSeasons } from '@/app/lib/data';
+import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'

@@ -5,20 +5,12 @@ import Link from 'next/link'
 import { Session } from 'next-auth';
 import {
     IconHome,
-    IconScubaDiving,
     IconChartBarPopular,
-    IconFileDescription,
-    Icon2fa,
     IconFiles,
-    IconBellRinging,
-    IconDatabaseImport,
-    IconFingerprint,
     IconKey,
     IconLogin,
-    IconLogout,
-    IconReceipt2,
     IconSettings,
-    IconSwitchHorizontal,
+    IconUsersGroup,
 } from '@tabler/icons-react';
 import { signIn, signOut } from "next-auth/react"
 
@@ -26,13 +18,13 @@ import classes from './MyNavBar.module.css';
 
 const data = [
     { link: '/', label: 'Home', icon: IconHome },
+    { link: '/teams', label: 'Teams', icon: IconUsersGroup },
     { link: '/meets', label: 'Meets', icon: IconDiver },
     { link: '/standings', label: 'Standings', icon: IconChartBarPopular },
     { link: '/resources', label: 'Resources', icon: IconFiles },
     { link: '/users', label: 'Users', icon: IconKey },
-    { link: '', label: 'Databases', icon: IconDatabaseImport },
-    { link: '', label: 'Authentication', icon: Icon2fa },
-    { link: '', label: 'Other Settings', icon: IconSettings },
+
+    { link: '/test', label: 'Test Page', icon: IconSettings },
 ];
 
 export function MyNavBar({ session, toggle }: { session: Session | null, toggle: () => void }) {

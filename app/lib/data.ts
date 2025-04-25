@@ -35,8 +35,8 @@ export async function fetchTeams(): Promise<Team[]> {
     return await (await fetch(`${process.env.DATA_URL}/teams`, { next: { revalidate: 30 } })).json();
 }
 
-export async function fetchTeamSeasons(seasonId: number): Promise<TeamSeason[]> {
-    return await (await fetch(`${process.env.DATA_URL}/team-seasons?season-id=${seasonId}`, { next: { revalidate: 30 } })).json();
+export async function fetchTeamsForSeason(seasonId: number): Promise<TeamSeason[]> {
+    return await (await fetch(`${process.env.DATA_URL}/team-seasons?season-id=${seasonId}&include-team-detail=1`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchAgeGroups(): Promise<AgeGroup[]> {
