@@ -1,4 +1,4 @@
-import { Container, Grid, GridCol, Popover, PopoverDropdown, PopoverTarget, Overlay, Menu, MenuTarget, MenuDropdown, MenuItem, Button } from '@mantine/core';
+import { Container, Grid, GridCol, Popover, PopoverDropdown, PopoverTarget, Overlay, Menu, MenuTarget, MenuDropdown, MenuItem, Button , Group} from '@mantine/core';
 import {
     IconChevronDown,
 } from '@tabler/icons-react';
@@ -29,6 +29,15 @@ export default async function CrudGrid<T>({
                         <PopoverTarget>
 
                             <Grid className={classes.item}>
+                            import { Group, Button } from '@mantine/core';
+
+
+    <Group justify="flex-end">
+      <Button variant="default">First</Button>
+      <Button variant="default">Second</Button>
+      <Button variant="default">Third</Button>
+    </Group>
+
                                 <div className={classes.test}>
                                     <div className={classes.menuItem}>
                                         <Button>test</Button>
