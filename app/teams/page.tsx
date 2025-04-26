@@ -9,8 +9,9 @@ import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamsForSeason } fro
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
-import { Meet, MeetTeam } from '@/app/lib/definitions'
+import { Meet, MeetTeam, TeamSeason } from '@/app/lib/definitions'
 import { Suspense } from 'react';
+import CrudGrid from '@/app/ui/crudGrid';
 
 import { IconChevronRight, IconPlus, IconX, IconSettings, IconChevronDown, IconPencil, IconTag, IconFileSpreadsheet, IconLogin2, IconClipboardData, IconDotsVertical } from '@tabler/icons-react';
 
@@ -22,6 +23,7 @@ export default async function Page(props: {
     const currentSeasonId = await fetchCurrentSeasonId();
 
     const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
+    const teamsForSeason = (await fetchTeamsForSeason(selectedSeasonId)).sort((a, b) => (a.team.name > b.team.name) ? 1 : -1);
 
 
     return (
@@ -33,37 +35,29 @@ export default async function Page(props: {
             </Grid>
 
             <Suspense fallback={Loading()} >
-                <Teams season={selectedSeasonId} />
+                <CrudGrid resources={teamsForSeason} renderHeader={TeamHeader} renderRow={TeamRow} />
             </Suspense>
         </>
     )
 }
 
-async function Teams(props: {
-    season: number
-}) {
-    //const teams = await fetchTeams();
-    //const kteams = keyBy(teams, 'id');
-    const teamsForSeason = (await fetchTeamsForSeason(props.season)).sort((a, b) => (a.team.name > b.team.name) ? 1 : -1);
 
+function TeamHeader() {
     return (
-        <div style={{ maxWidth: '1000px' }}>
-            <Grid columns={12}>
+        <>
                 <GridCol span={3} className='text-center font-semibold'>Team Name</GridCol>
                 <GridCol span={1} className='text-center font-semibold'>Code</GridCol>
                 <GridCol span={6} className='text-center font-semibold'>Address</GridCol>
-            </Grid>
-            {teamsForSeason.map((t, k) =>
-                <div key={k}  >
-                    <Grid columns={12}>
-                        <GridCol span={3} className=''>{t.team.name}</GridCol>
-                        <GridCol span={1} className='text-center'>{t.teamId}</GridCol>
-                        <GridCol span={6} className=''>{t.team.address1 + ', ' + t.team.address2}</GridCol>
-                    </Grid>
-
-                </div>
-            )}
-        </div >
+        </>
     )
 }
 
+function TeamRow(t: TeamSeason) {
+    return (
+        <>
+            <GridCol span={3} className=''>{t.team.name}</GridCol>
+            <GridCol span={1} className='text-center'>{t.teamId}</GridCol>
+            <GridCol span={6} className=''>{t.team.address1 + ', ' + t.team.address2}</GridCol>
+        </>
+    )
+}
