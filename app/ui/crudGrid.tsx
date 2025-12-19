@@ -1,9 +1,10 @@
-import { Container, Grid, GridCol, Popover, PopoverDropdown, PopoverTarget, Overlay, Menu, MenuTarget, MenuDropdown, MenuItem, Button , Group} from '@mantine/core';
+import { Container, Grid, GridCol, Popover, PopoverDropdown, PopoverTarget, Overlay, Menu, MenuTarget, MenuDropdown, MenuItem, Button, Group, Table, TableThead, TableTbody, TableTr, TableTd } from '@mantine/core';
 import {
     IconChevronDown,
 } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import classes from './CrudGrid.module.css';
+import Row from './CrudGridRow'
 
 export default async function CrudGrid<T>({
     resources,
@@ -19,49 +20,49 @@ export default async function CrudGrid<T>({
 
     return (
         <>
-            <Grid>
-                {renderHeader && renderHeader()}
-            </Grid>
+
+
+            <Table striped>
+                <TableThead>
+                    <TableTr>
+                        {   renderHeader && renderHeader()}
+                        </TableTr>
+                </TableThead>
+                <TableTbody>
+                    {(sorter ? resources.sort(sorter) : resources).map((r, k) =>
+                        <Row key={k} renderedRow={renderRow(r)} />
+                    )}
+                </TableTbody>
+            </Table>
+        </>
+    )
+}
+
+/*
             <Container className={classes.striped}>
                 {(sorter ? resources.sort(sorter) : resources).map((r, k) =>
 
-                    <Popover key={k} position='bottom' width='target' offset={-50}>
-                        <PopoverTarget>
-
-                            <Grid className={classes.item}>
-                            import { Group, Button } from '@mantine/core';
 
 
-    <Group justify="flex-end">
-      <Button variant="default">First</Button>
-      <Button variant="default">Second</Button>
-      <Button variant="default">Third</Button>
-    </Group>
+                    <Grid key={k} className={classes.item} columns={14}>
 
-                                <div className={classes.test}>
-                                    <div className={classes.menuItem}>
-                                        <Button>test</Button>
-                                    </div>
-                                    <div className={classes.menuItem}>
-                                        <Button>test2</Button>
-                                    </div>
-                                </div>
-                                {
-                                    renderRow(r)
-                                }
-                            </Grid>
-                        </PopoverTarget>
-                        <PopoverDropdown>
-                            <Button size='xs'>Button</Button>
-                        </PopoverDropdown>
-                    </Popover>
+                        {
+                            renderRow(r)
+                        }
+                        <GridCol span={1} key={99}>
+                            <div className={classes.actionGroupBox}>
+                                <Button variant="default" size='xs'>First</Button>
+                                <Button variant="default" size='xs'>Second</Button>
+                                <Button variant="default" size='xs'>Third</Button>
+                            </div>
+                        </GridCol>
+                    </Grid>
+
 
                 )}
 
             </Container>
-        </>
-    )
-}
+
 /*
 'use client'
 function CrudInlineToolBar ({

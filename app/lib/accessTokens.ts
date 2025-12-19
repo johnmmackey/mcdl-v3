@@ -15,7 +15,7 @@ const client = createClient({
 
 });
 
-client.on('error', err => logger.error('Redis Client Error'));
+client.on('error', err => logger.error('Redis Client Error:' +err));
 logger.debug('creating REDIS client...');
 logger.debug({a:1, b:2});
 logger.debug({a:1, b:2}, 'combo messsage')

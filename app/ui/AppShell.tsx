@@ -43,7 +43,7 @@ export default function MyAppShell({
 
             <AppShell.Main>
                 <ScrollArea h="calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px))" >
-                    <div className="p-4 pb-16" style={{ maxWidth: '800px' }}>
+                    <div className="p-4 pb-16" style={{ maxWidth: '1200px' }}>
                         {children}
                     </div>
                 </ScrollArea>
