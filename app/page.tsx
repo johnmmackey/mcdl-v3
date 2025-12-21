@@ -1,6 +1,7 @@
 import styles from "./page.module.css";
 import sanitizeHtml from 'sanitize-html';
-import { Card, Text } from '@mantine/core';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { fetchPosts } from '@/app/lib/cmsdata'
 
 export default async function Home() {
@@ -8,17 +9,21 @@ export default async function Home() {
 
   return (
     posts.map((p, k) => (
-        <Card withBorder padding="lg" radius="md" key={k} className="w-xl m-4 border-slate-800">
-          <Text size="lg" fw={800}>
-          {p.title}
-          </Text>
-            
+      <Card key={k} className="w-full max-w-lg mb-4">
+        {p.title &&
+          <CardHeader>
+            <CardTitle>
+              {p.title}
+            </CardTitle>
+          </CardHeader>
+        }
 
+        <CardContent>
           <div className="revertstyles" dangerouslySetInnerHTML={{ __html: sanitizeHtml(p.content) }} />
+        </CardContent>
 
-
-        </Card>
-      )
+      </Card>
+    )
     )
   )
 }

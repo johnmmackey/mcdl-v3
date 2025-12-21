@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Grid, GridCol } from '@mantine/core'
 import { format } from 'date-fns';
 import { AgeGroup, DiverScore, Meet, Team, Entry } from '@/app/lib/definitions';
 
@@ -45,11 +44,11 @@ export const MeetScore = ({
             .teams
             .sort((a, b) => b.score - a.score)
             .map((ts, k) =>
-                <Grid key={k} columns={4}>
-                    <GridCol span={3} className='text-left font-semibold'>
-                        {team(teams, ts.teamId)?.name}</GridCol>
-                    <GridCol span={1} className='text-right font-semibold'>{ts.score.toFixed(1)}</GridCol>
-                </Grid>
+                <div key={k} className='grid grid-cols-4'>
+                    <div className='col-span-3 text-left font-semibold'>
+                        {team(teams, ts.teamId)?.name}</div>
+                    <div className='col-span-1 text-right font-semibold'>{ts.score.toFixed(1)}</div>
+                </div>
             )
         }
     </div>
@@ -71,9 +70,9 @@ export const AgeGroupGrid = ({
                     return (
                         <div key={k1} className='my-8'>
                             {/* Preset an age group title */}
-                            <Grid columns={1}>
-                                <GridCol span={1} className='font-bold text-xl'>{ageGroup.name}</GridCol>
-                            </Grid>
+                            <div className='grid grid-cols-1'>
+                                <div className='col-span-1 font-bold text-xl'>{ageGroup.name}</div>
+                            </div>
                             <div className='ml-4'>
                                 <GroupHeader />
                                 <Placeholder>
@@ -98,11 +97,11 @@ const Placeholder = ({
     return (
         (children instanceof Array ? children.length : children)
             ? children
-            : <Grid>
-                <GridCol span="auto" offset={1}>
+            : <div className='grid grid-cols-1'>
+                <div className='col-span-1'>
                     <em>No Divers In This Age Group</em>
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
     )
 }
 

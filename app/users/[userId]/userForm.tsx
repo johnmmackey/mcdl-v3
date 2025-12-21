@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, } from 'react';
 import { useRouter } from 'next/navigation'
-import { Grid, GridCol, Alert, Button } from '@mantine/core';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useForm, SubmitHandler } from "react-hook-form"
 import styles from './newUser.module.css';
@@ -51,25 +52,23 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
             });
     }
 
+    //onClose={() => reset({}, { keepValues: true })}
     return (
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
 
             {errors.root &&
-                <Alert variant="light" color="blue"
-                    title={errors.root.message}
-                    icon={<IconInfoCircle />}
-                    withCloseButton
-                    closeButtonLabel="Dismiss"
-                    onClose={() => reset({}, { keepValues: true })}
-                />
+                <Alert>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{errors.root.message}</AlertDescription>
+                </Alert>
 
             }
 
-            <Grid className="p-2">
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-3">
                     <label>First Name:</label>
-                </GridCol>
-                <GridCol span={9}>
+                </div>
+                <div className="col-span-9">
                     <input 
                         className={`${styles.scoreInput} ${errors?.givenName ? styles.scoreError : ''}`}
                         {...register('givenName',
@@ -79,15 +78,15 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
                             }
                         )}
                         defaultValue={''}
-                    /> abc
-                </GridCol>
-            </Grid>
+                    />
+                </div>
+            </div>
 
-            <Grid className="p-2">
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-3">
                     <label>Family Name:</label>
-                </GridCol>
-                <GridCol span={9}>
+                </div>
+                <div className="col-span-9">
                     <input
                         className={`${styles.scoreInput} ${errors?.familyName ? styles.scoreError : ''}`}
                         {...register('familyName',
@@ -98,13 +97,13 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
                         )}
                         defaultValue={''}
                     />
-                </GridCol>
-            </Grid>
-            <Grid className="p-2">
-                <GridCol span={3}>
+                </div>
+            </div>
+            <div className="grid grid-cols-12 gap-2">
+                <div className='col-span-3'>
                     <label>Email:</label>
-                </GridCol>
-                <GridCol span={9}>
+                </div>
+                <div className="col-span-9">
                     <input
                         type="email"
                         className={`${styles.scoreInput} ${errors?.email ? styles.scoreError : ''}`}
@@ -116,15 +115,15 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
                         )}
                         defaultValue={''}
                     />
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
 
 
-            <Grid className="p-2">
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-3">
                     <label>Note:</label>
-                </GridCol>
-                <GridCol span={9}>
+                </div>
+                <div className="col-span-9">
                     <input
                         type="email"
                         className={`${styles.scoreInput} ${errors?.email ? styles.scoreError : ''}`}
@@ -136,14 +135,14 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
                         )}
                         defaultValue={''}
                     />
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
 
-            <Grid className="p-2">
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-2">
+                <div className="col-span-3">
                     <label>Groups:</label>
-                </GridCol>
-                <GridCol span={9}>
+                </div>
+                <div className="col-span-9">
                     <input
                         type="email"
                         className={`${styles.scoreInput} ${errors?.email ? styles.scoreError : ''}`}
@@ -155,8 +154,8 @@ export default function Page({ user, newUser }: { user: User, newUser: boolean }
                         )}
                         defaultValue={''}
                     />
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
 
             <br />
 

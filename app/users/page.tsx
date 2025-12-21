@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Grid, Button, GridCol } from '@mantine/core';
+import { Button } from "@/components/ui/button"
 import { fetchUsers } from '@/app/lib/userPoolData';
 
 export default async function Page() {
@@ -14,22 +14,22 @@ export default async function Page() {
                 </Button>
             </Link>
 
-            <Grid>
+            <div className="grid grid-cols-11 gap-2">
 
-                <GridCol span={4}>Name</GridCol>
-                <GridCol span={6}>Email</GridCol>
-                <GridCol span={1}>Groups</GridCol>
+                <div className="col-span-4">Name</div>
+                <div className="col-span-6">Email</div>
+                <div className="col-span-1">Groups</div>
 
-            </Grid>
+            </div>
             <hr />
             {users.map((u, k) =>
                 <Link key={k} href={"/users/"+u.sub}>
-                    <Grid key={k} className='hover:bg-slate-200 cursor-pointer'>
-                        <GridCol span={4}>{u.familyName}, {u.givenName}</GridCol>
-                        <GridCol span={6}>{u.email}</GridCol>
-                        <GridCol span={1}>{u.serializedGroups}</GridCol>
+                    <div key={k} className='grid grid-cols-11 gap-2 hover:bg-slate-200 cursor-pointer'>
+                        <div className="col-span-4">{u.familyName}, {u.givenName}</div>
+                        <div className="col-span-6">{u.email}</div>
+                        <div className="col-span-1">{u.serializedGroups}</div>
 
-                    </Grid>
+                    </div>
                 </Link>
             )}
         </>

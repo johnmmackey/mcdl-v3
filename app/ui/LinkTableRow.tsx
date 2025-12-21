@@ -1,5 +1,5 @@
 'use client'
-import { TableTr } from '@mantine/core';
+import { TableRow } from '@/components/ui/table';
 import { useRouter } from 'next/navigation'
 import React from 'react';
 
@@ -8,8 +8,8 @@ export function LinkTableRow({ className, children, href, inactive }: {  childre
     const router = useRouter();
        
     return (
-        <TableTr className={className} onClick={(e) => {console.log(e);  !inactive && router.push(href)}}>
+        <TableRow className={className} onClick={(e) => {console.log(e);  !inactive && router.push(href)}}>
            {children}
-        </TableTr>
+        </TableRow>
     )
 }

@@ -1,4 +1,13 @@
-import { Container, Grid, GridCol, Popover, PopoverDropdown, PopoverTarget, Overlay, Menu, MenuTarget, MenuDropdown, MenuItem, Button, Group, Table, TableThead, TableTbody, TableTr, TableTd } from '@mantine/core';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
     IconChevronDown,
 } from '@tabler/icons-react';
@@ -22,17 +31,18 @@ export default async function CrudGrid<T>({
         <>
 
 
-            <Table striped>
-                <TableThead>
-                    <TableTr>
+            <Table className={classes.striped}>
+                <TableHeader>
+                    <TableRow>
+
                         {   renderHeader && renderHeader()}
-                        </TableTr>
-                </TableThead>
-                <TableTbody>
+                        </TableRow>
+                </TableHeader>
+                <TableBody>
                     {(sorter ? resources.sort(sorter) : resources).map((r, k) =>
                         <Row key={k} renderedRow={renderRow(r)} />
                     )}
-                </TableTbody>
+                </TableBody>
             </Table>
         </>
     )

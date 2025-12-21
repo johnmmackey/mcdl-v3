@@ -2,7 +2,7 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Table, TableThead, TableTr, TableTh, TableTd, TableTbody } from '@mantine/core';
+
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
 import { fetchAgeGroups, fetchDivers } from '@/app/lib/data';
 

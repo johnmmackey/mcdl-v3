@@ -4,7 +4,7 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, MenuLabel, TableTh, TableTd } from '@mantine/core';
+import { TableHead, TableCell } from '@/components/ui/table';
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamsForSeason } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
@@ -28,11 +28,11 @@ export default async function Page(props: {
 
     return (
         <>
-            <Grid>
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-3">
                     <SeasonSelector base="/teams" selectedSeasonId={selectedSeasonId} />
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
 
   
 
@@ -48,9 +48,9 @@ export default async function Page(props: {
 function TeamHeader() {
     return (
         <>
-                <TableTh >Team Name</TableTh>
-                <TableTh>Code</TableTh>
-                <TableTh>Address</TableTh>
+                <TableHead >Team Name</TableHead>
+                <TableHead>Code</TableHead>
+                <TableHead>Address</TableHead>
         </>
     )
 }
@@ -58,9 +58,9 @@ function TeamHeader() {
 function TeamRow(t: TeamSeason) {
     return (
         <>
-            <TableTd>{t.team.name}</TableTd>
-            <TableTd>{t.teamId}</TableTd>
-            <TableTd>{t.team.address1 + ', ' + t.team.address2}</TableTd>
+            <TableCell>{t.team.name}</TableCell>
+            <TableCell>{t.teamId}</TableCell>
+            <TableCell>{t.team.address1 + ', ' + t.team.address2}</TableCell>
         </>
     )
 }

@@ -1,6 +1,6 @@
 
 import { format } from 'date-fns';
-import { Grid, GridCol } from '@mantine/core';
+
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups } from '@/app/lib/data';
 import strcmp from '@/app/lib/strcmp'
 import { Meet, Entry, AgeGroup } from '@/app/lib/definitions'
@@ -43,18 +43,18 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
 
 const EntriesHeader = () => {
     return (
-        <Grid columns={8}>
-            <GridCol span={1} className='font-semibold'>Pool</GridCol>
-            <GridCol span={3} className='font-semibold'>Diver</GridCol>
-        </Grid>
+        <div className="grid grid-cols-8">
+            <div className='font-semibold'>Pool</div>
+            <div className='font-semibold col-'>Diver</div>
+        </div>
     )
 }
 
 const EntriesElement = ({entry}: {entry: Entry}) => {
     return (
-        <Grid columns={8} className='hover:bg-slate-200'>
-            <GridCol span={1} className='py-1'>{entry.diver.teamId}</GridCol>
-            <GridCol span={3} className='py-1'><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</GridCol>
-        </Grid>
+        <div className="grid grid-cols-8 hover:bg-slate-200">
+            <div>{entry.diver.teamId}</div>
+            <div className='col-span-3'><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</div>
+        </div>
     )
 }

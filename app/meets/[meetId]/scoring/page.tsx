@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Button } from '@mantine/core';
+import { Button } from '@/components/ui/button';
 
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups, fetchMeetResults } from '@/app/lib/data';
 import ScoreForm from './WrappedScoreForm';

@@ -2,13 +2,14 @@
 
 import React, { useEffect, } from 'react';
 import { useRouter } from 'next/navigation';
-import { Grid, GridCol, Button } from '@mantine/core';
+import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
 import { AgeGroupGrid, } from '../MeetComponents';
 import { Meet, AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
 import { scoreMeet } from '@/app/lib/data'
 import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
+import { Divide } from 'lucide-react';
 
 type Inputs = Record<string, any>
 type EntryWithResult = Entry & { result: DiverScore | null };
@@ -91,14 +92,14 @@ const ScoreForm = ({
 }
 
 const ScoringHeader = () => (
-    <Grid className='font-semibold' columns={10}>
-        <GridCol span={1} className="text-center">Pool</GridCol>
-        <GridCol span={3}>Diver</GridCol>
-        <GridCol span={1} className="text-center">EX</GridCol>
-        <GridCol span={2} className="text-center">Score</GridCol>
-        <GridCol span={1} className="text-center">DiveUp</GridCol>
-        <GridCol span={2} className="text-center">Wildcard</GridCol>
-    </Grid>
+    <div className='font-semibold grid grid-cols-10'>
+        <div className="text-center">Pool</div>
+        <div className='col-span-3'>Diver</div>
+        <div className="text-center">EX</div>
+        <div className="col-span-2 text-center">Score</div>
+        <div className="text-center">DiveUp</div>
+        <div className="col-span-2 text-center">Wildcard</div>
+    </div>
 )
 
 const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, meet: Meet }) => {
@@ -128,16 +129,16 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
     }, [form, ex, du, ag.id, k]);
 
     return (
-        <Grid columns={10} className='hover:bg-slate-200'>
-            <GridCol span={1} className='text-center'>{entry.diver.teamId}</GridCol>
-            <GridCol span={3} className=''><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</GridCol>
+        <div className='grid grid-cols-10 hover:bg-slate-200'>
+            <div className='text-center'>{entry.diver.teamId}</div>
+            <div className=''><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</div>
 
-            <GridCol span={1} className='text-center'>
+            <div className='text-center'>
                 <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.diverId.toString()} />
                 <input className={styles.scoreInput} type="checkbox" defaultChecked={iVEx} {...form.register(fName(ag.id, k, 'ex'))} disabled={meet.meetType !== 'Dual' && meet.meetType !== 'Multidual'} />
-            </GridCol>
+            </div>
 
-            <GridCol span={2} className='text-center'>
+            <div className='col-span-2 text-center'>
                 <input
                     type="number"
                     className={`${styles.scoreInput} ${errors?.score ? styles.scoreError : ''}`}
@@ -154,13 +155,13 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
                 {errors?.score &&
                     <div className='text-red-500'>{errorMatrix['score'][errors.score.type]}</div>
                 }
-            </GridCol>
+            </div>
 
-            <GridCol span={1} className='text-center'>
+            <div className='text-center'>
                 <input className={styles.scoreInput} type="checkbox" defaultChecked={iVDu} {...form.register(fName(ag.id, k, 'du'))} disabled={ex || !ag.nextGroup || meet.meetType !== 'Dual'} />
-            </GridCol>
+            </div>
 
-            <GridCol span={2} className='text-center'>
+            <div className='col-span-2 text-center'>
                 <input
                     type="number"
                     className={`${styles.scoreInput} ${errors?.wc ? styles.scoreError : ''}`}
@@ -182,8 +183,8 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
                 {errors?.wc &&
                     <div className='text-red-500'>{errorMatrix['wc'][errors.wc.type]}</div>
                 }
-            </GridCol>
-        </Grid>
+            </div>
+        </div>
     )
 }
 

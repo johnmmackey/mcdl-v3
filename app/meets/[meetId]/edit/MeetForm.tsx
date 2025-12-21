@@ -1,18 +1,34 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, } from '@mantine/core';
+import { Button, } from '@/components/ui/button'
 
-import { Form, useForm, useWatch } from "react-hook-form"
+import { Controller, useForm, useWatch } from "react-hook-form"
 import { DevTool } from "@hookform/devtools";
-import { TextInput, Select, DateTimePicker, MultiSelect } from "react-hook-form-mantine"
+import {
+    Field,
+    FieldContent,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectSeparator,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Meet, MeetTeam, TeamSeason, MeetUpdateInput, MeetCreateInput, Season } from '@/app/lib/definitions'
 
-import { TeamSelect } from './teamSelect';
+//import { TeamSelect } from './teamSelect';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
@@ -28,22 +44,22 @@ const toFormStr = (v: number | string | null | undefined) => {
 
 class zx {
     static string(): z.ZodEffects<z.ZodString, string, unknown> {
-      return z.preprocess((arg) => {
-        if (arg === null || arg === undefined) {
-          return "";
-        }
-  
-        if (typeof arg === "string") {
-          return arg;
-        }
-        if (typeof arg === "number") {
-          return arg.toString();
-        }
-  
-        return "";
-      }, z.string());
+        return z.preprocess((arg) => {
+            if (arg === null || arg === undefined) {
+                return "";
+            }
+
+            if (typeof arg === "string") {
+                return arg;
+            }
+            if (typeof arg === "number") {
+                return arg.toString();
+            }
+
+            return "";
+        }, z.string());
     }
-  }
+}
 
 export const MeetForm = ({
     meet,
@@ -66,7 +82,7 @@ export const MeetForm = ({
         divisionId: zx.string(),
         hostPool: zx.string(),
         coordinatorPool: zx.string(),
-        teams: z.object({teamId: z.string()}).array().transform(ts => ts.map(t => t.teamId)).default([])
+        teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([])
     });
 
     const validationSchema = z.object({
@@ -80,14 +96,14 @@ export const MeetForm = ({
         coordinatorPool: z.string(),
         teams: z.string().array()
     }).superRefine((val, ctx) => {
-        if (val.meetType === 'Dual' && val.teams.length !== 2 ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['teams'],
-            message: `Dual Meets must have 2 teams`,
-          });
+        if (val.meetType === 'Dual' && val.teams.length !== 2) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['teams'],
+                message: `Dual Meets must have 2 teams`,
+            });
         }
-      });;
+    });;
 
     const outMeetSchema = z.object({
         seasonId: z.coerce.number(),
@@ -107,30 +123,30 @@ export const MeetForm = ({
 
     type FormSchemaType = z.infer<typeof validationSchema>;
 
-    const { setValue, getValues, watch, control, formState: { errors } } = useForm<FormSchemaType>({
+    const form = useForm<FormSchemaType>({
         resolver: zodResolver(validationSchema),
         defaultValues: inSchema.parse(meet ?? {})
     });
 
-    const showEntryDeadline = ['Div', 'Star'].includes(watch('meetType'));
+    const showEntryDeadline = ['Div', 'Star'].includes(form.watch('meetType'));
     const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
     const router = useRouter();
 
-    useEffect(() => {
-        console.log('fetching teams for ', watch('seasonId'))
-        fetchTeamsForSeason(parseInt(watch('seasonId')))
+     useEffect(() => {
+        console.log('fetching teams for ', form.watch('seasonId'))
+        fetchTeamsForSeason(parseInt(form.watch('seasonId')))
             .then(r => {
                 const ts = r.map(r => r.teamId).sort()
                 setActiveTeamIds(ts);
-                if(!ts.includes(getValues('hostPool')))
-                    setValue('hostPool', '');
-                if(!ts.includes(getValues('coordinatorPool')))
-                    setValue('coordinatorPool', '');
-                setValue('teams', getValues('teams').filter(e => ts.includes(e)));
+                if (!ts.includes(form.getValues('hostPool')))
+                    form.setValue('hostPool', '');
+                if (!ts.includes(form.getValues('coordinatorPool')))
+                    form.setValue('coordinatorPool', '');
+                form.setValue('teams', form.getValues('teams').filter(e => ts.includes(e)));
             });
-    }, [watch('seasonId')]);
+    }, [form.watch('seasonId')]);
 
-    const handleSubmit = ({ data }: { data: FormSchemaType }) => {
+    const onSubmit = (data: z.infer<FormSchemaType>) => {
         console.log(data)
         const outMeetData = outMeetSchema.parse(data);
         const outTeamsData = outTeamsSchema.parse(data);
@@ -148,21 +164,71 @@ export const MeetForm = ({
     }
 
     return (
-        <>
-            <Form
-                control={control}
-                onSubmit={handleSubmit}
-            >
-                <Select
-                    name="seasonId"
-                    label="Season"
-                    className="my-4"
-                    data={sortedSeasons}
-                    control={control}
-                    disabled={!!meetId}
-                />
 
-                <TextInput
+        <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)}>
+
+            <FieldGroup>
+                <Controller
+                    name="seasonId"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field
+                            orientation="responsive"
+                            data-invalid={fieldState.invalid}
+                        >
+                            <FieldContent>
+                                <FieldLabel htmlFor="form-rhf-select-language">
+                                    Season ID
+                                </FieldLabel>
+
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]} />
+                                )}
+                            </FieldContent>
+                            <Select
+                                name={field.name}
+                                value={field.value}
+                                onValueChange={field.onChange}
+                            >
+                                <SelectTrigger
+                                    id="form-rhf-select-language"
+                                    aria-invalid={fieldState.invalid}
+                                    className="min-w-[120px]"
+                                >
+                                    <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent position="item-aligned">
+                                    {sortedSeasons.map(s => (
+                                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    ))}
+
+                                </SelectContent>
+                            </Select>
+                        </Field>
+                    )}
+                />
+            </FieldGroup>
+            {/*}
+
+      <Select
+        name="seasonId"
+      >
+        <SelectTrigger
+          id="form-rhf-select-language"
+          className="min-w-[120px]"
+        >
+          <SelectValue placeholder="Select" />
+        </SelectTrigger>
+        <SelectContent position="item-aligned">
+            {sortedSeasons.map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+
+        </SelectContent>
+      </Select>                
+
+
+               <TextInput
                     name="name"
                     className="my-4"
                     label="Meet Name"
@@ -234,6 +300,7 @@ export const MeetForm = ({
                     data={activeTeamIds}
                     control={control}
                 />
+
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
                 </Button>
@@ -245,8 +312,12 @@ export const MeetForm = ({
                 }
 
             </Form>
-        </>
-    )
+                            */}
+
+
+        </form>
+        
+            )
 }
 
 

@@ -4,7 +4,17 @@ import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
-import { Grid, GridCol, Button, Menu, MenuTarget, MenuDropdown, MenuItem, MenuDivider, MenuLabel } from '@mantine/core';
+
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
@@ -12,7 +22,7 @@ import Loading from '@/app/ui/Loading'
 import { Meet, MeetTeam } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 
-import { IconChevronRight, IconPlus, IconX, IconSettings, IconChevronDown, IconPencil, IconTag, IconFileSpreadsheet, IconLogin2, IconClipboardData, IconDotsVertical } from '@tabler/icons-react';
+import { IconDotsVertical } from '@tabler/icons-react';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -26,15 +36,15 @@ export default async function Page(props: {
 
     return (
         <>
-            <Grid>
-                <GridCol span={3}>
+            <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-3">
                     <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-                </GridCol>
+                </div>
 
-                <GridCol span={3}>
+                <div className="col-span-3">
                     <Link href={"/meets/_/edit"}><Button>Add New</Button></Link>
-                </GridCol>
-            </Grid>
+                </div>
+            </div>
 
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
                 <Meets season={selectedSeasonId} />
@@ -53,12 +63,12 @@ async function Meets(props: {
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
     const meetName = (m: Meet) => {
-        if(m.name)
+        if (m.name)
             return m.name;
 
         const visitingTeams = m.teams.filter(e => e.teamId !== m.hostPool).map(t => kteams[t.teamId].name);
-        return visitingTeams.join(', ') + (m.hostPool ? ' @ ' + kteams[m.hostPool!].name : '' );
-    } 
+        return visitingTeams.join(', ') + (m.hostPool ? ' @ ' + kteams[m.hostPool!].name : '');
+    }
     const scoreStr = (m: Meet) => {
         if (!m.scoresPublished || !m.teams.length)
             return '';
@@ -76,66 +86,53 @@ async function Meets(props: {
 
                     <div className="mb-4 font-bold">{dt}</div>
 
-                    <Grid columns={6}>
-                        <GridCol span={1} className='text-center font-semibold'>Division</GridCol>
-                        <GridCol span={3} className='text-center font-semibold'>Meet Name</GridCol>
-                        <GridCol span={1} className='text-center font-semibold'>Score</GridCol>
-                    </Grid>
-
+                    <div className="grid grid-cols-6 gap-4">
+                        <div className='text-center font-semibold'>Division</div>
+                        <div className='col-span-3text-center font-semibold'>Meet Name</div>
+                        <div className='text-center font-semibold'>Score</div>
+                    </div>
                     {meets.map((m, k2) =>
-                            <Grid key={k2} className='group hover:bg-slate-200' columns={6} >
-                                <GridCol span={1} className='text-center'>{m.divisionId && m.divisionId < 99 ? m.divisionId : 'NDM'}</GridCol>
-                                <GridCol span={3} className=''>
-                                    <div>{meetName(m)}</div>
-                                </GridCol>
-                                <GridCol span={1} className='text-center'>
-                                    <div>{scoreStr(m)}</div>
-                                </GridCol>
-                                <GridCol span={1} className='text-center'>
-                                        <Menu shadow="md" width={200}>
-                                            <MenuTarget>
-                                                <IconDotsVertical className="text-white group-hover:text-black"/>
-                                            </MenuTarget>
+                        <div key={k2} className='group hover:bg-slate-200 grid grid-cols-6 gap-4' >
+                            <div className='text-center'>{m.divisionId && m.divisionId < 99 ? m.divisionId : 'NDM'}</div>
+                            <div className='col-span-3'>
+                                <div>{meetName(m)}</div>
+                            </div>
+                            <div className='text-center'>
+                                <div>{scoreStr(m)}</div>
+                            </div>
+                            <div className='text-center'>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger>
+                                        <IconDotsVertical className="text-white group-hover:text-black" />
+                                    </DropdownMenuTrigger>
 
-                                            <MenuDropdown>
-                                                <Link href={`/meets/${m.id}/enter`}>
-                                                    <MenuItem leftSection={<IconLogin2 size={14} />}>
-                                                        Enter Divers
-                                                    </MenuItem>
-                                                </Link>
-                                                <Link href={`/meets/${m.id}/scoring`}>
-                                                    <MenuItem leftSection={<IconClipboardData size={14} />} >
-                                                        Enter Scores
-                                                    </MenuItem>
-                                                </Link>
-                                                <Link href={`/meets/${m.id}/roster`}>
-                                                    <MenuItem leftSection={<IconPlus size={14} />}>
-                                                        Roster
-                                                    </MenuItem>
-                                                </Link>
-                                                <Link href={`/meets/${m.id}/labels`}>
-                                                    <MenuItem leftSection={<IconTag size={14} />} >
-                                                        Print Labels
-                                                    </MenuItem>
-                                                </Link>
-                                                <Link href={`/meets/${m.id}/results`}>
-                                                    <MenuItem leftSection={<IconFileSpreadsheet size={14} />} >
-                                                        View Results
-                                                    </MenuItem>
-                                                </Link>
-                                                <MenuDivider />
-                                                <MenuLabel>Admin</MenuLabel>
-                                                <Link href={`/meets/${m.id}/edit`}>
-                                                    <MenuItem leftSection={<IconPencil size={14} />} >
-                                                        Edit Meet
-                                                    </MenuItem>
-                                                </Link>
+                                    <DropdownMenuContent>
 
-                                            </MenuDropdown>
-                                        </Menu>
+                                        <Link href={`/meets/${m.id}/enter`}>
+                                            <DropdownMenuItem>Enter Divers</DropdownMenuItem>
+                                        </Link>
+                                        <Link href={`/meets/${m.id}/scoring`}>
+                                            <DropdownMenuItem>Enter Scores</DropdownMenuItem>
+                                        </Link>
+                                        <Link href={`/meets/${m.id}/roster`}>
+                                            <DropdownMenuItem>Roster</DropdownMenuItem>
+                                        </Link>
+                                        <Link href={`/meets/${m.id}/labels`}>
+                                            <DropdownMenuItem>Print Labels</DropdownMenuItem>
+                                        </Link>
+                                        <Link href={`/meets/${m.id}/results`}>
+                                            <DropdownMenuItem>View Results</DropdownMenuItem>
+                                        </Link>
+                                        <DropdownMenuSeparator />
+                                        <Link href={`/meets/${m.id}/edit`}>
+                                            <DropdownMenuItem>Edit Meet</DropdownMenuItem>
+                                        </Link>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
 
-                                </GridCol>
-                            </Grid>
+
+                            </div>
+                        </div>
 
                     )}
                 </div>

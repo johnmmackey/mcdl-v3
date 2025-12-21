@@ -30,6 +30,8 @@ export const {
   providers: [
     Cognito({
       profile(profile) {
+        console.log('in cognito callback');
+        console.log(profile);
         logger.debug(profile, 'in cognito callback')
         return {
           id: profile.sub, // required by the db adapter, ignored if JWT

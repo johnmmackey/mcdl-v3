@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { Avatar } from '@mantine/core';
+import {
+  Avatar,
+} from "@/components/ui/avatar"
 import Link from 'next/link'
 import { Session } from 'next-auth';
 import {
@@ -62,7 +64,7 @@ export function MyNavBar({ session, toggle }: { session: Session | null, toggle:
 
 
                         <div className={classes.link} onClick={(event) => signOut()}>
-                            <Avatar color="cyan" radius="xl" className="mr-2">
+                            <Avatar className="rounded-lg mr-2">
                                 { (session.user.givenName[0] + session.user.familyName[0] ) 
                                     || (session.user.email && session.user.email[0].toUpperCase())
                                 }

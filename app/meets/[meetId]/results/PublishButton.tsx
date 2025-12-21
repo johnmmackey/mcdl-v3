@@ -1,16 +1,21 @@
 "use client"
 import { useState, useOptimistic, useTransition, use } from 'react';
-import { Modal, Button, Loader, Alert, Notification } from '@mantine/core'
+import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose, DialogFooter } from '@/components/ui/dialog';
 import { Meet } from '@/app/lib/definitions';
 import { setPublishedStatus } from '@/app/lib/data';
 import { useRouter } from 'next/navigation';
 import { meetPermissions } from '@/app/lib/userCan';
-import { useDisclosure } from '@mantine/hooks';
+
 
 
 export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
     const [isPending, startTransition] = useTransition();
-    const [opened, { open, close }] = useDisclosure(false);
+    const [opened, setOpended] = useState(false);   
+    const open = () => setOpended(true);
+    const close = () => setOpended(false);
+
     const router = useRouter();
 
     //console.log('rendering publishbutton')
@@ -34,7 +39,13 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
     return (
         <>
             {isPending &&
-                <Notification loading title="Please Wait">Update in progress</Notification>
+                <Alert>
+
+                    <AlertTitle>
+                        Please Wait - UPdate in progress
+                    </AlertTitle>
+                </Alert>
+
             }
             {!false &&
                 <Button onClick={open} disabled={isPending}>
@@ -44,12 +55,25 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
                     }
                 </Button>
             }
-            <Modal opened={opened} onClose={close} title="Confirm" centered size="md">
-                Are You Sure?
-                <div>
-                    <Button onClick={togglePublished}>Yes</Button>
-                </div>
-            </Modal>
+
+
+
+                <Dialog defaultOpen={opened} onOpenChange={setOpended}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Confirm</DialogTitle>
+                        </DialogHeader>
+                        Are You Sure?
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button type="submit">Save changes</Button>
+                        </DialogFooter>
+                    </DialogContent>
+
+                </Dialog>
+            
         </>
     )
 }
