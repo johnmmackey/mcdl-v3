@@ -32,7 +32,7 @@ export type MeetTeamUpdateInput = {
 }
 
 export type Meet = {
-    id: number,
+    id: number | null,
     seasonId: number,
     name: string | null,
     parentMeet: number | null,
@@ -44,7 +44,7 @@ export type Meet = {
     meetType: string,
     divisionId: number | null,
     week?: number | null,
-    scoresPublished: string | null,
+    scoresPublished: Date | null,
     teams: MeetTeam[]
 }
 

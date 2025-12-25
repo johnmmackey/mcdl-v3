@@ -63,26 +63,7 @@ const toFormStr = (v: number | string | null | undefined) => {
     return '';
 };
 
-/*
-class zx {
-    static string(): z.ZodEffects<z.ZodString, string, unknown> {
-        return z.preprocess((arg) => {
-            if (arg === null || arg === undefined) {
-                return "";
-            }
 
-            if (typeof arg === "string") {
-                return arg;
-            }
-            if (typeof arg === "number") {
-                return arg.toString();
-            }
-
-            return "";
-        }, z.string());
-    }
-}
-*/
 
 /* Issues
 - If season changed, what happens to the teams? Need to ensure a team that is not in the current season is not selected
@@ -93,11 +74,9 @@ class zx {
 
 export const MeetForm = ({
     meet,
-    meetId,
     seasons
 }: Readonly<{
-    meet: Meet ,
-    meetId: number | null,
+    meet: Meet,
     seasons: Season[]
 }>) => {
 
@@ -109,7 +88,7 @@ export const MeetForm = ({
         meetDate: z.date(),
         entryDeadline: z.date().nullable(),
         meetType: z.string(),
-        divisionId: z.string().nullable(),
+        divisionId: z.number().nullable(),
         hostPool: z.string().nullable(),
         coordinatorPool: z.string().nullable(),
         teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([])
@@ -121,7 +100,7 @@ export const MeetForm = ({
         meetDate: z.date().nullish(),
         entryDeadline: z.date().nullish(),
         meetType: z.string(),
-        divisionId: z.string().nullish(),
+        divisionId: z.number().nullish(),
         hostPool: z.string().nullable(),
         coordinatorPool: z.string().nullable(),
         teams: z.string().array()
@@ -165,13 +144,13 @@ export const MeetForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        fetchTeamsForSeason(parseInt(form.watch('seasonId')))
+        fetchTeamsForSeason((form.watch('seasonId')))
             .then(r => {
                 const ts = r.map(r => r.teamId).sort()
                 setActiveTeamIds(ts);
-                if (!ts.includes(form.getValues('hostPool')))
+                if (form.getValues('hostPool') && !ts.includes(form.getValues('hostPool')!))
                     form.setValue('hostPool', '');
-                if (!ts.includes(form.getValues('coordinatorPool')))
+                if (form.getValues('coordinatorPool') && !ts.includes(form.getValues('coordinatorPool')!))
                     form.setValue('coordinatorPool', '');
                 form.setValue('teams', form.getValues('teams').filter(e => ts.includes(e)));
             });
@@ -182,7 +161,7 @@ export const MeetForm = ({
         const outMeetData = outMeetSchema.parse(data);
         const outTeamsData = outTeamsSchema.parse(data);
 
-        return (meetId ? updateMeet(meetId, outMeetData, outTeamsData) : createMeet(outMeetData, outTeamsData))
+        return (meet.id ? updateMeet(meet.id, outMeetData, outTeamsData) : createMeet(outMeetData, outTeamsData))
             //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
             .then(() => router.push(`/meets`));
     }
@@ -190,8 +169,8 @@ export const MeetForm = ({
 
 
     const handleDelete = () => {
-        if (meetId)
-            deleteMeet(meetId)
+        if (meet.id)
+            deleteMeet(meet.id)
                 //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
                 .then(() => router.push(`/meets`));
     }

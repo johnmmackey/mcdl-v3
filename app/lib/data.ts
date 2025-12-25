@@ -100,8 +100,8 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
         throw new Error('Error posting scores')
 
     //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`);
-    revalidateTag(`meets`);
+    revalidateTag(`meet:${meetId}`, 'max');
+    revalidateTag(`meets`, 'max');
 }
 
 export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
@@ -120,8 +120,8 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`);
-    revalidateTag(`meets`);
+    revalidateTag(`meet:${meetId}`, 'max');
+    revalidateTag(`meets`, 'max');
 }
 
 export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
@@ -139,8 +139,8 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: s
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`);
-    revalidateTag(`meets`);
+    revalidateTag(`meet:${meetId}`, 'max');
+    revalidateTag(`meets`, 'max');
     return await(r.json());
 }
 
@@ -159,7 +159,7 @@ export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promis
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
-    revalidateTag(`meets`);
+    revalidateTag(`meets`, 'max');
     return await(r.json());
 }
 
@@ -177,7 +177,7 @@ export async function deleteMeet(meetId: number): Promise<void> {
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
-    revalidateTag(`meets`);
+    revalidateTag(`meets`, 'max');
 }
 
 
