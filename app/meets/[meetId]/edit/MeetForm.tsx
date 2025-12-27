@@ -80,7 +80,7 @@ export const MeetForm = ({
     seasons: Season[]
 }>) => {
 
-    const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s.toString());
+    const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s);
 
     const inSchema = z.object({
         seasonId: z.number(),
@@ -125,6 +125,27 @@ export const MeetForm = ({
         coordinatorPool: z.string()
     });
 
+
+    const validationSchema1 = z.object({
+        seasonId: z.number(),
+        name: z.string().nullish(),
+        meetDate: z.date(),
+        entryDeadline: z.date().nullable(),
+        meetType: z.string(),
+        divisionId: z.number().nullable(),
+        hostPool: z.string().nullable(),
+        coordinatorPool: z.string().nullable(),
+        teams: z.string().array()
+    }).superRefine((val, ctx) => {
+        if (val.meetType === 'Dual' && val.teams.length !== 2) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['teams'],
+                message: `Dual Meets must have 2 teams`,
+            });
+        }
+    });;
+
     // flatten teams to a simgple array of strings
     const outTeamsSchema = z.object({
         teams: z.string().array()
@@ -132,11 +153,11 @@ export const MeetForm = ({
 
     let x  = inSchema.parse(meet);
 
-    type FormSchemaType = z.infer<typeof validationSchema>;
+    type FormSchemaType = z.infer<typeof validationSchema1>;
 
     const form = useForm<FormSchemaType>({
-        resolver: zodResolver(validationSchema),
-        defaultValues: inSchema.parse(meet)
+        resolver: zodResolver(validationSchema1),
+        defaultValues: validationSchema1.parse(meet)
     });
 
     const showEntryDeadline = ['Div', 'Star'].includes(form.watch('meetType'));
@@ -179,7 +200,7 @@ export const MeetForm = ({
         <>
             <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)}>
 
-                <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons} />
+                <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} />
 
                 <FormFieldInput form={form} name="name" label="Meet Name" />
                 <FormFieldMultiSelect form={form} name="teams" label="Teams" options={activeTeamIds} />
