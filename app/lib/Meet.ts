@@ -58,7 +58,22 @@ export class Meet {
         this.scoresPublished = (typeof scoresPublished === 'undefined') ? null : scoresPublished;
         this.teams = teams || [];
     }
-
+/*
+    toForm() {
+        return {
+            ...this,
+            name: this.name || "",
+            parentMeet: this.parentMeet || "",
+            hostPool: this.hostPool || "",
+            coordinatorPool: this.coordinatorPool || "",
+            divisionId: this.divisionId || "",
+            week: this.week || "",
+            meetDate: this.meetDate.toISOString(),
+            entryDeadline: this.entryDeadline ? this.entryDeadline.toISOString : "",
+            scoresPublished: this.scoresPublished ? this.scoresPublished.toISOString() : ""
+        };
+    }
+*/
     static async getById(id: number): Promise<Meet> {
         // 'this' refers to the class (MyClass) itself within the static method
         const r = await fetch(`${process.env.DATA_URL}/meets/${id}`, { next: { revalidate: 30, tags: [`meet:${id}`] } });
