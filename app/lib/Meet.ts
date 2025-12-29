@@ -5,14 +5,14 @@ export class Meet {
     seasonId: number;
     name: string | null;
     parentMeet: number | null;
-    meetDate: Date;
-    entryDeadline: Date | null;
+    meetDate: string;
+    entryDeadline: string;
     hostPool: string | null;
     coordinatorPool: string | null;
     meetType: string;
     divisionId: number | null;
     week: number | null;
-    scoresPublished: Date | null;
+    scoresPublished: string | null;
     teams: MeetTeam[]
 
     constructor({
@@ -34,22 +34,22 @@ export class Meet {
         seasonId: number,
         name?: string | null,
         parentMeet?: number | null,
-        meetDate?: Date,
-        entryDeadline?: Date | null,
+        meetDate?: string,
+        entryDeadline?: string | null,
         hostPool?: string | null,
         coordinatorPool?: string | null,
         meetType?: string,
         divisionId?: number | null,
         week?: number | null,
-        scoresPublished?: Date | null,
+        scoresPublished?: string | null,
         teams?: MeetTeam[]
     }>) {
         this.id = id || null;
         this.seasonId = seasonId;
         this.name = name || null;
         this.parentMeet = parentMeet || null;
-        this.meetDate = meetDate || new Date();
-        this.entryDeadline = entryDeadline || new Date();
+        this.meetDate = meetDate || new Date().toISOString(),
+        this.entryDeadline = entryDeadline || meetDate || new Date().toISOString(),
         this.hostPool = hostPool || null;
         this.coordinatorPool = coordinatorPool || null;
         this.meetType = meetType || 'Dual';
@@ -66,15 +66,7 @@ export class Meet {
         if (!r.ok)
             throw new Error(`Error retrieving meet ${id}: ${r.statusText}`);
 
-        const meetData = await r.json();
-
-        //rehydrate
-        return (new this({
-            ...meetData,
-            meetDate: new Date(meetData.meetDate),
-            entryDeadline: meetData.entryDeadline ? new Date(meetData.entryDeadline) : null,
-            scoresPublished: meetData.scoresPublished ? new Date(meetData.scoresPublished) : null
-        }));
+        return new this(await r.json());
     }
 
 }

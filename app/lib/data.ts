@@ -52,13 +52,7 @@ export async function fetchMeet(meetId: number): Promise<Meet> {
     if (!r.ok)
         throw new Error(`Error retrieving meet ${meetId}: ${r.statusText}`);
 
-    const meet: Meet = await r.json();
-    //rehydrate
-    return ({
-        ...meet,
-        meetDate: new Date(meet.meetDate),
-        entryDeadline: meet.entryDeadline ? new Date(meet.entryDeadline) : null
-    })
+    return (await r.json());
 }
 
 export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {

@@ -17,7 +17,6 @@ import { Meet } from '@/app/lib/Meet'
 
 export default async function Page(props: {
     params: Promise<{ meetId: string }>,
-    searchParams: Promise<{ 'season-id': number }>
 }) {
     const params = await props.params;
     const seasons = await fetchSeasons();
@@ -25,8 +24,6 @@ export default async function Page(props: {
     const meetId = parseInt(params.meetId) || null;
 
     const meet = meetId ? await Meet.getById(meetId) : new Meet({ seasonId: currentSeasonId });
-
-    console.log('meet', meet);
 
     return (
         <MeetForm meet={{...meet}}  seasons={seasons} />

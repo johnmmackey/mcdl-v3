@@ -40,12 +40,12 @@ export const MeetForm = ({
     // schema for the incoming data
     const inSchema = z.object({
         seasonId: z.number().transform((v) => v.toString()),
-        meetDate: z.date(),
+        meetDate: z.iso.datetime({ offset: true }).transform((val) => new Date(val) ),
         meetType: z.string(),
 
         name: z.string().nullable().transform(val => val ?? ""),
 
-        entryDeadline: z.date().nullable().transform((s) => s ?? new Date()),
+        entryDeadline: z.iso.datetime({ offset: true }).transform((val) => new Date(val) ), 
         divisionId: z.coerce.string().nullable().transform(val => val ?? ""),
         hostPool: z.string().nullable().transform(val => val ?? ""),
         coordinatorPool: z.string().nullable().transform(val => val ?? ""),
@@ -53,8 +53,6 @@ export const MeetForm = ({
 
         teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([]),
 
-        //parentMeet: z.number().nullable(),
-        //scoresPublished: z.date().nullable()
     });
 
     // define the schema for the form - most things other than dates are strings
@@ -65,7 +63,7 @@ export const MeetForm = ({
 
         name: z.string(),
 
-        entryDeadline: z.date().nullable(),
+        entryDeadline: z.date(),
         divisionId: z.string(),
         hostPool: z.string(),
         coordinatorPool: z.string(),
@@ -73,8 +71,6 @@ export const MeetForm = ({
 
         teams: z.string().array(),
 
-        //parentMeet: z.number().nullable(),
-        //scoresPublished: z.date().nullable()
     })
         .refine((data) => !['Dual', 'Qual'].includes(data.meetType) || data.week, {
             message: "Week not specified for Dual/Qual meet",
@@ -131,11 +127,12 @@ export const MeetForm = ({
     const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
     const router = useRouter();
 
-    // Login to remove a team who is no longer active in the season if the season changes
+    // Logic to load relevant teams and remove a team who is no longer active in the season if the season changes
     useEffect(() => {
         fetchTeamsForSeason(Number((form.getValues('seasonId'))))
             .then(r => {
-                const ts = r.map(r => r.teamId).sort()
+                //const ts = r.map(r => ([r.teamId, r.team.name])).sort((a, b) => a[0].localeCompare(b[0]));
+                const ts = r.map(r => r.teamId).sort((a, b) => a.localeCompare(b));
                 setActiveTeamIds(ts);
                 if (form.getValues('hostPool') && !ts.includes(form.getValues('hostPool')!))
                     form.setValue('hostPool', '');
@@ -144,8 +141,6 @@ export const MeetForm = ({
                 form.setValue('teams', form.getValues('teams').filter((e: string) => ts.includes(e)));
             });
     }, [seasonId]);
-
-
 
     const onSubmit = (data: z.infer<FormSchemaType>) => {
         console.log('submitted', data);
