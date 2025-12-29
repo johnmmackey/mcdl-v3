@@ -1,56 +1,19 @@
 "use client";
-import React, { useState, useEffect, useId, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, } from '@/components/ui/button'
 
-import { Controller, useForm, UseFormReturn, useWatch } from "react-hook-form"
-
-import { DevTool } from "@hookform/devtools";
-
-import {
-    Field,
-    FieldContent,
-    FieldDescription,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field";
-
-import { Input } from "@/components/ui/input"
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectSeparator,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-
-import {
-    MultiSelect,
-    MultiSelectContent,
-    MultiSelectGroup,
-    MultiSelectItem,
-    MultiSelectTrigger,
-    MultiSelectValue,
-} from "@/components/ui/multi-select"
-
-import { ChevronDownIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-
+import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Meet, Season } from '@/app/lib/definitions'
-
+import { Season } from '@/app/lib/definitions'
+import { Meet } from '@/app/lib/Meet';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
+
+import { Button } from '@/components/ui/button'
+import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
+
+/*
 
 const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
 const numToStr = (v: number) => v.toString();
@@ -62,14 +25,6 @@ const toFormStr = (v: number | string | null | undefined) => {
         return v;
     return '';
 };
-
-
-
-/* Issues
-- If season changed, what happens to the teams? Need to ensure a team that is not in the current season is not selected
-- Non-divisional meet - empty string is a problem as it conflicts with "select..."
-
-- key value for select
 */
 
 export const MeetForm = ({
@@ -82,28 +37,73 @@ export const MeetForm = ({
 
     const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s);
 
-    // define the schema per the data
-    const unifiedSchema = z.object({
-        id: z.number().nullable(),
-        seasonId: z.number(),
+    // schema for the incoming data
+    const inSchema = z.object({
+        seasonId: z.number().transform((v) => v.toString()),
         meetDate: z.date(),
         meetType: z.string(),
 
-        parentMeet: z.number().nullable(),
+        name: z.string().nullable().transform(val => val ?? ""),
 
-        name: z.string().nullable(),
-        week: z.coerce.number().nullable(),
-        entryDeadline: z.date().nullable(),
+        entryDeadline: z.date().nullable().transform((s) => s ?? new Date()),
+        divisionId: z.coerce.string().nullable().transform(val => val ?? ""),
+        hostPool: z.string().nullable().transform(val => val ?? ""),
+        coordinatorPool: z.string().nullable().transform(val => val ?? ""),
+        week: z.coerce.string().nullable().transform(val => val ?? ""),
 
-        divisionId: z.number().nullable(),
-        hostPool: z.string().nullable(),
-        coordinatorPool: z.string().nullable(),
+        teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([]),
 
-        teams: z.object({ teamId: z.string() }).array(),
-        
-
-        scoresPublished: z.date().nullable()
+        //parentMeet: z.number().nullable(),
+        //scoresPublished: z.date().nullable()
     });
+
+    // define the schema for the form - most things other than dates are strings
+    const formValidationSchema = z.object({
+        seasonId: z.string(),
+        meetDate: z.date(),
+        meetType: z.string(),
+
+        name: z.string(),
+
+        entryDeadline: z.date().nullable(),
+        divisionId: z.string(),
+        hostPool: z.string(),
+        coordinatorPool: z.string(),
+        week: z.string(),
+
+        teams: z.string().array(),
+
+        //parentMeet: z.number().nullable(),
+        //scoresPublished: z.date().nullable()
+    })
+        .refine((data) => !['Dual', 'Qual'].includes(data.meetType) || data.week, {
+            message: "Week not specified for Dual/Qual meet",
+            path: ["week"], // path of error
+        })
+        .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
+            message: "Division not specified for Dual/Div meet",
+            path: ["divisionId"], // path of error
+        })
+        .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
+            message: "Division not specified for Dual/Div meet",
+            path: ["divisionId"], // path of error
+        })
+        .superRefine((val, ctx) => {
+            if (val.meetType === 'Dual' && val.teams.length !== 2) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ['teams'],
+                    message: `Dual Meets must have 2 teams`,
+                });
+            }
+            if (['Qual','Star', 'Div'].includes(val.meetType) && val.teams.length < 2) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ['teams'],
+                    message: `This meet type must have at least 2 teams`,
+                });
+            }
+        });;
 
     /*
         // flatten teams to a simgple array of strings
@@ -111,17 +111,15 @@ export const MeetForm = ({
             teams: z.string().array()
         }).transform(ts => ts.teams);
     
-        let x = unifiedSchema.parse(meet);
+        let x = formValidationSchema.parse(meet);
     */
-    type FormSchemaType = z.infer<typeof unifiedSchema>;
-
-    // Might need to override some defaults if components don't support nulls.
-    // my input, select and multiselect do
+    type FormSchemaType = z.infer<typeof formValidationSchema>;
 
     const form = useForm({
-        resolver: zodResolver(unifiedSchema),
+        resolver: zodResolver(formValidationSchema),
         defaultValues: {
-            ...unifiedSchema.parse(meet)
+            ...inSchema.parse(meet),
+
         }
     });
 
@@ -133,8 +131,9 @@ export const MeetForm = ({
     const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
     const router = useRouter();
 
+    // Login to remove a team who is no longer active in the season if the season changes
     useEffect(() => {
-        fetchTeamsForSeason(Number((form.watch('seasonId'))))
+        fetchTeamsForSeason(Number((form.getValues('seasonId'))))
             .then(r => {
                 const ts = r.map(r => r.teamId).sort()
                 setActiveTeamIds(ts);
@@ -146,8 +145,12 @@ export const MeetForm = ({
             });
     }, [seasonId]);
 
+
+
     const onSubmit = (data: z.infer<FormSchemaType>) => {
-        console.log(data)
+        console.log('submitted', data);
+        console.log(form.formState);
+        return false;
         /*
         const outMeetData = outMeetSchema.parse(data);
         const outTeamsData = outTeamsSchema.parse(data);
@@ -171,7 +174,7 @@ export const MeetForm = ({
         <>
             <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)}>
 
-                <FormFieldSelectNum form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} />
+                <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} />
                 <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
                 <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
 
@@ -181,19 +184,15 @@ export const MeetForm = ({
                     <FormFieldInput form={form} name="name" label="Meet Name" />
                 }
 
-
                 {
                     ['Dual', 'Qual'].includes(meetType) &&
-                    <FormFieldSelectNum form={form} name="week" label="Week" options={['1', '2', '3', '4', '5', '6', '7', '8']} />
+                    <FormFieldSelect form={form} name="week" label="Week" options={['1', '2', '3', '4', '5', '6', '7', '8']} />
                 }
 
                 {
-                    ['Dual'].includes(meetType) &&
+                    ['Dual', 'Div'].includes(meetType) &&
                     <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} />
                 }
-
-
-
 
                 {['Div', 'Star'].includes(meetType) &&
                     <>
@@ -202,9 +201,7 @@ export const MeetForm = ({
                     </>
                 }
 
-                {/*}
                 <FormFieldMultiSelect form={form} name="teams" label="Teams" options={activeTeamIds} />
-*/}
 
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit
@@ -212,263 +209,7 @@ export const MeetForm = ({
 
 
             </form>
-            <hr className='my-4'></hr>
-            <Button onClick={() => console.log(JSON.stringify(form.getValues()))}>Log Form Values</Button>
         </>
-    )
-}
-
-
-export const FormFieldGeneric = ({
-    form,
-    name,
-    label,
-    options,
-    render
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string,
-    options?: string[],
-    render: (id: string, field: any, fieldState: any) => React.ReactNode
-}>) => {
-    const id = useId();
-
-    return (
-        <FieldGroup>
-            <Controller
-                name={name}
-                control={form.control}
-                render={({ field, fieldState }) => (
-                    <Field
-                        orientation="responsive"
-                        data-invalid={fieldState.invalid}
-                    >
-                        <FieldContent>
-                            <FieldLabel htmlFor={id}>
-                                {label}
-                            </FieldLabel>
-
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
-                        </FieldContent>
-
-                        {render(id, field, fieldState)}
-                    </Field>
-                )}
-            />
-        </FieldGroup>
-    )
-
-}
-
-export const FormFieldInput = ({
-    form,
-    name,
-    label,
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string
-}>) => {
-
-    if (form.getValues(name) === null) {
-        form.setValue(name, '');
-    }
-
-    return (
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-                <Input
-                    {...field}
-                    id={id}
-                    aria-invalid={fieldState.invalid}
-                    placeholder={label}
-                    className='min-w-[500px]'
-                />
-            }
-        />
-    )
-}
-
-
-export const FormFieldDatePicker = ({
-    form,
-    name,
-    label,
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string
-}>) => {
-    const [openDatePicker, setOpenDatePicker] = React.useState(false);
-
-    return (
-
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-                <Popover open={openDatePicker} onOpenChange={setOpenDatePicker}>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant="outline"
-                            id={id}
-                            aria-invalid={fieldState.invalid}
-                            className="w-48 justify-between font-normal"
-                        >
-                            {field.value ? field.value.toLocaleDateString() : "Select date"}
-                            <ChevronDownIcon />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                        <Calendar
-                            mode="single"
-                            selected={field.value ? field.value : undefined}
-                            defaultMonth={field.value ? field.value : undefined}
-                            captionLayout="dropdown"
-                            onSelect={(date) => {
-                                field.onChange(date);
-                                setOpenDatePicker(false);
-                            }}
-                        />
-                    </PopoverContent>
-                </Popover>
-            }
-        />
-    )
-}
-
-export const FormFieldSelect = ({
-    form,
-    name,
-    label,
-    options
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string,
-    options: string[]
-}>) => {
-    if (form.getValues(name) === null) {
-        form.setValue(name, '');
-    }
-    return (
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-                <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                >
-                    <SelectTrigger
-                        id={id}
-                        aria-invalid={fieldState.invalid}
-                        className="min-w-[120px]"
-                    >
-                        <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="item-aligned" className='z-[200]'>
-                        {options.map(s => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-
-                    </SelectContent>
-                </Select>
-
-            }
-        />
-    )
-}
-
-export const FormFieldSelectNum = ({
-    form,
-    name,
-    label,
-    options
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string,
-    options: string[]
-}>) => {
-    if (form.getValues(name) === null) {
-        form.setValue(name, '');
-    }
-    return (
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-                <Select
-                    name={field.name}
-                    value={field.value.toString()}
-                    onValueChange={(v) => field.onChange(Number(v))}
-                >
-                    <SelectTrigger
-                        id={id}
-                        aria-invalid={fieldState.invalid}
-                        className="min-w-[120px]"
-                    >
-                        <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="item-aligned" className='z-[200]'>
-                        {options.map(s => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-
-                    </SelectContent>
-                </Select>
-
-            }
-        />
-    )
-}
-
-export const FormFieldMultiSelect = ({
-    form,
-    name,
-    label,
-    options
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string,
-    options: string[]
-}>) => {
-
-    return (
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-                <MultiSelect onValuesChange={field.onChange} values={field.value} >
-                    <MultiSelectTrigger className="w-full max-w-[400px]">
-                        <MultiSelectValue placeholder="Select..." />
-                    </MultiSelectTrigger>
-                    <MultiSelectContent>
-                        <MultiSelectGroup>
-                            {options.map((o) => (
-                                <MultiSelectItem key={o} value={o}>
-                                    {o}
-                                </MultiSelectItem>
-                            ))}
-                        </MultiSelectGroup>
-                    </MultiSelectContent>
-                </MultiSelect>
-
-            }
-        />
     )
 }
 
