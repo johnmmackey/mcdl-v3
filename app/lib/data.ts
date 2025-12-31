@@ -13,7 +13,7 @@ const logger = loggerFactory({ module: 'data' })
 
 
 
-async function accessToken(): Promise<string> {
+export async function accessToken(): Promise<string> {
     const session = await auth();
     if (!session || !session.user)
         throw new Error('Cant score meet if there is no session')

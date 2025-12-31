@@ -10,113 +10,138 @@ import { Season } from '@/app/lib/definitions'
 import { Meet } from '@/app/lib/Meet';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
+
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 
-/*
+const nullFlag = {value: "-- None --", label: "-- None --"};
 
-const nullToEmptyStr = (v: number | string | null | undefined) => v ?? '';
-const numToStr = (v: number) => v.toString();
+const intToStringCodec = z.codec(
+    z.number().nullable(),
+    z.string(),
+    {
+        decode: (v) => v !== null ? v.toString() : "",
+        encode: (v) => v ? parseInt(v) : null
+    }
+)
 
-const toFormStr = (v: number | string | null | undefined) => {
-    if (typeof v === "number")
-        return v.toString();
-    if (typeof v === "string")
-        return v;
-    return '';
-};
-*/
+const intToStringNNCodec = z.codec(
+    z.number(),
+    z.string(),
+    {
+        decode: (v) => v !== null ? v.toString() : "",
+        encode: (v) => parseInt(v)
+    }
+)
+
+const nullableStringToStringCodec = z.codec(
+    z.string().nullable(),
+    z.string(),
+    {
+        decode: (v) => v ?? nullFlag.value,
+        encode: (v) => v === nullFlag.value ? null : v
+    }
+)
+
+const ioSchema = z.object({
+    seasonId: intToStringNNCodec,
+    meetDate: z.iso.datetime({ offset: true }),
+    meetType: z.string(),
+
+    name: nullableStringToStringCodec,
+
+    entryDeadline: z.iso.datetime({ offset: true }),
+    divisionId: intToStringCodec,
+    hostPool: nullableStringToStringCodec,
+    coordinatorPool: nullableStringToStringCodec,
+
+    teams: z.codec(
+        z.object({ teamId: z.string() }).array(),
+        z.string().array(),
+        {
+            decode: (ts) => ts.map(t => t.teamId),
+            encode: (ts) => ts.map(t => ({ teamId: t }))
+        }
+    )
+});
+
+// define the schema for the form
+const formValidationSchema = z.object({
+    seasonId: z.string(),
+    meetDate: z.iso.datetime(),
+    meetType: z.string(),
+
+    name: z.string(),
+
+    entryDeadline: z.iso.datetime(),
+    divisionId: z.string(),
+    hostPool: z.string(),
+    coordinatorPool: z.string(),
+    //week: z.string(),
+
+    teams: z.string().array(),
+
+})
+    .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
+        message: "Division not specified for Dual/Div meet",
+        path: ["divisionId"], // path of error
+    })
+    .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
+        message: "Division not specified for Dual/Div meet",
+        path: ["divisionId"], // path of error
+    })
+    .superRefine((val, ctx) => {
+        if (val.meetType === 'Dual' && val.teams.length !== 2) {
+            ctx.addIssue({
+                code: "custom",
+                path: ['teams'],
+                message: `Dual Meets must have 2 teams`,
+            });
+        }
+        if (['Qual', 'Star', 'Div'].includes(val.meetType) && val.teams.length < 2) {
+            ctx.addIssue({
+                code: "custom",
+                path: ['teams'],
+                message: `This meet type must have at least 2 teams`,
+            });
+        }
+    });;
+
+
 
 export const MeetForm = ({
     meet,
-    seasons
+    seasons,
 }: Readonly<{
     meet: Meet,
     seasons: Season[]
 }>) => {
+    const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
+    const router = useRouter();
 
     const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s);
 
-    // schema for the incoming data
-    const inSchema = z.object({
-        seasonId: z.number().transform((v) => v.toString()),
-        meetDate: z.iso.datetime({ offset: true }).transform((val) => new Date(val) ),
-        meetType: z.string(),
+    const onSubmit = async (data: z.infer<typeof formValidationSchema>) => {
+        const encData = ioSchema.omit({teams: true}).encode(data);
+        console.log('Submitting meet data:', encData);
 
-        name: z.string().nullable().transform(val => val ?? ""),
+        if(['Star', 'Qual'].includes(data.meetType))
+            encData.divisionId = null;
 
-        entryDeadline: z.iso.datetime({ offset: true }).transform((val) => new Date(val) ), 
-        divisionId: z.coerce.string().nullable().transform(val => val ?? ""),
-        hostPool: z.string().nullable().transform(val => val ?? ""),
-        coordinatorPool: z.string().nullable().transform(val => val ?? ""),
-        week: z.coerce.string().nullable().transform(val => val ?? ""),
+        const newMeet = await (meet.id
+            ? updateMeet(meet.id, encData, data.teams)
+            : createMeet(encData, data.teams)
+        );
 
-        teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([]),
+        router.push(`/meets`);
+    }
 
-    });
-
-    // define the schema for the form - most things other than dates are strings
-    const formValidationSchema = z.object({
-        seasonId: z.string(),
-        meetDate: z.date(),
-        meetType: z.string(),
-
-        name: z.string(),
-
-        entryDeadline: z.date(),
-        divisionId: z.string(),
-        hostPool: z.string(),
-        coordinatorPool: z.string(),
-        week: z.string(),
-
-        teams: z.string().array(),
-
-    })
-        .refine((data) => !['Dual', 'Qual'].includes(data.meetType) || data.week, {
-            message: "Week not specified for Dual/Qual meet",
-            path: ["week"], // path of error
-        })
-        .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
-            message: "Division not specified for Dual/Div meet",
-            path: ["divisionId"], // path of error
-        })
-        .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
-            message: "Division not specified for Dual/Div meet",
-            path: ["divisionId"], // path of error
-        })
-        .superRefine((val, ctx) => {
-            if (val.meetType === 'Dual' && val.teams.length !== 2) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ['teams'],
-                    message: `Dual Meets must have 2 teams`,
-                });
-            }
-            if (['Qual','Star', 'Div'].includes(val.meetType) && val.teams.length < 2) {
-                ctx.addIssue({
-                    code: "custom",
-                    path: ['teams'],
-                    message: `This meet type must have at least 2 teams`,
-                });
-            }
-        });;
-
-    /*
-        // flatten teams to a simgple array of strings
-        const outTeamsSchema = z.object({
-            teams: z.string().array()
-        }).transform(ts => ts.teams);
-    
-        let x = formValidationSchema.parse(meet);
-    */
-    type FormSchemaType = z.infer<typeof formValidationSchema>;
+console.log('MeetForm render with meet:', meet);
+console.log('encoded meet data:', ioSchema.decode(meet));
 
     const form = useForm({
         resolver: zodResolver(formValidationSchema),
-        defaultValues: {
-            ...inSchema.parse(meet),
-
-        }
+        defaultValues: ioSchema.decode(meet)
     });
 
     const [seasonId, meetType] = useWatch({
@@ -124,8 +149,6 @@ export const MeetForm = ({
         name: ["seasonId", "meetType"]
     })
 
-    const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
-    const router = useRouter();
 
     // Logic to load relevant teams and remove a team who is no longer active in the season if the season changes
     useEffect(() => {
@@ -134,36 +157,13 @@ export const MeetForm = ({
                 //const ts = r.map(r => ([r.teamId, r.team.name])).sort((a, b) => a[0].localeCompare(b[0]));
                 const ts = r.map(r => r.teamId).sort((a, b) => a.localeCompare(b));
                 setActiveTeamIds(ts);
-                if (form.getValues('hostPool') && !ts.includes(form.getValues('hostPool')!))
+                if (form.getValues('hostPool') !== nullFlag.value && !ts.includes(form.getValues('hostPool')!))
                     form.setValue('hostPool', '');
-                if (form.getValues('coordinatorPool') && !ts.includes(form.getValues('coordinatorPool')!))
+                if (form.getValues('coordinatorPool') !=nullFlag.value && !ts.includes(form.getValues('coordinatorPool')!))
                     form.setValue('coordinatorPool', '');
                 form.setValue('teams', form.getValues('teams').filter((e: string) => ts.includes(e)));
             });
     }, [seasonId]);
-
-    const onSubmit = (data: z.infer<FormSchemaType>) => {
-        console.log('submitted', data);
-        console.log(form.formState);
-        return false;
-        /*
-        const outMeetData = outMeetSchema.parse(data);
-        const outTeamsData = outTeamsSchema.parse(data);
-
-        return (meet.id ? updateMeet(meet.id, outMeetData, outTeamsData) : createMeet(outMeetData, outTeamsData))
-            //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
-            .then(() => router.push(`/meets`));
-        */
-    }
-
-
-
-    const handleDelete = () => {
-        if (meet.id)
-            deleteMeet(meet.id)
-                //.then(updatedMeet => {console.log('updatedMeet', updatedMeet); return updateMeetTeams(updatedMeet.id, mTeams)})
-                .then(() => router.push(`/meets`));
-    }
 
     return (
         <>
@@ -173,15 +173,10 @@ export const MeetForm = ({
                 <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
                 <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
 
-                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={activeTeamIds} />
+                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} nullFlag={nullFlag}/>
 
                 {meetType !== 'Dual' &&
                     <FormFieldInput form={form} name="name" label="Meet Name" />
-                }
-
-                {
-                    ['Dual', 'Qual'].includes(meetType) &&
-                    <FormFieldSelect form={form} name="week" label="Week" options={['1', '2', '3', '4', '5', '6', '7', '8']} />
                 }
 
                 {
@@ -192,7 +187,7 @@ export const MeetForm = ({
                 {['Div', 'Star'].includes(meetType) &&
                     <>
                         <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={activeTeamIds} />
+                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} />
                     </>
                 }
 
@@ -209,68 +204,3 @@ export const MeetForm = ({
 }
 
 
-/*
-    const inSchema = z.object({
-        seasonId: z.number(),
-        name: z.string().nullable(),
-        meetDate: z.date(),
-        entryDeadline: z.date().nullable(),
-        meetType: z.string(),
-        divisionId: z.number().nullable(),
-        hostPool: z.string().nullable(),
-        coordinatorPool: z.string().nullable(),
-        teams: z.object({ teamId: z.string() }).array().transform(ts => ts.map(t => t.teamId)).default([])
-    });
- 
-    const validationSchema = z.object({
-        seasonId: z.number(),
-        name: z.string().nullish(),
-        meetDate: z.date().nullish(),
-        entryDeadline: z.date().nullish(),
-        meetType: z.string(),
-        divisionId: z.number().nullish(),
-        hostPool: z.string().nullable(),
-        coordinatorPool: z.string().nullable(),
-        teams: z.string().array()
-    }).superRefine((val, ctx) => {
-        if (val.meetType === 'Dual' && val.teams.length !== 2) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['teams'],
-                message: `Dual Meets must have 2 teams`,
-            });
-        }
-    });;
- 
-    const outMeetSchema = z.object({
-        seasonId: z.number(),
-        name: z.string(),
-        meetDate: z.date(),
-        entryDeadline: z.date().nullable(),
-        meetType: z.string(),
-        divisionId: z.coerce.number(),
-        hostPool: z.string(),
-        coordinatorPool: z.string()
-    });
- 
- 
-    const validationSchema1 = z.object({
-        seasonId: z.string(),
-        name: z.string(),
-        meetDate: z.date(),
-        entryDeadline: z.date().nullable(),
-        meetType: z.string(),
-        divisionId: z.number().nullable(),
-        hostPool: z.string().nullable(),
-        coordinatorPool: z.string().nullable(),
-        teams: z.string().array()
-    }).superRefine((val, ctx) => {
-        if (val.meetType === 'Dual' && val.teams.length !== 2) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['teams'],
-                message: `Dual Meets must have 2 teams`,
-            });
-        }
-    });;
-*/

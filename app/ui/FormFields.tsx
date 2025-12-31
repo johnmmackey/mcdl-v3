@@ -144,18 +144,18 @@ export const FormFieldDatePicker = ({
                             aria-invalid={fieldState.invalid}
                             className="w-48 justify-between font-normal"
                         >
-                            {field.value ? field.value.toLocaleDateString() : "Select date"}
+                            {field.value ? new Date(field.value).toLocaleDateString() : "Select date"}
                             <ChevronDownIcon />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                         <Calendar
                             mode="single"
-                            selected={field.value ? field.value : undefined}
-                            defaultMonth={field.value ? field.value : undefined}
+                            selected={field.value ? new Date(field.value) : undefined}
+                            defaultMonth={field.value ? new Date(field.value) : undefined}
                             captionLayout="dropdown"
                             onSelect={(date) => {
-                                field.onChange(date);
+                                field.onChange(date ? date.toISOString() : new Date().toISOString());
                                 setOpenDatePicker(false);
                             }}
                         />
@@ -167,6 +167,62 @@ export const FormFieldDatePicker = ({
 }
 
 export const FormFieldSelect = ({
+    form,
+    name,
+    label,
+    nullFlag,
+    options
+}: Readonly<{
+    form: UseFormReturn<any>,
+    name: string,
+    label: string,
+    nullFlag?: { value: string, label: string },
+    options: string[] | string[][]
+}>) => {
+
+    return (
+        <FormFieldGeneric
+            form={form}
+            name={name}
+            label={label}
+            render={(id, field, fieldState) =>
+
+                <Select
+                    name={field.name}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                >
+                   
+                    <SelectTrigger
+                        id={id}
+                        aria-invalid={fieldState.invalid}
+                        className="min-w-[120px]"
+                    >
+                        <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent position="item-aligned" className='z-[200]'>
+                        {nullFlag && (
+                            <SelectItem key={nullFlag.value} value={nullFlag.value}>
+                                {nullFlag.label}
+                            </SelectItem>
+                        )}
+                        {options.map(o => (
+
+                            <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
+                                {Array.isArray(o) ? o[1] : o} 
+                            </SelectItem>
+                        ))}
+                    </SelectContent>                
+                </Select>
+            }
+        />
+    )
+}
+
+
+const nullFlag={value: "---null---", label: '---null---'}
+
+export const FormFieldSelectx = ({
     form,
     name,
     label,
@@ -184,11 +240,13 @@ export const FormFieldSelect = ({
             name={name}
             label={label}
             render={(id, field, fieldState) =>
+
                 <Select
                     name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
+                    value={field.value ?? nullFlag.value}
+                    onValueChange={ (v) => field.onChange( v === nullFlag.value ? null : v)}
                 >
+                   
                     <SelectTrigger
                         id={id}
                         aria-invalid={fieldState.invalid}
@@ -197,15 +255,19 @@ export const FormFieldSelect = ({
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent position="item-aligned" className='z-[200]'>
+                        {nullFlag && (
+                            <SelectItem key={nullFlag.value} value={nullFlag.value}>
+                                {nullFlag.label}
+                            </SelectItem>
+                        )}
                         {options.map(o => (
+
                             <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
-                                {Array.isArray(o) ? o[1] : o}
+                                {Array.isArray(o) ? o[1] : o} 
                             </SelectItem>
                         ))}
-
-                    </SelectContent>
+                    </SelectContent>                
                 </Select>
-
             }
         />
     )

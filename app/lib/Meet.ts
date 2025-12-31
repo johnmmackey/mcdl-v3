@@ -1,4 +1,6 @@
+import { revalidateTag } from "next/cache";
 import { MeetTeam } from './definitions';
+import { accessToken } from "@/app/lib/data"
 
 export class Meet {
     id: number | null;
@@ -31,7 +33,7 @@ export class Meet {
         teams
     }: Readonly<{
         id?: number,
-        seasonId: number,
+        seasonId?: number,
         name?: string | null,
         parentMeet?: number | null,
         meetDate?: string,
@@ -45,7 +47,7 @@ export class Meet {
         teams?: MeetTeam[]
     }>) {
         this.id = id || null;
-        this.seasonId = seasonId;
+        this.seasonId = seasonId || new Date().getFullYear();
         this.name = name || null;
         this.parentMeet = parentMeet || null;
         this.meetDate = meetDate || new Date().toISOString(),

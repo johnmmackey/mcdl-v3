@@ -25,6 +25,8 @@ export default async function Page(props: {
 
     const meet = meetId ? await Meet.getById(meetId) : new Meet({ seasonId: currentSeasonId });
 
+
+
     return (
         <MeetForm meet={{...meet}}  seasons={seasons} />
     )
