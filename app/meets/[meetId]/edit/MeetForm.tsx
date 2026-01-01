@@ -38,8 +38,8 @@ const nullableStringToStringCodec = z.codec(
     z.string().nullable(),
     z.string(),
     {
-        decode: (v) => v ?? nullFlag.value,
-        encode: (v) => v === nullFlag.value ? null : v
+        decode: (v) => v ?? "",
+        encode: (v) => v
     }
 )
 
@@ -48,12 +48,12 @@ const ioSchema = z.object({
     meetDate: z.iso.datetime({ offset: true }),
     meetType: z.string(),
 
-    name: nullableStringToStringCodec,
+    name: z.string().nullable(),// nullableStringToStringCodec,
 
     entryDeadline: z.iso.datetime({ offset: true }),
     divisionId: intToStringCodec,
-    hostPool: nullableStringToStringCodec,
-    coordinatorPool: nullableStringToStringCodec,
+    hostPool: z.string().nullable(), //nullableStringToStringCodec,
+    coordinatorPool: z.string().nullable(),
 
     teams: z.codec(
         z.object({ teamId: z.string() }).array(),
@@ -71,13 +71,12 @@ const formValidationSchema = z.object({
     meetDate: z.iso.datetime(),
     meetType: z.string(),
 
-    name: z.string(),
+    name: z.string().nullable(),
 
     entryDeadline: z.iso.datetime(),
     divisionId: z.string(),
-    hostPool: z.string(),
-    coordinatorPool: z.string(),
-    //week: z.string(),
+    hostPool: z.string().nullable(),
+    coordinatorPool: z.string().nullable(),
 
     teams: z.string().array(),
 
@@ -136,8 +135,8 @@ export const MeetForm = ({
         router.push(`/meets`);
     }
 
-console.log('MeetForm render with meet:', meet);
-console.log('encoded meet data:', ioSchema.decode(meet));
+//console.log('MeetForm render with meet:', meet);
+//console.log('encoded meet data:', ioSchema.decode(meet));
 
     const form = useForm({
         resolver: zodResolver(formValidationSchema),
@@ -157,10 +156,10 @@ console.log('encoded meet data:', ioSchema.decode(meet));
                 //const ts = r.map(r => ([r.teamId, r.team.name])).sort((a, b) => a[0].localeCompare(b[0]));
                 const ts = r.map(r => r.teamId).sort((a, b) => a.localeCompare(b));
                 setActiveTeamIds(ts);
-                if (form.getValues('hostPool') !== nullFlag.value && !ts.includes(form.getValues('hostPool')!))
-                    form.setValue('hostPool', '');
-                if (form.getValues('coordinatorPool') !=nullFlag.value && !ts.includes(form.getValues('coordinatorPool')!))
-                    form.setValue('coordinatorPool', '');
+                if (form.getValues('hostPool') && !ts.includes(form.getValues('hostPool')!))
+                    form.setValue('hostPool', null);
+                if (form.getValues('coordinatorPool') && !ts.includes(form.getValues('coordinatorPool')!))
+                    form.setValue('coordinatorPool', null);
                 form.setValue('teams', form.getValues('teams').filter((e: string) => ts.includes(e)));
             });
     }, [seasonId]);
@@ -173,7 +172,7 @@ console.log('encoded meet data:', ioSchema.decode(meet));
                 <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
                 <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
 
-                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} nullFlag={nullFlag}/>
+                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} allowNullForNone/>
 
                 {meetType !== 'Dual' &&
                     <FormFieldInput form={form} name="name" label="Meet Name" />
@@ -187,11 +186,13 @@ console.log('encoded meet data:', ioSchema.decode(meet));
                 {['Div', 'Star'].includes(meetType) &&
                     <>
                         <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} />
+                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} allowNullForNone/>
                     </>
                 }
 
                 <FormFieldMultiSelect form={form} name="teams" label="Teams" options={activeTeamIds} />
+
+                <Button type="button" onClick={() => console.log(form.getValues())}>Dump</Button>
 
                 <Button className={'mt-4'} type="submit" disabled={false}>
                     Submit

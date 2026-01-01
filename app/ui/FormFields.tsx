@@ -99,7 +99,8 @@ export const FormFieldInput = ({
     name: string,
     label: string
 }>) => {
-
+    if(form.getValues(name) === null)
+        form.setValue(name, "");
     return (
         <FormFieldGeneric
             form={form}
@@ -166,18 +167,20 @@ export const FormFieldDatePicker = ({
     )
 }
 
+const nullFlag={value: "-----null-----", label: '-- None --'}
+
 export const FormFieldSelect = ({
     form,
     name,
     label,
-    nullFlag,
-    options
+    options,
+    allowNullForNone
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
     label: string,
-    nullFlag?: { value: string, label: string },
-    options: string[] | string[][]
+    options: string[] | string[][],
+    allowNullForNone?: boolean
 }>) => {
 
     return (
@@ -186,61 +189,6 @@ export const FormFieldSelect = ({
             name={name}
             label={label}
             render={(id, field, fieldState) =>
-
-                <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                >
-                   
-                    <SelectTrigger
-                        id={id}
-                        aria-invalid={fieldState.invalid}
-                        className="min-w-[120px]"
-                    >
-                        <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="item-aligned" className='z-[200]'>
-                        {nullFlag && (
-                            <SelectItem key={nullFlag.value} value={nullFlag.value}>
-                                {nullFlag.label}
-                            </SelectItem>
-                        )}
-                        {options.map(o => (
-
-                            <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
-                                {Array.isArray(o) ? o[1] : o} 
-                            </SelectItem>
-                        ))}
-                    </SelectContent>                
-                </Select>
-            }
-        />
-    )
-}
-
-
-const nullFlag={value: "---null---", label: '---null---'}
-
-export const FormFieldSelectx = ({
-    form,
-    name,
-    label,
-    options
-}: Readonly<{
-    form: UseFormReturn<any>,
-    name: string,
-    label: string,
-    options: string[] | string[][]
-}>) => {
-
-    return (
-        <FormFieldGeneric
-            form={form}
-            name={name}
-            label={label}
-            render={(id, field, fieldState) =>
-
                 <Select
                     name={field.name}
                     value={field.value ?? nullFlag.value}
@@ -255,7 +203,7 @@ export const FormFieldSelectx = ({
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent position="item-aligned" className='z-[200]'>
-                        {nullFlag && (
+                        {allowNullForNone && (
                             <SelectItem key={nullFlag.value} value={nullFlag.value}>
                                 {nullFlag.label}
                             </SelectItem>
