@@ -171,6 +171,8 @@ https://www.sanity.io/learn/course/day-one-with-sanity-studio/bringing-content-t
 https://icons.sanity.build/all?scheme=light
 https://www.sanity.io/docs/ids
 
+# Test setup:
+https://nextjs.org/docs/app/guides/testing/jest
 
 ## Meet views:
 * entries list (implicit and explicit)

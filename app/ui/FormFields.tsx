@@ -90,6 +90,27 @@ const FormFieldGeneric = ({
 
 }
 
+/*
+ * valueAsNumber
+ * nullforEmpty
+ * includeEmptyChoice  (select only)
+ */
+const convertFormValue = (v: string, nullForEmpty: boolean, valueAsNumber: boolean) => {
+    if(nullForEmpty && v === '')
+        return null;
+    return valueAsNumber ? Number(v) : v;
+}
+
+/*
+["", "a", "1"].map(s =>
+    [false, true].map(nullForEmpty => 
+        [false, true].map(valueAsNumber => 
+            console.log(`String: "${s}", nullForEmpty: ${nullForEmpty}, valueAsNumber: ${valueAsNumber}: output: "${convertFormValue(s, nullForEmpty, valueAsNumber)}" (${typeof convertFormValue(s, nullForEmpty, valueAsNumber)})`)
+        )
+    )
+)
+*/
+
 export const FormFieldInput = ({
     form,
     name,
@@ -167,20 +188,24 @@ export const FormFieldDatePicker = ({
     )
 }
 
-const nullFlag={value: "-----null-----", label: '-- None --'}
+const emptyFlag={value: "-----empty-----", label: '-- None --'}
 
 export const FormFieldSelect = ({
     form,
     name,
     label,
     options,
-    allowNullForNone
+    nullForEmpty = false,
+    valueAsNumber = false,
+    includeEmptyChoice = false
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
     label: string,
-    options: string[] | string[][],
-    allowNullForNone?: boolean
+    options: string[] | string[][] | number[],
+    nullForEmpty?: boolean,
+    valueAsNumber?: boolean,
+    includeEmptyChoice?: boolean | string
 }>) => {
 
     return (
@@ -191,8 +216,8 @@ export const FormFieldSelect = ({
             render={(id, field, fieldState) =>
                 <Select
                     name={field.name}
-                    value={field.value ?? nullFlag.value}
-                    onValueChange={ (v) => field.onChange( v === nullFlag.value ? null : v)}
+                    value={field.value === null ? emptyFlag.value : (typeof field.value === 'number' ? field.value.toString() : field.value)}
+                    onValueChange={ (v) => field.onChange(convertFormValue( v === emptyFlag.value ? "" : v, nullForEmpty, valueAsNumber))}
                 >
                    
                     <SelectTrigger
@@ -202,16 +227,16 @@ export const FormFieldSelect = ({
                     >
                         <SelectValue placeholder="Select" />
                     </SelectTrigger>
+
                     <SelectContent position="item-aligned" className='z-[200]'>
-                        {allowNullForNone && (
-                            <SelectItem key={nullFlag.value} value={nullFlag.value}>
-                                {nullFlag.label}
+                        {includeEmptyChoice && (
+                            <SelectItem key={emptyFlag.value} value={emptyFlag.value}>
+                                {typeof includeEmptyChoice === 'string' ? includeEmptyChoice : emptyFlag.label}
                             </SelectItem>
                         )}
                         {options.map(o => (
-
-                            <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
-                                {Array.isArray(o) ? o[1] : o} 
+                            <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : (typeof o === 'number' ? o.toString() : o)}>
+                                {Array.isArray(o) ? o[1] : (typeof o === 'number' ? o.toString() : o)} 
                             </SelectItem>
                         ))}
                     </SelectContent>                

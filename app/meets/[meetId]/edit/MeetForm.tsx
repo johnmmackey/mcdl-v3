@@ -14,8 +14,6 @@ import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/l
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 
-const nullFlag = {value: "-- None --", label: "-- None --"};
-
 const intToStringCodec = z.codec(
     z.number().nullable(),
     z.string(),
@@ -34,25 +32,16 @@ const intToStringNNCodec = z.codec(
     }
 )
 
-const nullableStringToStringCodec = z.codec(
-    z.string().nullable(),
-    z.string(),
-    {
-        decode: (v) => v ?? "",
-        encode: (v) => v
-    }
-)
-
 const ioSchema = z.object({
     seasonId: intToStringNNCodec,
     meetDate: z.iso.datetime({ offset: true }),
     meetType: z.string(),
 
-    name: z.string().nullable(),// nullableStringToStringCodec,
+    name: z.string().nullable(),
 
     entryDeadline: z.iso.datetime({ offset: true }),
-    divisionId: intToStringCodec,
-    hostPool: z.string().nullable(), //nullableStringToStringCodec,
+    divisionId: z.number().nullable(),
+    hostPool: z.string().nullable(), 
     coordinatorPool: z.string().nullable(),
 
     teams: z.codec(
@@ -74,7 +63,7 @@ const formValidationSchema = z.object({
     name: z.string().nullable(),
 
     entryDeadline: z.iso.datetime(),
-    divisionId: z.string(),
+    divisionId: z.number().nullable(),
     hostPool: z.string().nullable(),
     coordinatorPool: z.string().nullable(),
 
@@ -172,7 +161,7 @@ export const MeetForm = ({
                 <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
                 <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
 
-                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} allowNullForNone/>
+                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
 
                 {meetType !== 'Dual' &&
                     <FormFieldInput form={form} name="name" label="Meet Name" />
@@ -180,13 +169,13 @@ export const MeetForm = ({
 
                 {
                     ['Dual', 'Div'].includes(meetType) &&
-                    <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} />
+                    <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} includeEmptyChoice nullForEmpty valueAsNumber />
                 }
 
                 {['Div', 'Star'].includes(meetType) &&
                     <>
                         <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} allowNullForNone/>
+                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty/>
                     </>
                 }
 
