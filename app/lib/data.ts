@@ -118,11 +118,11 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
     revalidateTag(`meets`, 'max');
 }
 
-export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<Meet> {
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
         method: 'PATCH',
-        body: JSON.stringify({meet, teams}),
+        body: JSON.stringify(meet),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t
@@ -138,11 +138,11 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput, teams: s
     return await(r.json());
 }
 
-export async function createMeet(meet: MeetUpdateInput, teams: string[]): Promise<Meet> {
+export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets`, {
         method: 'POST',
-        body: JSON.stringify({meet, teams}),
+        body: JSON.stringify(meet),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t

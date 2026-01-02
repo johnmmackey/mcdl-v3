@@ -1,19 +1,9 @@
-import Link from 'next/link';
-import { auth } from '@/auth';
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
-import keyBy from 'lodash/keyBy';
-import { format } from 'date-fns';
 
-import { fetchCurrentSeasonId, fetchSeasons } from '@/app/lib/data';
-import { userCan } from '@/app/lib/userCan';
-import { SeasonSelector } from '@/app/ui/SeasonSelector';
-import Loading from '@/app/ui/Loading'
-import { MeetCreateInput, MeetTeam } from '@/app/lib/definitions'
-import { Suspense } from 'react';
+import { fetchCurrentSeasonId, fetchMeet, fetchSeasons } from '@/app/lib/data';
+import { Meet } from '@/app/lib/definitions'
+
 
 import { MeetForm } from './MeetForm'
-import { Meet } from '@/app/lib/Meet'
 
 export default async function Page(props: {
     params: Promise<{ meetId: string }>,
@@ -23,12 +13,23 @@ export default async function Page(props: {
     const currentSeasonId = await fetchCurrentSeasonId();
     const meetId = parseInt(params.meetId) || null;
 
-    const meet = meetId ? await Meet.getById(meetId) : new Meet({ seasonId: currentSeasonId });
-
-
+    const meet: Meet = meetId ? await fetchMeet(meetId) : {
+        id:null,
+        seasonId: currentSeasonId,
+        name: "",
+        parentMeet: null,
+        meetDate: new Date().toISOString(),
+        entryDeadline: new Date().toISOString(),
+        hostPool: null,
+        coordinatorPool: null,
+        meetType: 'Dual',
+        divisionId: null,
+        scoresPublished: null,
+        teams: []
+    };
 
     return (
-        <MeetForm meet={{...meet}}  seasons={seasons} />
+        <MeetForm meet={{ ...meet, teamList: meet.teams.map(t => t.teamId) }} seasons={seasons} />
     )
 }
 

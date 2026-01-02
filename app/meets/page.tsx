@@ -74,7 +74,7 @@ async function Meets(props: {
             return '';
         if (m.teams.length > 2)
             return 'Results';
-        return (m.teams.find(e => e.teamId === m.visitingPool)?.score || 0)
+        return (m.teams.find(e => e.teamId !== m.hostPool)?.score || 0)
             + ' - '
             + ((m.teams.find(e => e.teamId === m.hostPool)?.score) || 0);
     }
@@ -88,7 +88,7 @@ async function Meets(props: {
 
                     <div className="grid grid-cols-6 gap-4">
                         <div className='text-center font-semibold'>Division</div>
-                        <div className='col-span-3text-center font-semibold'>Meet Name</div>
+                        <div className='col-span-3 text-center font-semibold'>Meet Name</div>
                         <div className='text-center font-semibold'>Score</div>
                     </div>
                     {meets.map((m, k2) =>

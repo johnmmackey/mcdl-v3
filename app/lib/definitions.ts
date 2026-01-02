@@ -39,11 +39,9 @@ export type Meet = {
     meetDate: string,
     entryDeadline: string | null,
     hostPool: string | null,
-    visitingPool?: string | null,
     coordinatorPool: string | null,
     meetType: string,
     divisionId: number | null,
-    week?: number | null,
     scoresPublished: Date | null,
     teams: MeetTeam[]
 }
@@ -55,11 +53,10 @@ export type MeetCreateInput = {
     meetDate?: string,
     entryDeadline?: string | null,
     hostPool?: string | null,
-    //visitingPool?: string | null,
     coordinatorPool?: string | null,
     meetType?: string,
     divisionId?: number | null,
-    //week?: number | null,
+    teamList: string[]
     //scoresPublished?: string | null
 }
 
@@ -70,11 +67,10 @@ export type MeetUpdateInput = {
     meetDate?: string,
     entryDeadline?: string | null,
     hostPool?: string | null,
-    //visitingPool?: string | null,
     coordinatorPool?: string | null,
     meetType?: string,
     divisionId?: number | null,
-    //week?: number | null,
+    teamList: string[]
     //scoresPublished?: string | null
 }
 

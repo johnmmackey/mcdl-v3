@@ -95,11 +95,13 @@ const FormFieldGeneric = ({
  * nullforEmpty
  * includeEmptyChoice  (select only)
  */
+
 const convertFormValue = (v: string, nullForEmpty: boolean, valueAsNumber: boolean) => {
     if(nullForEmpty && v === '')
         return null;
     return valueAsNumber ? Number(v) : v;
 }
+
 
 /*
 ["", "a", "1"].map(s =>
@@ -216,7 +218,7 @@ export const FormFieldSelect = ({
             render={(id, field, fieldState) =>
                 <Select
                     name={field.name}
-                    value={field.value === null ? emptyFlag.value : (typeof field.value === 'number' ? field.value.toString() : field.value)}
+                    value={field.value === null ? (nullForEmpty ? emptyFlag.value : "") : (typeof field.value === 'number' ? field.value.toString() : field.value)}
                     onValueChange={ (v) => field.onChange(convertFormValue( v === emptyFlag.value ? "" : v, nullForEmpty, valueAsNumber))}
                 >
                    
