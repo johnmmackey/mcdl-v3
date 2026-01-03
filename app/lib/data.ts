@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, } from "./definitions";
+import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState } from "./definitions";
 
 import jwt from "jsonwebtoken";
 import { revalidateTag } from "next/cache";
@@ -18,7 +18,7 @@ export async function accessToken(): Promise<string> {
     if (!session || !session.user)
         throw new Error('Cant score meet if there is no session')
     const t = await getAccessToken(session.user.id as string);
-    if(!t)
+    if (!t)
         throw new Error('Cant get access token');
     return t;
 }
@@ -135,7 +135,7 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
     //invalidate the cache for this meet
     revalidateTag(`meet:${meetId}`, 'max');
     revalidateTag(`meets`, 'max');
-    return await(r.json());
+    return await (r.json());
 }
 
 export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
@@ -149,15 +149,16 @@ export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
         },
     });
 
-    if (!r.ok)
+    if (r.ok)
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
     revalidateTag(`meets`, 'max');
-    return await(r.json());
+    return await (r.json());
 }
 
-export async function deleteMeet(meetId: number): Promise<void> {
+export async function deleteMeet(_currentState: GenericServerActionState<Meet> | null, meetId: number): Promise<GenericServerActionState<Meet>> {
+    console.log('in delete meet')
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
         method: 'DELETE',
@@ -167,11 +168,13 @@ export async function deleteMeet(meetId: number): Promise<void> {
         },
     });
 
-    if (!r.ok)
-        throw new Error(r.statusText);
-
-    //invalidate the cache for this meet
-    revalidateTag(`meets`, 'max');
+    if (r.ok) {
+        revalidateTag(`meets`, 'max');
+        return { error: null, data: await r.json() }
+    } else {
+        const text = await r.text();
+        return { error: r.statusText + (text ? `: ${text}` : ''), data: null };
+    }
 }
 
 

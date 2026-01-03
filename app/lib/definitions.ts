@@ -295,3 +295,13 @@ export enum MeetView {
     Preview,
     Results
 }
+
+export type GenericServerActionState<T> = {
+    error: string | null,
+    data: T | null
+}
+
+export const GenericServerActionStatePlaceHolder: GenericServerActionState<any> = {
+    error: null,
+    data: null
+}

@@ -6,14 +6,6 @@ import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
@@ -22,7 +14,9 @@ import Loading from '@/app/ui/Loading'
 import { Meet, MeetTeam } from '@/app/lib/definitions'
 import { Suspense } from 'react';
 
-import { IconDotsVertical } from '@tabler/icons-react';
+import { MeetDropDownMenu } from './MeetDropDownMenu';
+
+
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -79,6 +73,8 @@ async function Meets(props: {
             + ((m.teams.find(e => e.teamId === m.hostPool)?.score) || 0);
     }
 
+ 
+
     return (
         <div style={{ maxWidth: '1000px' }}>
             {Object.entries(gmeets).map(([dt, meets], k1) =>
@@ -101,36 +97,8 @@ async function Meets(props: {
                                 <div>{scoreStr(m)}</div>
                             </div>
                             <div className='text-center'>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                        <IconDotsVertical className="text-white group-hover:text-black" />
-                                    </DropdownMenuTrigger>
-
-                                    <DropdownMenuContent>
-
-                                        <Link href={`/meets/${m.id}/enter`}>
-                                            <DropdownMenuItem>Enter Divers</DropdownMenuItem>
-                                        </Link>
-                                        <Link href={`/meets/${m.id}/scoring`}>
-                                            <DropdownMenuItem>Enter Scores</DropdownMenuItem>
-                                        </Link>
-                                        <Link href={`/meets/${m.id}/roster`}>
-                                            <DropdownMenuItem>Roster</DropdownMenuItem>
-                                        </Link>
-                                        <Link href={`/meets/${m.id}/labels`}>
-                                            <DropdownMenuItem>Print Labels</DropdownMenuItem>
-                                        </Link>
-                                        <Link href={`/meets/${m.id}/results`}>
-                                            <DropdownMenuItem>View Results</DropdownMenuItem>
-                                        </Link>
-                                        <DropdownMenuSeparator />
-                                        <Link href={`/meets/${m.id}/edit`}>
-                                            <DropdownMenuItem>Edit Meet</DropdownMenuItem>
-                                        </Link>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-
+                                
+<MeetDropDownMenu meet={m} />
                             </div>
                         </div>
 

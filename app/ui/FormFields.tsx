@@ -199,7 +199,8 @@ export const FormFieldSelect = ({
     options,
     nullForEmpty = false,
     valueAsNumber = false,
-    includeEmptyChoice = false
+    includeEmptyChoice = false,
+    disabled = false
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
@@ -207,7 +208,8 @@ export const FormFieldSelect = ({
     options: string[] | string[][] | number[],
     nullForEmpty?: boolean,
     valueAsNumber?: boolean,
-    includeEmptyChoice?: boolean | string
+    includeEmptyChoice?: boolean | string,
+    disabled?: boolean
 }>) => {
 
     return (
@@ -217,6 +219,7 @@ export const FormFieldSelect = ({
             label={label}
             render={(id, field, fieldState) =>
                 <Select
+                    disabled={disabled}
                     name={field.name}
                     value={field.value === null ? (nullForEmpty ? emptyFlag.value : "") : (typeof field.value === 'number' ? field.value.toString() : field.value)}
                     onValueChange={ (v) => field.onChange(convertFormValue( v === emptyFlag.value ? "" : v, nullForEmpty, valueAsNumber))}
@@ -252,12 +255,14 @@ export const FormFieldMultiSelect = ({
     form,
     name,
     label,
-    options
+    options,
+    disabled = false,
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
     label: string,
-    options: string[] | string[][]
+    options: string[] | string[][],
+    disabled?: boolean
 }>) => {
 
     return (
@@ -266,14 +271,14 @@ export const FormFieldMultiSelect = ({
             name={name}
             label={label}
             render={(id, field, fieldState) =>
-                <MultiSelect onValuesChange={field.onChange} values={field.value} >
+                <MultiSelect onValuesChange={field.onChange} values={field.value}  >
                     <MultiSelectTrigger className="w-full max-w-[400px]">
                         <MultiSelectValue placeholder="Select..." />
                     </MultiSelectTrigger>
                     <MultiSelectContent>
                         <MultiSelectGroup>
                             {options.map((o) => (
-                                <MultiSelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
+                                <MultiSelectItem disabled key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
                                     {Array.isArray(o) ? o[1] : o}
                                 </MultiSelectItem>
                             ))}
