@@ -278,7 +278,7 @@ export const FormFieldMultiSelect = ({
                     <MultiSelectContent>
                         <MultiSelectGroup>
                             {options.map((o) => (
-                                <MultiSelectItem disabled key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
+                                <MultiSelectItem disabled={disabled} key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : o}>
                                     {Array.isArray(o) ? o[1] : o}
                                 </MultiSelectItem>
                             ))}

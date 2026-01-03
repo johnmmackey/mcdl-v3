@@ -15,6 +15,7 @@ import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSel
 
 
 import { AlertCircleIcon } from "lucide-react"
+
 import {
     Alert,
     AlertDescription,
@@ -199,7 +200,6 @@ export const MeetForm = ({
                         </Button>
                     </form>
 
-
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="outline">Delete Meet</Button>
@@ -218,10 +218,6 @@ export const MeetForm = ({
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
-
-
-
-
                 </>
             }
         </>

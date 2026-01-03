@@ -149,7 +149,7 @@ export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
         },
     });
 
-    if (r.ok)
+    if (!r.ok)
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
@@ -170,7 +170,7 @@ export async function deleteMeet(_currentState: GenericServerActionState<Meet> |
 
     if (r.ok) {
         revalidateTag(`meets`, 'max');
-        return { error: null, data: await r.json() }
+        return { error: null, data: null }
     } else {
         const text = await r.text();
         return { error: r.statusText + (text ? `: ${text}` : ''), data: null };
