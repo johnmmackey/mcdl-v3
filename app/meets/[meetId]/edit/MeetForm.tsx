@@ -153,57 +153,64 @@ export const MeetForm = ({
             }
             {
                 delState.error &&
-                    <div className="flex justify-center items-start">
-                        <Alert variant="destructive" className="max-w-xl">
-                            <AlertCircleIcon />
-                            <AlertTitle>Unable to complete the operation</AlertTitle>
-                            <AlertDescription>
-                                <p>{delState.error}</p>
-                            </AlertDescription>
-                        </Alert>
-                    </div>
+                <div className="flex justify-center items-start">
+                    <Alert variant="destructive" className="max-w-xl">
+                        <AlertCircleIcon />
+                        <AlertTitle>Unable to complete the operation</AlertTitle>
+                        <AlertDescription>
+                            <p>{delState.error}</p>
+                        </AlertDescription>
+                    </Alert>
+                </div>
             }
             {!isPending &&
                 <>
-                    <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
-                        <FormFieldSelect form={form} disabled={isPending} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
-                        <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
-                        <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
-
-                        {
-                            ['Dual', 'Div'].includes(meetType) &&
-                            <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
-                        }
-
-                        {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
-                            <>
-                                <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-
-
-                                {meetType !== 'Dual' &&
-                                    <FormFieldInput form={form} name="name" label="Meet Name" />
-                                }
-
-                                {['Div', 'Star'].includes(meetType) &&
-                                    <>
-                                        <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                                        <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-                                    </>
-                                }
-
-                                <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
-                            </>
-                        }
-
-                        <Button className={'mt-4'} type="submit" disabled={false}>
-                            Submit
-                        </Button>
-                    </form>
-
                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline">Delete Meet</Button>
-                        </AlertDialogTrigger>
+                        <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
+                            <FormFieldSelect form={form} disabled={isPending} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
+                            <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
+                            <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
+
+                            {
+                                ['Dual', 'Div'].includes(meetType) &&
+                                <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
+                            }
+
+                            {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
+                                <>
+                                    <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+
+
+                                    {meetType !== 'Dual' &&
+                                        <FormFieldInput form={form} name="name" label="Meet Name" />
+                                    }
+
+                                    {['Div', 'Star'].includes(meetType) &&
+                                        <>
+                                            <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
+                                            <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+                                        </>
+                                    }
+
+                                    <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
+                                </>
+                            }
+
+                            <div className='flex mt-4 gap-x-4'>
+                                <Button type="submit" disabled={false} variant='outline'>
+                                    Submit
+                                </Button>
+
+                                {meet.id && // !meet.scoresPublished && 
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="destructive">Delete Meet</Button>
+                                    </AlertDialogTrigger>
+                                }
+                            </div>
+                        </form>
+
+
+
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
