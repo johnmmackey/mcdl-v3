@@ -16,7 +16,7 @@ export default function MyAppShell({
 
     return (
         <AppShell
-            header={{ height: 80, }}
+            header={{ height: 80, offset: true}}
             navbar={{
                 width: 300,
                 breakpoint: 'md',
@@ -24,7 +24,7 @@ export default function MyAppShell({
             }}
             padding={0}
         >
-            <AppShell.Header>
+            <AppShell.Header className='z-10'>   {/* default z index is 100, which obscures popups */}
                 <Group className="p-2">
                     <Burger
                         opened={opened}

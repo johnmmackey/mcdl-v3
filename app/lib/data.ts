@@ -4,7 +4,7 @@ import { auth } from "@/auth"
 import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState } from "./definitions";
 
 import jwt from "jsonwebtoken";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { delay } from "./delay";
 import { getAccessToken } from "@/app/lib/accessTokens"
 
@@ -94,8 +94,8 @@ export async function scoreMeet(meetId: number, data: Array<any>): Promise<undef
         throw new Error('Error posting scores')
 
     //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`, 'max');
-    revalidateTag(`meets`, 'max');
+    updateTag(`meet:${meetId}`);
+    updateTag(`meets`);
 }
 
 export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
@@ -114,8 +114,8 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
         throw new Error(r.statusText);
 
     //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`, 'max');
-    revalidateTag(`meets`, 'max');
+    updateTag(`meet:${meetId}`);
+    updateTag(`meets`);
 }
 
 export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<Meet> {
@@ -132,9 +132,9 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
     if (!r.ok)
         throw new Error(r.statusText);
 
-    //invalidate the cache for this meet
-    revalidateTag(`meet:${meetId}`, 'max');
-    revalidateTag(`meets`, 'max');
+    //invalidate the cache 
+    updateTag(`meet:${meetId}`);
+    updateTag(`meets`);
     return await (r.json());
 }
 
@@ -152,8 +152,8 @@ export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
     if (!r.ok)
         throw new Error(r.statusText);
 
-    //invalidate the cache for this meet
-    revalidateTag(`meets`, 'max');
+    //invalidate the cache 
+    updateTag(`meets`);
     return await (r.json());
 }
 
@@ -169,11 +169,11 @@ export async function deleteMeet(_currentState: GenericServerActionState<Meet> |
     });
 
     if (r.ok) {
-        revalidateTag(`meets`, 'max');
+        updateTag(`meets`);
         return { error: null, data: null }
     } else {
         const text = await r.text();
-        return { error: r.statusText + (text ? `: ${text}` : ''), data: null };
+        return { error: {msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now()}, data: null };
     }
 }
 

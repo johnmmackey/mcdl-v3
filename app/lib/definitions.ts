@@ -297,7 +297,10 @@ export enum MeetView {
 }
 
 export type GenericServerActionState<T> = {
-    error: string | null,
+    error: {
+        msg: string,
+        seq: number
+    } | null,
     data: T | null
 }
 

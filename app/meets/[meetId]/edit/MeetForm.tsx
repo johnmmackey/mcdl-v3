@@ -13,28 +13,7 @@ import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/l
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 
-
-import { AlertCircleIcon } from "lucide-react"
-
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert"
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
-import Loading from "@/app/ui/Loading"
+import { Processing, ErrorToast, AreYouSure } from "@/app/ui/Processing"
 
 
 const inputSchema = z.object({
@@ -117,11 +96,12 @@ export const MeetForm = ({
             ? updateMeet(meet.id, data)
             : createMeet(data)
         );
-
         router.push(`/meets`);
     }
 
+    const [delAlertOpen, setDelAlertOpen] = useState(false);
     const handleDelete = () => {
+        setDelAlertOpen(false);
         startTransition(() => {
             delFormAction(meet.id!);
         });
@@ -145,88 +125,53 @@ export const MeetForm = ({
     }, [seasonId, divisionId, meetType]);
 
     return (
-
         <>
+            <ErrorToast actionState={delState} />
+            <Processing open={isPending} />
+            <AreYouSure open={delAlertOpen} sure={handleDelete} notSure={() => setDelAlertOpen(false)} msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" />
 
-            {isPending &&
-                <Loading />
-            }
-            {
-                delState.error &&
-                <div className="flex justify-center items-start">
-                    <Alert variant="destructive" className="max-w-xl">
-                        <AlertCircleIcon />
-                        <AlertTitle>Unable to complete the operation</AlertTitle>
-                        <AlertDescription>
-                            <p>{delState.error}</p>
-                        </AlertDescription>
-                    </Alert>
+            <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
+                <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
+                <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
+                <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
+
+                {
+                    ['Dual', 'Div'].includes(meetType) &&
+                    <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
+                }
+
+                {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
+                    <>
+                        <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+
+
+                        {meetType !== 'Dual' &&
+                            <FormFieldInput form={form} name="name" label="Meet Name" />
+                        }
+
+                        {['Div', 'Star'].includes(meetType) &&
+                            <>
+                                <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
+                                <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+                            </>
+                        }
+
+                        <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
+                    </>
+                }
+
+                <div className='flex mt-4 gap-x-4'>
+                    <Button type="submit" disabled={false} variant='outline'>
+                        Submit
+                    </Button>
+
+                    {meet.id && // !meet.scoresPublished && 
+
+                        <Button type="button" variant="destructive" onClick={() => setDelAlertOpen(true)}>Delete Meet</Button>
+
+                    }
                 </div>
-            }
-            {!isPending &&
-                <>
-                    <AlertDialog>
-                        <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
-                            <FormFieldSelect form={form} disabled={isPending} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
-                            <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
-                            <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
-
-                            {
-                                ['Dual', 'Div'].includes(meetType) &&
-                                <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
-                            }
-
-                            {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
-                                <>
-                                    <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-
-
-                                    {meetType !== 'Dual' &&
-                                        <FormFieldInput form={form} name="name" label="Meet Name" />
-                                    }
-
-                                    {['Div', 'Star'].includes(meetType) &&
-                                        <>
-                                            <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                                            <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-                                        </>
-                                    }
-
-                                    <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
-                                </>
-                            }
-
-                            <div className='flex mt-4 gap-x-4'>
-                                <Button type="submit" disabled={false} variant='outline'>
-                                    Submit
-                                </Button>
-
-                                {meet.id && // !meet.scoresPublished && 
-                                    <AlertDialogTrigger asChild>
-                                        <Button variant="destructive">Delete Meet</Button>
-                                    </AlertDialogTrigger>
-                                }
-                            </div>
-                        </form>
-
-
-
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. Are you sure you want to permanently
-                                    delete this meet?
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={handleDelete}> Continue</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </>
-            }
+            </form>
         </>
     )
 }
