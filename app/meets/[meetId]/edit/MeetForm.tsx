@@ -13,7 +13,7 @@ import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/l
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 
-import { Processing, ErrorToast, AreYouSure, AreYouSure2 } from "@/app/ui/Processing"
+import { Processing, AreYouSure } from "@/app/ui/Processing"
 
 import { Toaster, toast } from 'sonner'
 import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -79,7 +79,6 @@ export const MeetForm = ({
 
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    //const [delState, delFormAction] = useActionState(deleteMeet, GenericServerActionStatePlaceHolder);
 
     const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
     const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s);
@@ -112,18 +111,20 @@ export const MeetForm = ({
             });
     }, [seasonId, divisionId, meetType]);
 
-    const onSubmit = async (data: z.infer<typeof formValidationSchema>) => {
-        await (meet.id
-            ? updateMeet(meet.id, data)
-            : createMeet(data)
-        );
-        router.push(`/meets`);
+    const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
+        startTransition(async () => {
+            let r = await (meet.id
+                ? updateMeet(meet.id, data)
+                : createMeet(data)
+            );
+            if (r.error)
+                toast.error(r.error.msg);
+            else
+                router.push(`/meets`);
+        });
     }
 
-    const [delAlertOpen, setDelAlertOpen] = useState(false);
-
     const handleDelete = () => {
-        setDelAlertOpen(false);
         startTransition(async () => {
             let r = await deleteMeet(meet.id!)
             if (r.error)
@@ -135,11 +136,10 @@ export const MeetForm = ({
 
     return (
         <>
-            {/*<ErrorToast actionState={delState} /> */}
             <Toaster richColors closeButton position='top-center' />
             <Processing open={isPending} />
 
-            <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
+            <form id='meetForm' onSubmit={form.handleSubmit(handleSubmit)}>
                 <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
                 <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
                 <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
@@ -178,7 +178,7 @@ export const MeetForm = ({
                         Submit
                     </Button>
 
-                    {meet.id && // !meet.scoresPublished && 
+                    {meet.id && !meet.scoresPublished &&
                         <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" onConfirm={handleDelete} >
                             <Button type="button" variant="destructive" >Delete Meet</Button>
                         </AreYouSure>

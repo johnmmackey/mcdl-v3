@@ -42,7 +42,7 @@ export const AreYouSure = ({
 }>) => {
     return (
             <AlertDialog>
-                <AlertDialogTrigger>
+                <AlertDialogTrigger asChild>
                         {children}
                 </AlertDialogTrigger>
 

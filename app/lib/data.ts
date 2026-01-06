@@ -118,7 +118,7 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
     updateTag(`meets`);
 }
 
-export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<Meet> {
+export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<GenericServerActionState<Meet>> {
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
         method: 'PATCH',
@@ -129,16 +129,17 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
         },
     });
 
-    if (!r.ok)
-        throw new Error(r.statusText);
-
-    //invalidate the cache 
-    updateTag(`meet:${meetId}`);
-    updateTag(`meets`);
-    return await (r.json());
+    if (r.ok) {
+        updateTag(`meets`);
+        updateTag(`meet:${meetId}`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
 }
 
-export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
+export async function createMeet(meet: MeetUpdateInput): Promise<GenericServerActionState<Meet>> {
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets`, {
         method: 'POST',
@@ -149,12 +150,13 @@ export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
         },
     });
 
-    if (!r.ok)
-        throw new Error(r.statusText);
-
-    //invalidate the cache 
-    updateTag(`meets`);
-    return await (r.json());
+    if (r.ok) {
+        updateTag(`meets`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
 }
 
 export async function deleteMeet(meetId: number): Promise<GenericServerActionState<Meet>> {
@@ -173,7 +175,7 @@ export async function deleteMeet(meetId: number): Promise<GenericServerActionSta
         return { error: null, data: null }
     } else {
         const text = await r.text();
-        return { error: {msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now()}, data: null };
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
     }
 }
 
