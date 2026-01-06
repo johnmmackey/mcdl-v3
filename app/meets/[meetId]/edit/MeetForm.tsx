@@ -1,23 +1,20 @@
 "use client";
-import { useState, useEffect, useActionState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useForm, useWatch } from "react-hook-form"
+
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Meet, Season, GenericServerActionStatePlaceHolder, GenericServerActionState } from '@/app/lib/definitions'
-import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
-
-
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
+import { Toaster, toast } from 'sonner'
+
+import { Meet, Season } from '@/app/lib/definitions'
+import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
-
-import { Toaster, toast } from 'sonner'
-import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
-
 
 const inputSchema = z.object({
     seasonId: z.number(),
@@ -93,7 +90,6 @@ export const MeetForm = ({
         name: ["seasonId", "meetType", "divisionId"]
     })
 
-
     // Logic to load relevant teams and remove a team who is no longer active in the season if the season changes
     useEffect(() => {
         if (['Qual', 'Star'].includes(meetType) && form.getValues('divisionId'))
@@ -113,79 +109,68 @@ export const MeetForm = ({
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
-            let r = await (meet.id
-                ? updateMeet(meet.id, data)
-                : createMeet(data)
-            );
-            if (r.error)
-                toast.error(r.error.msg);
-            else
-                router.push(`/meets`);
+            let r = await (meet.id ? updateMeet(meet.id, data) : createMeet(data));
+            r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/meets`);
         });
     }
 
     const handleDelete = () => {
         startTransition(async () => {
             let r = await deleteMeet(meet.id!)
-            if (r.error)
-                toast.error(r.error.msg);
-            else
-                router.push(`/meets`);
+            r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/meets`);
         });
     }
 
     return (
-        <>
+        <form id='meetForm' onSubmit={form.handleSubmit(handleSubmit)}>
+            <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
+            <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
+            <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
+
+            {
+                ['Dual', 'Div'].includes(meetType) &&
+                <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
+            }
+
+            {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
+                <>
+                    <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+
+
+                    {meetType !== 'Dual' &&
+                        <FormFieldInput form={form} name="name" label="Meet Name" />
+                    }
+
+                    {['Div', 'Star'].includes(meetType) &&
+                        <>
+                            <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
+                            <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+                        </>
+                    }
+
+                    <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
+                </>
+            }
+
+            <div className='flex mx-4 my-4 gap-x-4'>
+                <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
+                    Cancel
+                </Button>
+
+                <Button type="submit" variant="default" disabled={false} >
+                    Submit
+                </Button>
+
+                {meet.id && !meet.scoresPublished &&
+                    <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" onConfirm={handleDelete} >
+                        <Button type="button" variant="destructive" >Delete Meet</Button>
+                    </AreYouSure>
+                }
+            </div>
+
             <Toaster richColors closeButton position='top-center' />
             <Processing open={isPending} />
-
-            <form id='meetForm' onSubmit={form.handleSubmit(handleSubmit)}>
-                <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
-                <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
-                <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
-
-                {
-                    ['Dual', 'Div'].includes(meetType) &&
-                    <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
-                }
-
-                {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
-                    <>
-                        <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-
-
-                        {meetType !== 'Dual' &&
-                            <FormFieldInput form={form} name="name" label="Meet Name" />
-                        }
-
-                        {['Div', 'Star'].includes(meetType) &&
-                            <>
-                                <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                                <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-                            </>
-                        }
-
-                        <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
-                    </>
-                }
-
-                <div className='flex mt-4 gap-x-4'>
-                    <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
-                        Cancel
-                    </Button>
-
-                    <Button type="submit" variant="default" disabled={false} >
-                        Submit
-                    </Button>
-
-                    {meet.id && !meet.scoresPublished &&
-                        <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" onConfirm={handleDelete} >
-                            <Button type="button" variant="destructive" >Delete Meet</Button>
-                        </AreYouSure>
-                    }
-                </div>
-            </form>
-        </>
+        </form>
     )
 }
 
