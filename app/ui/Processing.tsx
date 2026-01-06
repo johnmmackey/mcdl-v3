@@ -13,6 +13,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { GenericServerActionState } from '../lib/definitions';
+import { Button } from '@mantine/core';
 
 export const Processing = ({
     open = true
@@ -30,36 +31,21 @@ export const Processing = ({
     );
 }
 
-export const ErrorToast = ({
-    actionState
-}: Readonly<{
-    actionState: GenericServerActionState<any>
-}>) => {
-        const [lastErrorSeq, setLastErrorSeq] = useState(0);
-        useEffect( () => {
-            if(actionState.error && actionState.error.seq > lastErrorSeq) {
-                toast.error(actionState.error.msg);
-                setLastErrorSeq(actionState.error.seq);
-            }
-        }, [actionState.error])
-    return (
-            <Toaster richColors closeButton position='top-center'/>
-    );
-}
-
 export const AreYouSure = ({
     msg,
-    sure,
-    notSure,
-    open = true
+    onConfirm,
+    children
 }: Readonly<{
     msg: string | null,
-    sure: () => void,
-    notSure: () => void,
-    open: boolean
+    onConfirm: () => void,
+    children: React.ReactNode
 }>) => {
     return (
-            <AlertDialog open={open}>
+            <AlertDialog>
+                <AlertDialogTrigger>
+                        {children}
+                </AlertDialogTrigger>
+
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Are You Sure?</AlertDialogTitle>
@@ -68,8 +54,8 @@ export const AreYouSure = ({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={notSure}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={sure}>Continue</AlertDialogAction>
+                        <AlertDialogCancel >Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -169,7 +169,7 @@ export const FormFieldDatePicker = ({
                             className="w-48 justify-between font-normal"
                         >
                             {field.value ? new Date(field.value).toLocaleDateString() : "Select date"}
-                            <ChevronDownIcon />
+                            <ChevronDownIcon className='opacity-25'/>
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto overflow-hidden p-0" align="start">

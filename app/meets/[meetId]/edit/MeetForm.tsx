@@ -6,14 +6,17 @@ import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Meet, Season, GenericServerActionStatePlaceHolder } from '@/app/lib/definitions'
+import { Meet, Season, GenericServerActionStatePlaceHolder, GenericServerActionState } from '@/app/lib/definitions'
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 
-import { Processing, ErrorToast, AreYouSure } from "@/app/ui/Processing"
+import { Processing, ErrorToast, AreYouSure, AreYouSure2 } from "@/app/ui/Processing"
+
+import { Toaster, toast } from 'sonner'
+import { AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 
 const inputSchema = z.object({
@@ -75,10 +78,10 @@ export const MeetForm = ({
 }>) => {
 
     const router = useRouter();
-    const [delState, delFormAction] = useActionState(deleteMeet, GenericServerActionStatePlaceHolder);
     const [isPending, startTransition] = useTransition();
-    const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
+    //const [delState, delFormAction] = useActionState(deleteMeet, GenericServerActionStatePlaceHolder);
 
+    const [activeTeamIds, setActiveTeamIds] = useState<string[]>([]);
     const sortedSeasons = seasons.map(s => s.id).sort((a: number, b: number) => b - a).map(s => s);
 
     const form = useForm({
@@ -91,21 +94,6 @@ export const MeetForm = ({
         name: ["seasonId", "meetType", "divisionId"]
     })
 
-    const onSubmit = async (data: z.infer<typeof formValidationSchema>) => {
-        await (meet.id
-            ? updateMeet(meet.id, data)
-            : createMeet(data)
-        );
-        router.push(`/meets`);
-    }
-
-    const [delAlertOpen, setDelAlertOpen] = useState(false);
-    const handleDelete = () => {
-        setDelAlertOpen(false);
-        startTransition(() => {
-            delFormAction(meet.id!);
-        });
-    }
 
     // Logic to load relevant teams and remove a team who is no longer active in the season if the season changes
     useEffect(() => {
@@ -124,11 +112,32 @@ export const MeetForm = ({
             });
     }, [seasonId, divisionId, meetType]);
 
+    const onSubmit = async (data: z.infer<typeof formValidationSchema>) => {
+        await (meet.id
+            ? updateMeet(meet.id, data)
+            : createMeet(data)
+        );
+        router.push(`/meets`);
+    }
+
+    const [delAlertOpen, setDelAlertOpen] = useState(false);
+
+    const handleDelete = () => {
+        setDelAlertOpen(false);
+        startTransition(async () => {
+            let r = await deleteMeet(meet.id!)
+            if (r.error)
+                toast.error(r.error.msg);
+            else
+                router.push(`/meets`);
+        });
+    }
+
     return (
         <>
-            <ErrorToast actionState={delState} />
+            {/*<ErrorToast actionState={delState} /> */}
+            <Toaster richColors closeButton position='top-center' />
             <Processing open={isPending} />
-            <AreYouSure open={delAlertOpen} sure={handleDelete} notSure={() => setDelAlertOpen(false)} msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" />
 
             <form id='meetForm' onSubmit={form.handleSubmit(onSubmit)} >
                 <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
@@ -161,19 +170,25 @@ export const MeetForm = ({
                 }
 
                 <div className='flex mt-4 gap-x-4'>
-                    <Button type="submit" disabled={false} variant='outline'>
+                    <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
+                        Cancel
+                    </Button>
+
+                    <Button type="submit" variant="default" disabled={false} >
                         Submit
                     </Button>
 
                     {meet.id && // !meet.scoresPublished && 
-
-                        <Button type="button" variant="destructive" onClick={() => setDelAlertOpen(true)}>Delete Meet</Button>
-
+                        <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" onConfirm={handleDelete} >
+                            <Button type="button" variant="destructive" >Delete Meet</Button>
+                        </AreYouSure>
                     }
                 </div>
             </form>
         </>
     )
 }
+
+
 
 

@@ -157,7 +157,7 @@ export async function createMeet(meet: MeetUpdateInput): Promise<Meet> {
     return await (r.json());
 }
 
-export async function deleteMeet(_currentState: GenericServerActionState<Meet> | null, meetId: number): Promise<GenericServerActionState<Meet>> {
+export async function deleteMeet(meetId: number): Promise<GenericServerActionState<Meet>> {
     console.log('in delete meet')
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/meets/${meetId}`, {
