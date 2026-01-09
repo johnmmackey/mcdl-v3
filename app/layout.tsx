@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from 'sonner'
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import '@mantine/dates/styles.css';
 
@@ -27,7 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  logger.debug(session, 'session is')
+  logger.debug('session is', session);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -46,6 +47,7 @@ export default async function RootLayout({
           </MyAppShell>
         </MantineProvider>
         <SanityLive />
+        <Toaster richColors closeButton position='top-center' />
       </body>
     </html>
   );

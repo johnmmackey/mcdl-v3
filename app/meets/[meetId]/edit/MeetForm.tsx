@@ -168,7 +168,7 @@ export const MeetForm = ({
                 }
             </div>
 
-            <Toaster richColors closeButton position='top-center' />
+
             <Processing open={isPending} />
         </form>
     )

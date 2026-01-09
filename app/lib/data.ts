@@ -11,6 +11,8 @@ import { getAccessToken } from "@/app/lib/accessTokens"
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'data' })
 
+import { logEvent } from "./dynamoEventLog";
+
 
 
 export async function accessToken(): Promise<string> {
@@ -132,6 +134,7 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
     if (r.ok) {
         updateTag(`meets`);
         updateTag(`meet:${meetId}`);
+        await logEvent({ eventType: 'app', eventSubType: 'update', text: `Meet ${meetId} updated` });
         return { error: null, data: null }
     } else {
         const text = await r.text();
