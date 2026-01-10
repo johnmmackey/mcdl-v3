@@ -1,10 +1,23 @@
 import Link from 'next/link';
 import { fetchSeasons } from '@/app/lib/data';
-import { Menu, MenuTarget, MenuDropdown, MenuItem, Button } from '@mantine/core';
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   IconChevronDown,
 } from '@tabler/icons-react';
-//import classes from './SeasonalPage.module.css';
 
 export const SeasonSelector = async ({
   base,
@@ -23,23 +36,24 @@ export const SeasonSelector = async ({
   });
 
   return (
-    <Menu transitionProps={{ exitDuration: 0 }} withinPortal>
-      <MenuTarget>
-        <Button rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12} variant='default'>
-          {selectedSeasonId}
+    <DropdownMenu >
+      <DropdownMenuTrigger asChild>
+        <Button variant='outline'>
+          {selectedSeasonId} <IconChevronDown size={18} stroke={1.5} />
         </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          {sortedSeasons.map((s, k) =>
 
-      </MenuTarget>
-      <MenuDropdown>
-        {sortedSeasons.map((s, k) =>
+            <DropdownMenuItem key={k} asChild>
+              <Link key={k} href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
+            </DropdownMenuItem>
 
-          <MenuItem key={k}>
-            <Link key={k} href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
-          </MenuItem>
-
-        )}
-      </MenuDropdown>
-    </Menu>
+          )}
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 
 }

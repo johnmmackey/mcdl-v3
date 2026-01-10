@@ -59,6 +59,7 @@ import {
     IconLogin,
     IconSettings,
     IconUsersGroup,
+    IconCalendar
 } from '@tabler/icons-react';
 
 import { LoginButton, ProfileDropdown } from './ProfileDropdown';
@@ -87,6 +88,7 @@ const header = <div className='flex gap-4 items-center'>
 const links = [
     { link: '/', label: 'Home', icon: IconHome },
     { link: '/teams', label: 'Teams', icon: IconUsersGroup },
+    { link: '/seasons', label: 'Seasons', icon: IconCalendar },
     { link: '/meets', label: 'Meets', icon: IconDiver },
     { link: '/standings', label: 'Standings', icon: IconChartBarPopular },
     { link: '/resources', label: 'Resources', icon: IconFiles },
