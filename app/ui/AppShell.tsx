@@ -1,14 +1,6 @@
-
-
 import { Session } from 'next-auth';
-import { signIn, signOut } from "next-auth/react"
 import Image from 'next/image'
 import Link from 'next/link'
-
-import { LoginButton, ProfileDropdown } from './ProfileDropdown';
-
-import crypto from 'crypto';
-
 
 import {
     ArrowRightLeftIcon,
@@ -69,6 +61,7 @@ import {
     IconUsersGroup,
 } from '@tabler/icons-react';
 
+import { LoginButton, ProfileDropdown } from './ProfileDropdown';
 import { userInitials } from '@/app/lib/userInitials';
 
 
@@ -138,13 +131,7 @@ return (
                                     {links.map((item) => (
                                         <SidebarMenuItem key={item.label}>
                                             <SidebarMenuButton asChild>
-
-                                                <Link
-
-                                                    href={item.link}
-
-
-                                                >
+                                                <Link href={item.link}>
                                                     <item.icon stroke={1.5} />
                                                     <span>{item.label}</span>
                                                 </Link>
@@ -154,54 +141,7 @@ return (
                                 </SidebarMenu>
                             </SidebarGroupContent>
                         </SidebarGroup>
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Supporting Features</SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <SquareActivityIcon />
-                                                <span>Real Time Monitoring</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <CalendarClockIcon />
-                                                <span>Schedule Post & Calendar</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <Undo2Icon />
-                                                <span>Report & Export</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <SettingsIcon />
-                                                <span>Settings & Integrations</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <UsersIcon />
-                                                <span>User Management</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                    </SidebarContent>
+                     </SidebarContent>
                 </Sidebar>
                 <div className='flex flex-1 flex-col'>
                     <header className='bg-card sticky top-0 z-50 border-b'>
@@ -253,25 +193,8 @@ return (
                         <div className='text-muted-foreground mx-auto flex size-full max-w-7xl items-center justify-between gap-3 px-4 py-3 max-sm:flex-col sm:gap-6 sm:px-6'>
                             <p className='text-sm text-balance max-sm:text-center'>
                                 {`©${new Date().getFullYear()}`}{' '}
-                                <a href='#' className='text-primary'>
-                                    shadcn/studio
-                                </a>
-                                , Made for better web design
+                                52west.com. All rights reserved.
                             </p>
-                            <div className='flex items-center gap-5'>
-                                <a href='#'>
-                                    <FacebookIcon className='size-4' />
-                                </a>
-                                <a href='#'>
-                                    <InstagramIcon className='size-4' />
-                                </a>
-                                <a href='#'>
-                                    <LinkedinIcon className='size-4' />
-                                </a>
-                                <a href='#'>
-                                    <TwitterIcon className='size-4' />
-                                </a>
-                            </div>
                         </div>
                     </footer>
                 </div>
