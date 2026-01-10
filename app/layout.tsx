@@ -7,7 +7,7 @@ import '@mantine/dates/styles.css';
 import { SanityLive } from "@/sanity/live";
 
 import { auth, } from "@/auth"
-import MyAppShell from '@/app/ui/AppShell'
+import { MyAppShell } from '@/app/ui/AppShell'
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({module: 'rootLayout'})
 
