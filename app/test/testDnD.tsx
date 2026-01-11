@@ -59,29 +59,28 @@ export const TestDnD = ({
     divisions: Division[]
 }>) => {
 
-    const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
+
     const [assignedTeamsMappedByTeamId, setAssignedTeamsMappedByTeamId] = useState<{ [key: string]: DivSlotNode }>({});
+    // maintain a helper state mapping by compositeId for easy lookup during rendering
+    const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
 
     function handleDragEnd(event: any) {
         console.log(event);
         let draggedTeam = teams.find(t => t.id === event.active.id);
         if(!draggedTeam) throw new Error('Dragged team not found: ' + event.active.id);
 
+                    // copy the existing state
+            let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
+
         if (event.over) {
             let [divId, slotId] = decodeCompositeId(event.over.id);
             console.log('dropping in div', divId, 'slot', slotId);
 
-            // copy the existing states
-            let newAssignedTeamsMappedByCompositeId = { ...assignedTeamsMappedByCompositeId };
-            let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
-
             // see if there is an existing team in the slot, and if so, bump it.
-            if (newAssignedTeamsMappedByCompositeId[event.over.id]) {
-                let teamInTargetSlot = newAssignedTeamsMappedByCompositeId[event.over.id].team;
+            if (assignedTeamsMappedByCompositeId[event.over.id]) {
+                let teamInTargetSlot = assignedTeamsMappedByCompositeId[event.over.id].team;
                 // remove existing team from teamId map
                 delete newAssignedTeamsMappedByTeamId[teamInTargetSlot.id];
-                // remove existing team from compositeId map
-                delete newAssignedTeamsMappedByCompositeId[event.over.id];
             }
 
             // see if the dragged team is already assigned to a different slot, and if so, remove it from there.
@@ -89,43 +88,28 @@ export const TestDnD = ({
                 let oldNode = newAssignedTeamsMappedByTeamId[draggedTeam.id];
                 // remove existing team from teamId map
                 delete newAssignedTeamsMappedByTeamId[draggedTeam.id];
-                // remove existing team from compositeId map
-                delete newAssignedTeamsMappedByCompositeId[encodeCompositeId(oldNode.divId, oldNode.slotId)];
             }
 
             // assign dragged team to the new slot
-
             const newNode: DivSlotNode = {
                 divId: divId,
                 slotId: slotId,
                 team: draggedTeam
             };
-            newAssignedTeamsMappedByCompositeId[event.over.id] = newNode;
+
             newAssignedTeamsMappedByTeamId[draggedTeam.id] = newNode;
-
-
-            // update states
-            setAssignedTeamsMappedByCompositeId(newAssignedTeamsMappedByCompositeId);
-            setAssignedTeamsMappedByTeamId(newAssignedTeamsMappedByTeamId);
 
         } else {
             console.log('dropped outside any droppable area');
             // remove from assigned teams if it was assigned
             if (assignedTeamsMappedByTeamId[draggedTeam!.id]) {
-                let newAssignedTeamsMappedByCompositeId = { ...assignedTeamsMappedByCompositeId };
-                let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
-
-                let nodeToRemove = assignedTeamsMappedByTeamId[draggedTeam!.id];
-                let compositeIdToRemove = encodeCompositeId(nodeToRemove.divId, nodeToRemove.slotId);
-
-                delete newAssignedTeamsMappedByCompositeId[compositeIdToRemove];
                 delete newAssignedTeamsMappedByTeamId[draggedTeam!.id];
-
-                // update states
-                setAssignedTeamsMappedByCompositeId(newAssignedTeamsMappedByCompositeId);
-                setAssignedTeamsMappedByTeamId(newAssignedTeamsMappedByTeamId);
             }
         }
+
+        setAssignedTeamsMappedByTeamId(newAssignedTeamsMappedByTeamId);
+        // cleanup our helper state to be consistent with the main state
+        setAssignedTeamsMappedByCompositeId(keyByCompositeId(Object.values(newAssignedTeamsMappedByTeamId)));
 
     }
 
