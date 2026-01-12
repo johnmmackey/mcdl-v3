@@ -16,6 +16,26 @@ import {
     ItemTitle,
 } from "@/components/ui/item"
 
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
 import { Grip } from 'lucide-react';
 
 import { Team, Season, Division } from '@/app/lib/definitions';
@@ -41,13 +61,6 @@ const keyByCompositeId = (nodes: DivSlotNode[]) => {
     return map;
 }
 
-const keyByTeamId = (nodes: DivSlotNode[]) => {
-    const map: { [key: string]: DivSlotNode } = {};
-    nodes.forEach(node => {
-        map[node.team.id] = node;
-    });
-    return map;
-}
 
 export const TestDnD = ({
     teams,
@@ -59,7 +72,6 @@ export const TestDnD = ({
     divisions: Division[]
 }>) => {
 
-
     const [assignedTeamsMappedByTeamId, setAssignedTeamsMappedByTeamId] = useState<{ [key: string]: DivSlotNode }>({});
     // maintain a helper state mapping by compositeId for easy lookup during rendering
     const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
@@ -67,80 +79,66 @@ export const TestDnD = ({
     function handleDragEnd(event: any) {
         console.log(event);
         let draggedTeam = teams.find(t => t.id === event.active.id);
-        if(!draggedTeam) throw new Error('Dragged team not found: ' + event.active.id);
+        if (!draggedTeam) throw new Error('Dragged team not found: ' + event.active.id);
 
-                    // copy the existing state
-            let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
+        // copy the existing state
+        let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
 
         if (event.over) {
+            // dropped in a droppable area. first see if there is an existing team in the slot, and if so, bump it.
+            if (assignedTeamsMappedByCompositeId[event.over.id])
+                delete newAssignedTeamsMappedByTeamId[assignedTeamsMappedByCompositeId[event.over.id].team.id];
+
+            // assign dragged team to the new slot - implicitly removes it from any previous slot
             let [divId, slotId] = decodeCompositeId(event.over.id);
-            console.log('dropping in div', divId, 'slot', slotId);
-
-            // see if there is an existing team in the slot, and if so, bump it.
-            if (assignedTeamsMappedByCompositeId[event.over.id]) {
-                let teamInTargetSlot = assignedTeamsMappedByCompositeId[event.over.id].team;
-                // remove existing team from teamId map
-                delete newAssignedTeamsMappedByTeamId[teamInTargetSlot.id];
-            }
-
-            // see if the dragged team is already assigned to a different slot, and if so, remove it from there.
-            if (newAssignedTeamsMappedByTeamId[draggedTeam.id]) {
-                let oldNode = newAssignedTeamsMappedByTeamId[draggedTeam.id];
-                // remove existing team from teamId map
-                delete newAssignedTeamsMappedByTeamId[draggedTeam.id];
-            }
-
-            // assign dragged team to the new slot
-            const newNode: DivSlotNode = {
-                divId: divId,
-                slotId: slotId,
-                team: draggedTeam
-            };
-
-            newAssignedTeamsMappedByTeamId[draggedTeam.id] = newNode;
-
+            newAssignedTeamsMappedByTeamId[draggedTeam.id] = {divId, slotId, team: draggedTeam};
         } else {
-            console.log('dropped outside any droppable area');
-            // remove from assigned teams if it was assigned
-            if (assignedTeamsMappedByTeamId[draggedTeam!.id]) {
+            // dropped outside any droppable area. remove from assigned teams if it was assigned
+            if (assignedTeamsMappedByTeamId[draggedTeam!.id])
                 delete newAssignedTeamsMappedByTeamId[draggedTeam!.id];
-            }
         }
-
+        // update the main state
         setAssignedTeamsMappedByTeamId(newAssignedTeamsMappedByTeamId);
-        // cleanup our helper state to be consistent with the main state
+        // rebuild our helper state to be consistent with the main state
         setAssignedTeamsMappedByCompositeId(keyByCompositeId(Object.values(newAssignedTeamsMappedByTeamId)));
-
     }
 
     return (
 
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
-            <div className='flex gap-10'>
+            <div className='flex gap-20'>
+
                 <div >
                     {teams.filter(t => !assignedTeamsMappedByTeamId[t.id]).map(team => (
                         <DraggableTeam key={team.id} id={team.id}> {team.name} </DraggableTeam>
                     ))}
                 </div>
+
                 <div>
                     {divisions.map((d) => (
-                        <div key={d.id}>
-                            <h2 > Division {d.id} </h2>
+                        <Card key={d.id} className='mb-8'>
+                            <CardHeader>
+                                <CardTitle>Division {d.id}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
                             {divSlotIds.map((slot) =>
                                 <Droppable key={slot} id={encodeCompositeId(d.id, slot)}>
-                                    <div style={{ width: 400, height: 100, border: '2px dashed gray' }} className='p-4'>
-
+                                    <Item variant='outline' className='w-74 h-18 my-2 p-0'>
+                                        <ItemContent>
                                         {assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)] &&
                                             <DraggableTeam id={assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)].team.id}>
                                                 {assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)].team.name}
                                             </DraggableTeam>
                                         }
-                                    </div>
+                                        </ItemContent>
+                                    </Item>
                                 </Droppable>
                             )}
-                        </div>
+                            </CardContent>
+                        </Card>
                     ))}
                 </div>
+
             </div>
         </DndContext>
     );
@@ -165,9 +163,8 @@ function DraggableTeamX(props: { id: string; children?: React.ReactNode }) {
 
 function DraggableTeam(props: { id: string, children: React.ReactNode }) {
     return (
-        <Draggable id={props.id} className='w-64 my-2'>
-
-            <Item variant="outline" >
+        <Draggable id={props.id} className='w-64 m-2'>
+            <Item variant="outline" size='sm'>
                 <ItemMedia variant="default" className='opacity-50'>
                     <Grip />
                 </ItemMedia>

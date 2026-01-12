@@ -95,6 +95,7 @@ const links = [
     { link: '/users', label: 'Users', icon: IconKey },
 
     { link: '/test', label: 'Test Page', icon: IconSettings },
+        { link: '/test2', label: 'Test Page 2', icon: IconSettings },
 ];
 
 
