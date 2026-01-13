@@ -1,7 +1,7 @@
 'use server'
 
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState } from "./definitions";
+import { GroupedStandings, Season, Division, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState } from "./definitions";
 
 import jwt from "jsonwebtoken";
 import { updateTag } from "next/cache";
@@ -31,6 +31,10 @@ export async function fetchCurrentSeasonId(): Promise<number> {
 
 export async function fetchSeasons(): Promise<Season[]> {
     return (await fetch(`${process.env.DATA_URL}/seasons`, { next: { revalidate: 30 } })).json();
+}
+
+export async function fetchDivisions(): Promise<Division[]> {
+    return (await fetch(`${process.env.DATA_URL}/divisions`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchTeams(): Promise<Team[]> {

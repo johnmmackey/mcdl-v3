@@ -180,6 +180,10 @@ export type Season = {
     endDate: string
 }
 
+export type Division = {
+    id: number
+}
+
 export type TeamSeason = {
     id: number,
     teamId: string,
