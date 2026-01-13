@@ -1,4 +1,4 @@
-import { fetchTeams, fetchSeasons, fetchDivisions } from '@/app/lib/data';
+import { fetchTeams, fetchSeasons, fetchDivisions, fetchTeamsForSeason } from '@/app/lib/data';
 import { TestDnD } from './testDnD';
 
 
@@ -6,9 +6,12 @@ import { TestDnD } from './testDnD';
 export default async function Page() {
     const seasons = await fetchSeasons();
     const teams = await fetchTeams();
-    const divisions = await fetchDivisions()
+    const divisions = await fetchDivisions();
+
+    // need to test edge case where no seasons exist
+    const lastDivAssignments = await fetchTeamsForSeason(seasons.map(season => season.id).sort()[0] || 0);
 
     return (
-        <TestDnD teams={teams} seasons={seasons} divisions={divisions} />
+        <TestDnD teams={teams} seasons={seasons} divisions={divisions} lastDivAssignments={lastDivAssignments} />
     )
 }

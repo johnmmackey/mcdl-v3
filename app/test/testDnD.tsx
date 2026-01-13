@@ -38,17 +38,18 @@ import { Label } from "@/components/ui/label"
 
 import { Grip } from 'lucide-react';
 
-import { Team, Season, Division } from '@/app/lib/definitions';
-import { de } from 'date-fns/locale';
+import { Team, Season, Division, TeamSeason } from '@/app/lib/definitions';
 
-const divSlotIds = [1, 2, 3, 4, 5, 6];
+//const divSlotIds = [1, 2, 3, 4, 5, 6];
 
+/*
 type DivSlotNode = {
     divId: number;
     slotId: number;
     team: Team;
 }
-
+*/
+/*
 const encodeCompositeId = (divId: number, slotId: number) => divId.toString() + '-' + slotId.toString();
 const decodeCompositeId = (id: string): [number, number] => id.split('-').map((x: string) => parseInt(x)) as [number, number];
 
@@ -60,21 +61,43 @@ const keyByCompositeId = (nodes: DivSlotNode[]) => {
     });
     return map;
 }
+*/
 
+type divSlotCount = {
+    divId: number,
+    teamCount: number
+}
 
 export const TestDnD = ({
     teams,
     seasons,
-    divisions
+    divisions,
+    lastDivAssignments = [],
 }: Readonly<{
     teams: Team[],
     seasons: Season[],
-    divisions: Division[]
+    divisions: Division[],
+    lastDivAssignments: TeamSeason[]
 }>) => {
 
-    const [assignedTeamsMappedByTeamId, setAssignedTeamsMappedByTeamId] = useState<{ [key: string]: DivSlotNode }>({});
+    //const [assignedTeamsMappedByTeamId, setAssignedTeamsMappedByTeamId] = useState<{ [key: string]: DivSlotNode }>({});
     // maintain a helper state mapping by compositeId for easy lookup during rendering
-    const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
+    //const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
+
+    // build a array of divisions and slot counts based on lastDivAssignments
+    let divSlotCounts: divSlotCount[] = [];
+    divisions.forEach(d => {
+        let teamCount = lastDivAssignments.filter(ts => ts.divisionId === d.id).length;
+        divSlotCounts.push({ divId: d.id, teamCount });
+    });
+
+    console.log(divSlotCounts);
+
+    // order an array of teams
+    const divSeedSortedTeams = lastDivAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed);
+
+    // define the ordered list of teams.
+    const [orderedTeams, setOrderedTeams] = useState<TeamSeason[]>(divSeedSortedTeams);
 
     function handleDragEnd(event: any) {
         console.log(event);
@@ -104,7 +127,20 @@ export const TestDnD = ({
     }
 
     return (
+        <div>
+            {orderedTeams.map(team => (
+                <div key={team.id}>{team.divisionId} {team.seed} {team.id}</div>
+            ))}
+        </div>
+    )
 
+}
+
+
+function dummy() {
+    return (
+
+    
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
             <div className='flex gap-20'>
 
