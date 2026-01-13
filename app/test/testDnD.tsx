@@ -17,28 +17,19 @@ import {
 } from "@/components/ui/item"
 
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardAction,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card"
-
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 import { Grip } from 'lucide-react';
 
 import { Team, Season, Division, TeamSeason } from '@/app/lib/definitions';
+import { all } from 'micromatch';
 
 //const divSlotIds = [1, 2, 3, 4, 5, 6];
 
@@ -65,7 +56,27 @@ const keyByCompositeId = (nodes: DivSlotNode[]) => {
 
 type divSlotCount = {
     divId: number,
-    teamCount: number
+    slotCount: number
+}
+
+const transformIndexToDivSeed = (index: number, divSlotCounts: divSlotCount[]): [number, number] => {
+    let prevDivTotal = 0;
+    let divIndex = 0;
+    while ((index + 1) > prevDivTotal + divSlotCounts[divIndex].slotCount && divIndex < divSlotCounts.length) {
+        prevDivTotal += divSlotCounts[divIndex].slotCount;
+        divIndex++;
+    }
+    const divSeed = index - (prevDivTotal) + 1;
+    return [divSlotCounts[divIndex].divId, divSeed];
+}
+
+const transformDivSeedToIndex = (divId: number, seed: number, divSlotCounts: divSlotCount[]): number => {
+    let index = divSlotCounts.reduce((acc, curr) => {
+        if (curr.divId < divId) return acc + curr.slotCount;
+        else return acc;
+    }, 0);
+    index += (seed - 1);
+    return index;
 }
 
 export const TestDnD = ({
@@ -87,126 +98,113 @@ export const TestDnD = ({
     // build a array of divisions and slot counts based on lastDivAssignments
     let divSlotCounts: divSlotCount[] = [];
     divisions.forEach(d => {
-        let teamCount = lastDivAssignments.filter(ts => ts.divisionId === d.id).length;
-        divSlotCounts.push({ divId: d.id, teamCount });
+        let slotCount = lastDivAssignments.filter(ts => ts.divisionId === d.id).length;
+        divSlotCounts.push({ divId: d.id, slotCount });
     });
 
-    console.log(divSlotCounts);
 
     // order an array of teams
-    const divSeedSortedTeams = lastDivAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed);
+    const divSeedSortedTeams = lastDivAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId);
 
     // define the ordered list of teams.
-    const [orderedTeams, setOrderedTeams] = useState<TeamSeason[]>(divSeedSortedTeams);
+    const [orderedTeams, setOrderedTeams] = useState<string[]>(divSeedSortedTeams);
 
     function handleDragEnd(event: any) {
         console.log(event);
-        let draggedTeam = teams.find(t => t.id === event.active.id);
-        if (!draggedTeam) throw new Error('Dragged team not found: ' + event.active.id);
 
-        // copy the existing state
-        let newAssignedTeamsMappedByTeamId = { ...assignedTeamsMappedByTeamId };
+
+        let newArr = [...orderedTeams];
+        let indexOfDragged = orderedTeams.indexOf(event.active.id);
+        console.log(indexOfDragged);
+        if(indexOfDragged >= 0)
+            newArr.splice(indexOfDragged, 1);
 
         if (event.over) {
-            // dropped in a droppable area. first see if there is an existing team in the slot, and if so, bump it.
-            if (assignedTeamsMappedByCompositeId[event.over.id])
-                delete newAssignedTeamsMappedByTeamId[assignedTeamsMappedByCompositeId[event.over.id].team.id];
-
-            // assign dragged team to the new slot - implicitly removes it from any previous slot
-            let [divId, slotId] = decodeCompositeId(event.over.id);
-            newAssignedTeamsMappedByTeamId[draggedTeam.id] = {divId, slotId, team: draggedTeam};
-        } else {
-            // dropped outside any droppable area. remove from assigned teams if it was assigned
-            if (assignedTeamsMappedByTeamId[draggedTeam!.id])
-                delete newAssignedTeamsMappedByTeamId[draggedTeam!.id];
+            if(indexOfDragged === -1)
+                // new elements coming in - pull last one
+                newArr.splice(newArr.length - 1, 1);
+            //insert the team at its new position
+            newArr.splice(event.over.id, 0, event.active.id);
         }
-        // update the main state
-        setAssignedTeamsMappedByTeamId(newAssignedTeamsMappedByTeamId);
-        // rebuild our helper state to be consistent with the main state
-        setAssignedTeamsMappedByCompositeId(keyByCompositeId(Object.values(newAssignedTeamsMappedByTeamId)));
+        setOrderedTeams(newArr);
+
+
+
+
+
+
+
+
+        return;
+
     }
 
     return (
-        <div>
-            {orderedTeams.map(team => (
-                <div key={team.id}>{team.divisionId} {team.seed} {team.id}</div>
-            ))}
-        </div>
+            <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
+
+
+
+                <div className='flex gap-8'>
+
+            <div>
+                <Card className='mb-8'>
+                    <CardHeader>
+                        <CardTitle>Unassigned Teams</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {teams.filter(t => !orderedTeams.includes(t.id)).map((team, index) => (
+                            <Item key={index}variant='outline' className='w-42 h-18 my-2 p-0'>
+                                <ItemContent>
+                                    <DraggableTeam key={team.id} id={team.id}> {team.id} </DraggableTeam>
+                                </ItemContent>
+                            </Item>
+                        ))}
+
+                    </CardContent>
+                </Card>
+            </div>
+
+                    <div>
+                        {divSlotCounts.map((d, index) => (
+                            <Card key={index} className='mb-8'>
+                                <CardHeader>
+                                    <CardTitle>Division {d.divId}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {Array.from({ length: d.slotCount }).map((n, slotIndex) =>
+                                        <Droppable key={slotIndex} id={transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)}>
+                                            <Item variant='outline' className='w-42 h-18 my-2 p-0'>
+                                                <ItemContent>
+                                                    {orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)] &&
+                                                        <DraggableTeam id={orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}>
+                                                            {orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}
+                                                        </DraggableTeam>
+                                                    }
+
+                                                </ItemContent>
+                                            </Item>
+                                        </Droppable>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                </div>
+            </DndContext>
+
+
     )
 
 }
 
-
-function dummy() {
-    return (
-
-    
-        <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
-            <div className='flex gap-20'>
-
-                <div >
-                    {teams.filter(t => !assignedTeamsMappedByTeamId[t.id]).map(team => (
-                        <DraggableTeam key={team.id} id={team.id}> {team.name} </DraggableTeam>
-                    ))}
-                </div>
-
-                <div>
-                    {divisions.map((d) => (
-                        <Card key={d.id} className='mb-8'>
-                            <CardHeader>
-                                <CardTitle>Division {d.id}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                            {divSlotIds.map((slot) =>
-                                <Droppable key={slot} id={encodeCompositeId(d.id, slot)}>
-                                    <Item variant='outline' className='w-74 h-18 my-2 p-0'>
-                                        <ItemContent>
-                                        {assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)] &&
-                                            <DraggableTeam id={assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)].team.id}>
-                                                {assignedTeamsMappedByCompositeId[encodeCompositeId(d.id, slot)].team.name}
-                                            </DraggableTeam>
-                                        }
-                                        </ItemContent>
-                                    </Item>
-                                </Droppable>
-                            )}
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-
-            </div>
-        </DndContext>
-    );
-
-
-
-}
-
-function DraggableTeamX(props: { id: string; children?: React.ReactNode }) {
-    return (
-        <div style={{ marginBottom: 10 }}>  {/* spacing between draggable items */}
-            <Draggable id={props.id}>
-                {props.children}
-            </Draggable>
-        </div>
-    );
-}
-
-
-
-
-
 function DraggableTeam(props: { id: string, children: React.ReactNode }) {
     return (
-        <Draggable id={props.id} className='w-64 m-2'>
-            <Item variant="outline" size='sm'>
-                <ItemMedia variant="default" className='opacity-50'>
-                    <Grip />
-                </ItemMedia>
+        <Draggable id={props.id} className='w-32 m-2'>
+            <Item variant="outline" size='sm' className='text-center cursor-move'>
                 <ItemContent>
                     <ItemDescription>
-                        {props.children} ({props.id})
+                        {props.children}
                     </ItemDescription>
                 </ItemContent>
             </Item>
@@ -214,10 +212,6 @@ function DraggableTeam(props: { id: string, children: React.ReactNode }) {
         </Draggable>
     )
 }
-
-
-
-
 
 function Draggable(props: { id: string; className?: string, children: React.ReactNode }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -236,12 +230,13 @@ function Draggable(props: { id: string; className?: string, children: React.Reac
 }
 
 
-function Droppable(props: { id: string, children?: React.ReactNode }) {
+function Droppable(props: { id: number, children?: React.ReactNode }) {
     const { isOver, setNodeRef } = useDroppable({
         id: props.id,
     });
     const style = {
-        color: isOver ? 'green' : undefined,
+        borderRadius: '8px',
+        backgroundColor: isOver ? '#D3D3D3' : undefined,
         //width: 100, height: 100, marginBottom: 20, border: '2px dashed black'
     };
 
