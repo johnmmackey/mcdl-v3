@@ -81,17 +81,19 @@ export const DivisionAssignments = ({
     divAssignments: TeamSeason[]
 }>) => {
     // build a array of divisions and slot counts based on divAssignments
-
-    const [divSlotCounts, setDivSlotsCounts] = useState(divisions
-        .map(d =>
-        ({
-            divId: d.id,
-            slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
-        }))
-        .filter(dsc => dsc.slotCount)
-    );
-
-console.log(`inside: ${divAssignments.length} divlength: ${JSON.stringify(divSlotCounts)}`)
+    const [divSlotCounts, setDivSlotsCounts] = useState([] as divSlotCount[])
+        
+    useEffect( () =>
+        // have to do this as an effect in case the props change without remount
+        setDivSlotsCounts(
+            divisions
+            .map(d =>
+            ({
+                divId: d.id,
+                slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
+            }))
+            .filter(dsc => dsc.slotCount)
+        ), [divAssignments]);
 
     // define the ordered list of teams.
     const [orderedTeams, setOrderedTeams] = useState<string[]>(
@@ -112,7 +114,6 @@ console.log(`inside: ${divAssignments.length} divlength: ${JSON.stringify(divSlo
     }
 
     const handleDragEnd = (event: DragEndEvent) => {
-        console.log(event.active)
         let newArr = [...orderedTeams];
         let indexOfDragged = orderedTeams.indexOf(event.active.id as string);
         console.log(indexOfDragged);
@@ -141,11 +142,8 @@ console.log(`inside: ${divAssignments.length} divlength: ${JSON.stringify(divSlo
         setOrderedTeams(orderedTeams.slice(0, seedSlots(newSlots)));
     }
 
-
-
     return (
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
-        <div>inside: {divAssignments.length} divlength: {JSON.stringify(divSlotCounts)}</div>
             <div className='flex justify-center gap-2 mb-4'>
                 <Button variant='outline' onClick={clearAll}>Clear All</Button>
                 <Button variant='outline' onClick={addDivision}>Add A Division</Button>

@@ -22,26 +22,21 @@ export default async function Page(props: {
     // need to test edge case where no seasons exist
     const divAssignments = await fetchTeamsForSeason(selectedSeasonId);
 
-
     return (
+        <>
+            <div className="flex gap-4 mb-2">
+                <SeasonSelector base="/seasons" selectedSeasonId={selectedSeasonId} />
+                <Link href='/seasons?season-id=_'>
+                    <Button variant='outline' >Add New Season</Button>
+                </Link>
+            </div>
 
-                <>
-        
-                    <div className="flex gap-4 mb-2">
+            <Suspense fallback={Loading()} >
+                <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} />
+            </Suspense>
 
-                            <SeasonSelector base="/seasons" selectedSeasonId={selectedSeasonId} />
-                            <Link href='/seasons?season-id=_'>
-                                <Button variant='outline' >Add New Season</Button>
-                                </Link>
-                    </div>
-        
-                    <Suspense fallback={Loading()} >
-                        Season: {selectedSeasonId} {divAssignments.length}
-                        <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} />
-                    </Suspense>
-        
-                </>
-        
+        </>
+
     )
 }
 
