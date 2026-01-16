@@ -36,6 +36,7 @@ export default async function Page(props: {
                     </div>
         
                     <Suspense fallback={Loading()} >
+                        Season: {selectedSeasonId} {divAssignments.length}
                         <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} />
                     </Suspense>
         
