@@ -75,33 +75,33 @@ export const DivisionAssignments = ({
     teams,
     divisions,
     divAssignments = [],
+    newSeason = false
 }: Readonly<{
     teams: Team[],
     divisions: Division[],
-    divAssignments: TeamSeason[]
+    divAssignments: TeamSeason[],
+    newSeason: boolean
 }>) => {
     // build a array of divisions and slot counts based on divAssignments
-    const [divSlotCounts, setDivSlotsCounts] = useState([] as divSlotCount[])
-        
-    useEffect( () =>
+    const [divSlotCounts, setDivSlotsCounts] = useState([] as divSlotCount[]);
+    const [orderedTeams, setOrderedTeams] = useState([] as string[]);
+    const [editMode, setEditMode] = useState(false);
+
+    useEffect(() => {
         // have to do this as an effect in case the props change without remount
         setDivSlotsCounts(
             divisions
-            .map(d =>
-            ({
-                divId: d.id,
-                slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
-            }))
-            .filter(dsc => dsc.slotCount)
-        ), [divAssignments]);
+                .map(d =>
+                ({
+                    divId: d.id,
+                    slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
+                }))
+                .filter(dsc => dsc.slotCount));
 
-    // define the ordered list of teams.
-    const [orderedTeams, setOrderedTeams] = useState<string[]>(
-        divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId)
-    );
-
-    // define a flag whether we are editing
-    const [editing, setEditing] = useState(false);
+        setOrderedTeams(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
+        if (newSeason)
+            setEditMode(true);
+    }, [divAssignments, newSeason]);
 
     const handleSlotCountChange = (divId: number, val: number) => {
         let newDSC = [...divSlotCounts];
@@ -144,12 +144,20 @@ export const DivisionAssignments = ({
 
     return (
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
-            <div className='flex justify-center gap-2 mb-4'>
-                <Button variant='outline' onClick={clearAll}>Clear All</Button>
-                <Button variant='outline' onClick={addDivision}>Add A Division</Button>
-                <Button variant='outline' onClick={deleteLastDivision}>Delete Last Division</Button>
-            </div>
-            <div className='flex w-full justify-center gap-8 flex-wrap'>
+            {editMode &&
+                <div className='flex justify-center gap-2 mb-4'>
+                    <Button variant='outline' onClick={clearAll}>Clear All</Button>
+                    <Button variant='outline' onClick={addDivision}>Add A Division</Button>
+                    <Button variant='outline' onClick={deleteLastDivision}>Delete Last Division</Button>
+                    <Button variant='destructive' onClick={() => setEditMode(false)}>Save</Button>
+                </div>
+            }
+            {!editMode &&
+                <div className='flex justify-center gap-2 mb-4'>
+                    <Button variant='outline' onClick={() => setEditMode(true)}>Edit</Button>
+                </div>
+            }
+            <div className='flex w-full justify-center gap-8 flex-wrap' >
 
                 {divSlotCounts.map((d, index) => (
                     <Card key={d.divId} className='mb-8'>
@@ -158,8 +166,8 @@ export const DivisionAssignments = ({
                         </CardHeader>
                         <CardDescription>
                             <div className='flex justify-center text-sm'># Teams:</div>
-                            <div className='flex justify-center'>
-                                <Select
+                            <div className='flex justify-center' inert={!editMode}>
+                                <Select 
                                     value={d.slotCount.toString()}
                                     onValueChange={val => handleSlotCountChange(d.divId, Number(val))}
                                 >
@@ -185,6 +193,7 @@ export const DivisionAssignments = ({
                                                 id={orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}
                                                 label={orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}
                                                 fullName={(teams.find(t => t.id === orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)])?.name) || ''}
+                                                draggable={editMode}
                                             />
                                             : <span className='mt-3 text-lg opacity-20'>Seed {slotIndex + 1}</span>
                                         }
@@ -195,28 +204,31 @@ export const DivisionAssignments = ({
                     </Card>
                 ))}
             </div>
-            <div>
-                <Card className='mb-8 w-full'>
-                    <CardHeader>
-                        <CardTitle>Unassigned Teams</CardTitle>
-                    </CardHeader>
-                    <CardContent className='flex flex-wrap'>
-                        {teams.filter(t => !orderedTeams.includes(t.id)).map((team, index) => (
+            {editMode &&
+                <div>
+                    <Card className='mb-8 w-full'>
+                        <CardHeader>
+                            <CardTitle>Unassigned Teams</CardTitle>
+                        </CardHeader>
+                        <CardContent className='flex flex-wrap'>
+                            {teams.filter(t => !orderedTeams.includes(t.id)).map((team, index) => (
 
-                            <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={team.name || ''} />
+                                <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={team.name || ''} draggable={true}/>
 
-                        ))}
+                            ))}
 
-                    </CardContent>
-                </Card>
-            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            }
         </DndContext>
     )
 }
 
-function DraggableTeam(props: { id: string, label: string, fullName: string }) {
+function DraggableTeam(props: { id: string, label: string, fullName: string, draggable: boolean }) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: props.id,
+        disabled: !props.draggable
     });
 
     const style = {
@@ -226,7 +238,7 @@ function DraggableTeam(props: { id: string, label: string, fullName: string }) {
         <Tooltip>
             <TooltipTrigger asChild>
                 <div
-                    ref={setNodeRef}
+                    ref={setNodeRef }
                     style={style}
                     {...listeners}
                     {...attributes}
