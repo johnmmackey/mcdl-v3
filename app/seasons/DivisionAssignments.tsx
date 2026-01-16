@@ -81,6 +81,7 @@ export const DivisionAssignments = ({
     divAssignments: TeamSeason[]
 }>) => {
     // build a array of divisions and slot counts based on divAssignments
+
     const [divSlotCounts, setDivSlotsCounts] = useState(divisions
         .map(d =>
         ({
@@ -89,6 +90,8 @@ export const DivisionAssignments = ({
         }))
         .filter(dsc => dsc.slotCount)
     );
+
+console.log(`inside: ${divAssignments.length} divlength: ${JSON.stringify(divSlotCounts)}`)
 
     // define the ordered list of teams.
     const [orderedTeams, setOrderedTeams] = useState<string[]>(
@@ -137,6 +140,8 @@ export const DivisionAssignments = ({
         setDivSlotsCounts(newSlots);
         setOrderedTeams(orderedTeams.slice(0, seedSlots(newSlots)));
     }
+
+
 
     return (
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
