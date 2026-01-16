@@ -152,11 +152,7 @@ export const DivisionAssignments = ({
                     <Button variant='destructive' onClick={() => setEditMode(false)}>Save</Button>
                 </div>
             }
-            {!editMode &&
-                <div className='flex justify-center gap-2 mb-4'>
-                    <Button variant='outline' onClick={() => setEditMode(true)}>Edit</Button>
-                </div>
-            }
+
             <div className='flex w-full justify-center gap-8 flex-wrap' >
 
                 {divSlotCounts.map((d, index) => (
@@ -164,27 +160,30 @@ export const DivisionAssignments = ({
                         <CardHeader>
                             <CardTitle className='text-center'>Division {d.divId}</CardTitle>
                         </CardHeader>
-                        <CardDescription>
-                            <div className='flex justify-center text-sm'># Teams:</div>
-                            <div className='flex justify-center' inert={!editMode}>
-                                <Select 
-                                    value={d.slotCount.toString()}
-                                    onValueChange={val => handleSlotCountChange(d.divId, Number(val))}
-                                >
-                                    <SelectTrigger className="">
-                                        <SelectValue placeholder="# teams" />
-                                    </SelectTrigger>
 
-                                    <SelectContent>
-                                        {[2, 3, 4, 5, 6].map(n => (
-                                            <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <CardContent className='px-2 md:px-8'>
+                            {editMode &&
+                                <>
+                                    <div className='flex justify-center text-sm'># Teams:</div>
+                                    <div className='flex justify-center mb-4' >
 
-                        </CardDescription>
-                        <CardContent className='px-2 md:p-8'>
+                                        <Select
+                                            value={d.slotCount.toString()}
+                                            onValueChange={val => handleSlotCountChange(d.divId, Number(val))}
+                                        >
+                                            <SelectTrigger className="">
+                                                <SelectValue placeholder="# teams" />
+                                            </SelectTrigger>
+
+                                            <SelectContent>
+                                                {[2, 3, 4, 5, 6].map(n => (
+                                                    <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </>
+                            }
                             {Array.from({ length: d.slotCount }).map((n, slotIndex) =>
                                 <Droppable key={slotIndex} id={transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)}>
                                     <div className='w-24 min-h-[62px] my-2 p-0 flex justify-center border rounded-lg'>
@@ -213,7 +212,7 @@ export const DivisionAssignments = ({
                         <CardContent className='flex flex-wrap'>
                             {teams.filter(t => !orderedTeams.includes(t.id)).map((team, index) => (
 
-                                <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={team.name || ''} draggable={true}/>
+                                <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={team.name || ''} draggable={true} />
 
                             ))}
 
@@ -238,7 +237,7 @@ function DraggableTeam(props: { id: string, label: string, fullName: string, dra
         <Tooltip>
             <TooltipTrigger asChild>
                 <div
-                    ref={setNodeRef }
+                    ref={setNodeRef}
                     style={style}
                     {...listeners}
                     {...attributes}

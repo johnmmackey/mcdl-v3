@@ -33,6 +33,10 @@ export async function fetchSeasons(): Promise<Season[]> {
     return (await fetch(`${process.env.DATA_URL}/seasons`, { next: { revalidate: 30 } })).json();
 }
 
+export async function fetchSeason(seasonId: number): Promise<Season> {
+    return (await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, { next: { revalidate: 30 } })).json();
+}
+
 export async function fetchDivisions(): Promise<Division[]> {
     return (await fetch(`${process.env.DATA_URL}/divisions`, { next: { revalidate: 30 } })).json();
 }
