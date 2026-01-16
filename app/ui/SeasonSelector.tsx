@@ -21,12 +21,10 @@ import {
 
 export const SeasonSelector = async ({
   base,
-  selectedSeasonId,
-  children,
+  selectedSeasonId
 }: Readonly<{
   base: string,
   selectedSeasonId: number,
-  children?: React.ReactNode
 }>) => {
 
   const sortedSeasons = (await fetchSeasons()).sort((a, b) => {
@@ -36,7 +34,7 @@ export const SeasonSelector = async ({
   });
 
   return (
-    <DropdownMenu >
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='outline'>
           {selectedSeasonId} <IconChevronDown size={18} stroke={1.5} />
@@ -44,12 +42,10 @@ export const SeasonSelector = async ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          {sortedSeasons.map((s, k) =>
-
-            <DropdownMenuItem key={k} asChild>
-              <Link key={k} href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
-            </DropdownMenuItem>
-
+          {sortedSeasons.map((s) =>
+              <DropdownMenuItem key={s.id} asChild>
+                <Link href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
+              </DropdownMenuItem>
           )}
         </DropdownMenuGroup>
       </DropdownMenuContent>

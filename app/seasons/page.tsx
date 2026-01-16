@@ -1,66 +1,49 @@
-import Link from 'next/link';
-import { auth } from '@/auth';
-import sortBy from 'lodash/sortBy';
-import groupBy from 'lodash/groupBy';
-import keyBy from 'lodash/keyBy';
-import { format } from 'date-fns';
-import { TableHead, TableCell } from '@/components/ui/table';
-import { fetchTeams, fetchMeets, fetchCurrentSeasonId, fetchTeamsForSeason } from '@/app/lib/data';
-import { userCan } from '@/app/lib/userCan';
-import { SeasonSelector } from '@/app/ui/SeasonSelector';
-import Loading from '@/app/ui/Loading'
-import { Meet, MeetTeam, TeamSeason, Team } from '@/app/lib/definitions'
 import { Suspense } from 'react';
-import CrudGrid from '@/app/ui/crudGrid';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button'
+
+import { fetchTeams, fetchSeasons, fetchDivisions, fetchCurrentSeasonId, fetchTeamsForSeason } from '@/app/lib/data';
+import { DivisionAssignments } from './DivisionAssignments';
+import Loading from '@/app/ui/Loading'
+import { SeasonSelector } from '@/app/ui/SeasonSelector';
 
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
 }) {
+    const seasons = await fetchSeasons();
+    const teams = (await fetchTeams()).filter(t => !t.archived);
+    const divisions = await fetchDivisions();
+
     const searchParams = await props.searchParams;
     const currentSeasonId = await fetchCurrentSeasonId();
     const selectedSeasonId = searchParams['season-id'] ? Number(searchParams['season-id']) : currentSeasonId;
-   
-    const teams = (await fetchTeamsForSeason(selectedSeasonId)).sort((a, b) => (((a.divisionId - b.divisionId) || (a.seed - b.seed))));
+
+    // need to test edge case where no seasons exist
+    const divAssignments = await fetchTeamsForSeason(selectedSeasonId);
+
 
     return (
-        <>
 
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-3">
-                    <SeasonSelector base="/seasons" selectedSeasonId={selectedSeasonId} />
-                </div>
-            </div>
+                <>
+        
+                    <div className="flex gap-4 mb-2">
 
-            <Suspense fallback={Loading()} >
-                <CrudGrid resources={teams} renderHeader={TeamHeader} renderRow={TeamRow} />
-            </Suspense>
-
-        </>
+                            <SeasonSelector base="/seasons" selectedSeasonId={selectedSeasonId} />
+                            <Link href='/seasons?season-id=_'>
+                                <Button variant='outline' >Add New Season</Button>
+                                </Link>
+                    </div>
+        
+                    <Suspense fallback={Loading()} >
+                        <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} />
+                    </Suspense>
+        
+                </>
+        
     )
 }
 
 
-function TeamHeader() {
-    return (
-        <>
-            <TableHead>Division</TableHead>
-            <TableHead>Seed</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead >Team Name</TableHead>
 
 
-        </>
-    )
-}
-
-function TeamRow(t: TeamSeason) {
-    return (
-        <>
-            <TableCell>{t.divisionId}</TableCell>
-            <TableCell>{t.seed}</TableCell>
-            <TableCell>{t.team.id}</TableCell>
-            <TableCell>{t.team.name}</TableCell>
-        </>
-    )
-}
