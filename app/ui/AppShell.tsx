@@ -64,6 +64,7 @@ import {
 
 import { LoginButton, ProfileDropdown } from './ProfileDropdown';
 import { userInitials } from '@/app/lib/userInitials';
+import { AppBreadcrumbs } from './AppBreadCrumbs';
 
 
 function IconDiver(props: { className?: string }) {
@@ -152,21 +153,7 @@ return (
                             <div className='flex items-center gap-4'>
                                 <SidebarTrigger className='[&_svg]:!size-5' />
                                 <Separator orientation='vertical' className='hidden !h-4 sm:block' />
-                                <Breadcrumb className='hidden sm:block'>
-                                    <BreadcrumbList>
-                                        <BreadcrumbItem>
-                                            <BreadcrumbLink href='#'>Home</BreadcrumbLink>
-                                        </BreadcrumbItem>
-                                        <BreadcrumbSeparator />
-                                        <BreadcrumbItem>
-                                            <BreadcrumbLink href='#'>Dashboard</BreadcrumbLink>
-                                        </BreadcrumbItem>
-                                        <BreadcrumbSeparator />
-                                        <BreadcrumbItem>
-                                            <BreadcrumbPage>Free</BreadcrumbPage>
-                                        </BreadcrumbItem>
-                                    </BreadcrumbList>
-                                </Breadcrumb>
+                                <AppBreadcrumbs />
                             </div>
                             <div className='flex items-center gap-1.5'>
                                 {session && session.user 

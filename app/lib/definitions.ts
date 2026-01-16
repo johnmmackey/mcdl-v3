@@ -178,7 +178,8 @@ export type Season = {
     name: string,
     registerDate: string,
     startDate: string,
-    endDate: string
+    endDate: string,
+    week1Date: string
 }
 
 export type Division = {

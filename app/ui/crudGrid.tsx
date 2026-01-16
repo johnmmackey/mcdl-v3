@@ -31,7 +31,7 @@ export default async function CrudGrid<T>({
         <>
 
 
-            <Table className={classes.striped}>
+            <Table >
                 <TableHeader>
                     <TableRow>
 
