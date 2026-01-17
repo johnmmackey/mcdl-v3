@@ -29,14 +29,8 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator
-} from '@/components/ui/breadcrumb'
+
+
 import {
     Sidebar,
     SidebarContent,
@@ -48,37 +42,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarProvider,
-    SidebarTrigger
+    SidebarTrigger,
 } from '@/components/ui/sidebar'
-
-import {
-    IconHome,
-    IconChartBarPopular,
-    IconFiles,
-    IconKey,
-    IconLogin,
-    IconSettings,
-    IconUsersGroup,
-    IconCalendar
-} from '@tabler/icons-react';
 
 import { LoginButton, ProfileDropdown } from './ProfileDropdown';
 import { userInitials } from '@/app/lib/userInitials';
 import { AppBreadcrumbs } from './AppBreadCrumbs';
+import { MySidebar } from './MySidebar';
 
 
-function IconDiver(props: { className?: string }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg"
-            className={'tabler-icon ' + props.className || ''}
-            width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth="2.0" strokeLinecap="round" strokeLinejoin="round"
-        >
-            <path d="M19 12a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"></path>
-            <path d="M2 2l3 3l1.5 4l3.5 2l6 2l1 4l2.5 3"></path>
-        </svg>
-    )
-}
+
 
 const header = <div className='flex gap-4 items-center'>
     <Image style={{ borderRadius: '30px' }} src='/diver.png' alt="diver" width={55} height={55} />
@@ -86,18 +59,7 @@ const header = <div className='flex gap-4 items-center'>
 </div>
 
 
-const links = [
-    { link: '/', label: 'Home', icon: IconHome },
-    { link: '/teams', label: 'Teams', icon: IconUsersGroup },
-    { link: '/seasons', label: 'Seasons', icon: IconCalendar },
-    { link: '/meets', label: 'Meets', icon: IconDiver },
-    { link: '/standings', label: 'Standings', icon: IconChartBarPopular },
-    { link: '/resources', label: 'Resources', icon: IconFiles },
-    { link: '/users', label: 'Users', icon: IconKey },
 
-    { link: '/test', label: 'Test Page', icon: IconSettings },
-        { link: '/test2', label: 'Test Page 2', icon: IconSettings },
-];
 
 
 export const MyAppShell = ({
@@ -111,42 +73,8 @@ export const MyAppShell = ({
 return (
         <div className='flex min-h-dvh w-full'>
             <SidebarProvider>
-                <Sidebar>
-                    <SidebarContent>
-                        <SidebarGroup>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    <SidebarMenuItem>
-                                        <SidebarMenuButton asChild>
-                                            <a href='#'>
-                                                <ChartNoAxesCombinedIcon />
-                                                <span>Dashboard</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                        <SidebarMenuBadge className='bg-primary/10 rounded-full'>5</SidebarMenuBadge>
-                                    </SidebarMenuItem>
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                        <SidebarGroup>
-                            <SidebarGroupLabel>Pages</SidebarGroupLabel>
-                            <SidebarGroupContent>
-                                <SidebarMenu>
-                                    {links.map((item) => (
-                                        <SidebarMenuItem key={item.label}>
-                                            <SidebarMenuButton asChild>
-                                                <Link href={item.link}>
-                                                    <item.icon stroke={1.5} />
-                                                    <span>{item.label}</span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    ))}
-                                </SidebarMenu>
-                            </SidebarGroupContent>
-                        </SidebarGroup>
-                     </SidebarContent>
-                </Sidebar>
+                <MySidebar />
+
                 <div className='flex flex-1 flex-col'>
                     <header className='bg-card sticky top-0 z-50 border-b'>
                         <div className='mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6'>
@@ -174,9 +102,9 @@ return (
                     </header>
                     <main className='mx-auto size-full max-w-7xl flex-1 px-4 py-6 sm:px-6'>
 
-                        <CardContent className='h-full'>
+                        <div className='h-full'>
                             {children}
-                        </CardContent>
+                        </div>
 
                     </main>
                     <footer>

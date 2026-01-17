@@ -41,9 +41,22 @@ type divSlotCount = {
     slotCount: number
 }
 
+// Find total number of seeding slots across all divisions
+const totalSeedSlots = (divSlotsCount: divSlotCount[]) => {
+    let count = divSlotsCount.reduce((acc: number, d: divSlotCount) => {
+        return acc + d.slotCount
+    }, 0);
+    return count;
+}
+
+// get an ordered array of the deepest seed indexs for all divisions
+const getDeepestSeedIndexs = (divSlotCounts: divSlotCount[]): number[] =>
+    [1, 2, 3, 4, 5, 6].slice(0, Math.max(...divSlotCounts.map(d => d.slotCount), 0));
+
+// transform an overall index (into the ordered teams array) into a [divisionId, seed] reference
 const transformIndexToDivSeed = (index: number, divSlotCounts: divSlotCount[]): [number, number] => {
-    if (index < 0 || index >= seedSlots(divSlotCounts))
-        throw new Error(`transformIndexToDivSeed - out of range - index of ${index} vs ${seedSlots(divSlotCounts)}`)
+    if (index < 0 || index >= totalSeedSlots(divSlotCounts))
+        throw new Error(`transformIndexToDivSeed - out of range - index of ${index} vs ${totalSeedSlots(divSlotCounts)}`)
 
     let prevDivTotal = 0;
     let divIndex = 0;
@@ -55,13 +68,7 @@ const transformIndexToDivSeed = (index: number, divSlotCounts: divSlotCount[]): 
     return [divSlotCounts[divIndex].divId, divSeed];
 }
 
-const seedSlots = (divSlotsCount: divSlotCount[]) => {
-    let count = divSlotsCount.reduce((acc: number, d: divSlotCount) => {
-        return acc + d.slotCount
-    }, 0);
-    return count;
-}
-
+// the inverse - transform a [divisionId, seed] into an index in the ordered teams array
 const transformDivSeedToIndex = (divId: number, seed: number, divSlotCounts: divSlotCount[]): number => {
     let index = divSlotCounts.reduce((acc, curr) => {
         if (curr.divId < divId) return acc + curr.slotCount;
@@ -83,25 +90,21 @@ export const DivisionAssignments = ({
     newSeason: boolean
 }>) => {
     // build a array of divisions and slot counts based on divAssignments
-    const [divSlotCounts, setDivSlotsCounts] = useState([] as divSlotCount[]);
-    const [orderedTeams, setOrderedTeams] = useState([] as string[]);
-    const [editMode, setEditMode] = useState(false);
+    const [divSlotCounts, setDivSlotsCounts] = useState(divisions
+        .map(d =>
+        ({
+            divId: d.id,
+            slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
+        }))
+        .filter(dsc => dsc.slotCount)
+    );
+    const [orderedTeams, setOrderedTeams] = useState(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
+    const [editMode, setEditMode] = useState(!newSeason);
 
-    useEffect(() => {
-        // have to do this as an effect in case the props change without remount
-        setDivSlotsCounts(
-            divisions
-                .map(d =>
-                ({
-                    divId: d.id,
-                    slotCount: divAssignments.filter(ts => ts.divisionId === d.id).length
-                }))
-                .filter(dsc => dsc.slotCount));
-
-        setOrderedTeams(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
-        if (newSeason)
-            setEditMode(true);
-    }, [divAssignments, newSeason]);
+    const teamsKeyedById: Record<string, Team> = teams.reduce((acc, team) => {
+        acc[team.id] = team;
+        return acc;
+    }, {} as Record<string, Team>);
 
     const handleSlotCountChange = (divId: number, val: number) => {
         let newDSC = [...divSlotCounts];
@@ -110,7 +113,7 @@ export const DivisionAssignments = ({
             target.slotCount = val;
         setDivSlotsCounts(newDSC)
         // potentially truncate the teams array (if there are less slots available now)
-        setOrderedTeams(orderedTeams.slice(0, seedSlots(divSlotCounts)));
+        setOrderedTeams(orderedTeams.slice(0, totalSeedSlots(divSlotCounts)));
     }
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -127,19 +130,19 @@ export const DivisionAssignments = ({
             newArr.splice(Number(event.over.id), 0, event.active.id as string);
 
         // possible we have pushed beyond the end of the available slots so truncate
-        setOrderedTeams(newArr.slice(0, seedSlots(divSlotCounts)));
+        setOrderedTeams(newArr.slice(0, totalSeedSlots(divSlotCounts)));
         return;
     }
 
     const clearAll = () => setOrderedTeams([]);
     const addDivision = () => {
-        let highestCurrentDivisionId = Math.max(...divSlotCounts.map(d => d.divId));
-        setDivSlotsCounts([...divSlotCounts, { divId: highestCurrentDivisionId ? highestCurrentDivisionId + 1 : 1, slotCount: 6 }]);
+        let highestCurrentDivisionId = Math.max(...divSlotCounts.map(d => d.divId), 0);
+        setDivSlotsCounts([...divSlotCounts, { divId: highestCurrentDivisionId + 1, slotCount: 6 }]);
     }
     const deleteLastDivision = () => {
         let newSlots = divSlotCounts.slice(0, divSlotCounts.length - 1);
         setDivSlotsCounts(newSlots);
-        setOrderedTeams(orderedTeams.slice(0, seedSlots(newSlots)));
+        setOrderedTeams(orderedTeams.slice(0, totalSeedSlots(newSlots)));
     }
 
     return (
@@ -153,58 +156,71 @@ export const DivisionAssignments = ({
                 </div>
             }
 
-            <div className='flex w-full justify-center gap-8 flex-wrap' >
-
-                {divSlotCounts.map((d, index) => (
-                    <Card key={d.divId} className='mb-8'>
-                        <CardHeader>
-                            <CardTitle className='text-center'>Division {d.divId}</CardTitle>
-                        </CardHeader>
-
-                        <CardContent className='px-2 md:px-8'>
-                            {editMode &&
-                                <>
-                                    <div className='flex justify-center text-sm'># Teams:</div>
-                                    <div className='flex justify-center mb-4' >
-
-                                        <Select
-                                            value={d.slotCount.toString()}
-                                            onValueChange={val => handleSlotCountChange(d.divId, Number(val))}
-                                        >
-                                            <SelectTrigger className="">
-                                                <SelectValue placeholder="# teams" />
-                                            </SelectTrigger>
-
-                                            <SelectContent>
-                                                {[2, 3, 4, 5, 6].map(n => (
-                                                    <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </>
-                            }
-                            {Array.from({ length: d.slotCount }).map((n, slotIndex) =>
-                                <Droppable key={slotIndex} id={transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)}>
-                                    <div className='w-24 min-h-[62px] my-2 p-0 flex justify-center border rounded-lg'>
-                                        {orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]
-                                            ? <DraggableTeam
-                                                id={orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}
-                                                label={orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)]}
-                                                fullName={(teams.find(t => t.id === orderedTeams[transformDivSeedToIndex(d.divId, slotIndex + 1, divSlotCounts)])?.name) || ''}
-                                                draggable={editMode}
-                                            />
-                                            : <span className='mt-3 text-lg opacity-20'>Seed {slotIndex + 1}</span>
-                                        }
-                                    </div>
-                                </Droppable>
-                            )}
-                        </CardContent>
-                    </Card>
-                ))}
+            {/* Header */}
+            <div className='w-full flex gap-0' >
+                <Box xtraClassName='hidden sm:block'>&nbsp;</Box>
+                {divSlotCounts.map(d =>
+                    <Box key={d.divId}>Div {d.divId}</Box>
+                )}
             </div>
+
+            {/* Team count selector */}
             {editMode &&
-                <div>
+                <div className='w-full flex gap-0' >
+                    <Box xtraClassName='hidden sm:block'>&nbsp;</Box>
+                    {divSlotCounts.map(d =>
+                        <Box key={d.divId}>
+                            <div>
+                                <div className='flex justify-center text-sm'># Teams:</div>
+                                <div className='flex justify-center mb-4' >
+                                    <Select
+                                        key={d.divId}
+                                        value={d.slotCount.toString()}
+                                        onValueChange={val => handleSlotCountChange(d.divId, Number(val))}
+                                    >
+                                        <SelectTrigger className="">
+                                            <SelectValue placeholder="# teams" />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            {[2, 3, 4, 5, 6].map(n => (
+                                                <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                        </Box>
+                    )}
+                </div >
+            }
+
+            {getDeepestSeedIndexs(divSlotCounts).map(seedIndex =>
+                <div key={seedIndex} className='w-full flex gap-0'>
+                    <Box xtraClassName='hidden sm:flex'>
+                        <span className='pl-8'>Seed {seedIndex}</span>
+                    </Box>
+                    {divSlotCounts.map(d => ({ ...d, slotIndex: transformDivSeedToIndex(d.divId, seedIndex, divSlotCounts) })).map(d =>
+                        <DroppableBox key={d.divId} dropId={d.slotIndex} hidden={seedIndex > d.slotCount}>
+                            {seedIndex <= d.slotCount
+                                ? (orderedTeams[d.slotIndex]
+                                    ? <DraggableTeam
+                                        id={orderedTeams[d.slotIndex]}
+                                        label={orderedTeams[d.slotIndex]}
+                                        fullName={teamsKeyedById[orderedTeams[d.slotIndex]]?.name || ''}
+                                        draggable={editMode}
+                                    />
+                                    : <span></span>
+                                )
+                                : <span>N/A</span>
+                            }
+                        </DroppableBox>
+                    )}
+                </div>
+            )}
+
+            {editMode &&
+                <div className='mt-4'>
                     <Card className='mb-8 w-full'>
                         <CardHeader>
                             <CardTitle>Unassigned Teams</CardTitle>
@@ -212,7 +228,7 @@ export const DivisionAssignments = ({
                         <CardContent className='flex flex-wrap'>
                             {teams.filter(t => !orderedTeams.includes(t.id)).map((team, index) => (
 
-                                <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={team.name || ''} draggable={true} />
+                                <DraggableTeam key={team.id} id={team.id} label={team.id} fullName={teamsKeyedById[team.id]?.name || ''} draggable={true} />
 
                             ))}
 
@@ -220,8 +236,33 @@ export const DivisionAssignments = ({
                     </Card>
                 </div>
             }
-        </DndContext>
+        </DndContext >
     )
+}
+
+const Box = (props: { xtraClassName?: string | undefined, ref?: React.Ref<HTMLDivElement>, style?: Record<string, any>, children?: React.ReactNode }) => {
+    return (
+        <div className={'w-full min-h-[62px] p-0 m-1 flex justify-center items-center ' + (props.xtraClassName || '')} ref={props.ref} style={props.style} >
+            {props.children}
+        </div>
+    )
+}
+
+function DroppableBox(props: { dropId: number, hidden?: boolean, children?: React.ReactNode }) {
+    const { isOver, setNodeRef } = useDroppable({
+        id: props.dropId,
+        disabled: props.hidden || false
+    });
+    const style = {
+        backgroundColor: isOver ? '#D3D3D3' : undefined,
+        //width: 100, height: 100, marginBottom: 20, border: '2px dashed black'
+    };
+
+    return (
+        <Box ref={setNodeRef} xtraClassName={'border ' + (props.hidden ? 'invisible' : '')} style={style}>
+            {props.children}
+        </Box>
+    );
 }
 
 function DraggableTeam(props: { id: string, label: string, fullName: string, draggable: boolean }) {
@@ -234,38 +275,15 @@ function DraggableTeam(props: { id: string, label: string, fullName: string, dra
         transform: CSS.Translate.toString(transform),
     }
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <div
-                    ref={setNodeRef}
-                    style={style}
-                    {...listeners}
-                    {...attributes}
-                    className='w-16 m-2 p-2 text-center cursor-move border-2 border-solid rounded-lg bg-slate-200' // border-grey-500/50'
-                >
-                    {props.label}
-                </div>
-            </TooltipTrigger>
-            <TooltipContent>
-                <p>{props.fullName}</p>
-            </TooltipContent>
-        </Tooltip>
-    )
-}
-
-function Droppable(props: { id: number, children?: React.ReactNode }) {
-    const { isOver, setNodeRef } = useDroppable({
-        id: props.id,
-    });
-    const style = {
-        borderRadius: '8px',
-        backgroundColor: isOver ? '#D3D3D3' : undefined,
-        //width: 100, height: 100, marginBottom: 20, border: '2px dashed black'
-    };
-
-    return (
-        <div ref={setNodeRef} style={style}>
-            {props.children}
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...listeners}
+            {...attributes}
+            className='w-16 xl:w-40 m-2 p-2 text-center cursor-move border-2 border-solid rounded-lg bg-slate-200' // border-grey-500/50'
+        >
+            <div >{props.label}</div>
+            <div className='max-xl:hidden mx-2 text-sm truncate'>{props.fullName}</div>
         </div>
-    );
+    )
 }

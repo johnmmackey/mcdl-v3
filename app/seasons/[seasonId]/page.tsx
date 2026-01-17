@@ -1,3 +1,11 @@
+import {
+    Field,
+    FieldContent,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
 import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason } from '@/app/lib/data';
 import { DivisionAssignments } from './DivisionAssignments';
 
@@ -14,10 +22,19 @@ export default async function Page(props: {
 
     return (
         <div>
-            <div className='mb-4'>
-            Week 1 Date: {new Date(season.week1Date).toLocaleDateString()}
-            </div>
-        <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} newSeason={false} />
+            <Field
+                className='mb-4'
+                orientation="responsive"
+            >
+                <FieldLabel htmlFor='week1Date'>
+                    Week 1 Date
+                </FieldLabel>
+                <FieldContent>
+                    {new Date(season.week1Date).toLocaleDateString()}
+                </FieldContent>
+            </Field>
+
+            <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} newSeason={false} />
         </div>
 
     )
