@@ -1,46 +1,13 @@
 import { Session } from 'next-auth';
 import Image from 'next/image'
-import Link from 'next/link'
-
-import {
-    ArrowRightLeftIcon,
-    CalendarClockIcon,
-    ChartNoAxesCombinedIcon,
-    ChartPieIcon,
-    ChartSplineIcon,
-    ClipboardListIcon,
-    Clock9Icon,
-    CrownIcon,
-    FacebookIcon,
-    HashIcon,
-    InstagramIcon,
-    LanguagesIcon,
-    LinkedinIcon,
-    SettingsIcon,
-    SquareActivityIcon,
-    TwitterIcon,
-    Undo2Icon,
-    UserIcon,
-    UsersIcon,
-    LogInIcon
-} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuBadge,
-    SidebarMenuButton,
-    SidebarMenuItem,
     SidebarProvider,
     SidebarTrigger,
 } from '@/components/ui/sidebar'
@@ -50,17 +17,10 @@ import { userInitials } from '@/app/lib/userInitials';
 import { AppBreadcrumbs } from './AppBreadCrumbs';
 import { MySidebar } from './MySidebar';
 
-
-
-
 const header = <div className='flex gap-4 items-center'>
     <Image style={{ borderRadius: '30px' }} src='/diver.png' alt="diver" width={55} height={55} />
     <span className='text-2xl font-semibold'>MCDL</span>
 </div>
-
-
-
-
 
 export const MyAppShell = ({
     children,
