@@ -36,7 +36,7 @@ return (
                 <MySidebar />
 
                 <div className='flex flex-1 flex-col'>
-                    <header className='bg-card sticky top-0 z-50 border-b'>
+                    <header className='bg-card sticky top-0 z-50 border-b' role='heading'>
                         <div className='mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-2 sm:px-6'>
                             <div className='flex items-center gap-4'>
                                 <SidebarTrigger className='[&_svg]:!size-5' />

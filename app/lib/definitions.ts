@@ -95,7 +95,7 @@ export type DiverBase = {
     createDate: string,
 }
 
-export type DiverWithSeason = DiverBase & { seasons: DiverSeason[]}
+export type DiverWithSeason = DiverBase & { seasons: DiverSeason[] }
 
 export type Entry = {
     id: number | null,
@@ -176,10 +176,12 @@ export type GroupedStandings = {
 export type Season = {
     id: number,
     name: string,
-    registerDate: string,
     startDate: string,
     endDate: string,
     week1Date: string
+    _count: {
+        meets: number
+    }
 }
 
 export type Division = {
@@ -208,7 +210,8 @@ export type TeamSeason = {
     fsRank: number,
     fsTieBreaker: number,
     tsCsAcceptedBy: string,
-    tsCsAcceptedAt: string
+    tsCsAcceptedAt: string,
+    seasonComplete: boolean,
     team: {
         id: string,
         name: string,
@@ -219,6 +222,21 @@ export type TeamSeason = {
         phone: string,
         url: string
     }
+}
+
+export type SeasonCreateUpdateInput = {
+    name: string,
+    startDate: string,
+    endDate: string,
+    week1Date: string
+    divisionAssignments: TeamSeasonCreateInput[]
+}
+
+
+export type TeamSeasonCreateInput = {
+    teamId: string,
+    divisionId: number,
+    seed: number
 }
 
 
@@ -313,4 +331,10 @@ export type GenericServerActionState<T> = {
 export const GenericServerActionStatePlaceHolder: GenericServerActionState<any> = {
     error: null,
     data: null
+}
+
+export type DivisionAssignment = {
+    teamId: string,
+    divisionId: number,
+    seed: number
 }

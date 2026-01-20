@@ -1,37 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 
 import {
-    ArrowRightLeftIcon,
-    CalendarClockIcon,
     ChartNoAxesCombinedIcon,
-    ChartPieIcon,
-    ChartSplineIcon,
-    ClipboardListIcon,
-    Clock9Icon,
-    CrownIcon,
-    FacebookIcon,
-    HashIcon,
-    InstagramIcon,
-    LanguagesIcon,
-    LinkedinIcon,
-    SettingsIcon,
-    SquareActivityIcon,
-    TwitterIcon,
-    Undo2Icon,
-    UserIcon,
-    UsersIcon,
-    LogInIcon
 } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
-
 
 import {
     IconHome,
@@ -82,7 +55,7 @@ const links = [
     { link: '/users', label: 'Users', icon: IconKey },
 
     { link: '/test', label: 'Test Page', icon: IconSettings },
-        { link: '/test2', label: 'Test Page 2', icon: IconSettings },
+    { link: '/test2', label: 'Test Page 2', icon: IconSettings },
 ];
 
 export const MySidebar = () => {

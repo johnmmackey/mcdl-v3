@@ -97,7 +97,7 @@ const FormFieldGeneric = ({
  */
 
 const convertFormValue = (v: string, nullForEmpty: boolean, valueAsNumber: boolean) => {
-    if(nullForEmpty && v === '')
+    if (nullForEmpty && v === '')
         return null;
     return valueAsNumber ? Number(v) : v;
 }
@@ -117,31 +117,40 @@ export const FormFieldInput = ({
     form,
     name,
     label,
+    className,
+    type = "text",
+    disabled = false
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
-    label: string
+    label: string,
+    className?: string
+    type?: boolean | "text" | "number" | "email" | "password" | "tel" | "url"
+    disabled?: boolean
 }>) => {
-    if(form.getValues(name) === null)
+    if (form.getValues(name) === null)
         form.setValue(name, "");
     return (
         <FormFieldGeneric
             form={form}
             name={name}
             label={label}
-            render={(id, field, fieldState) =>
+            render={(id, field, fieldState) => (
                 <Input
                     {...field}
                     id={id}
                     aria-invalid={fieldState.invalid}
                     placeholder={label}
-                    className='min-w-[500px]'
+                    className={className || 'min-w-[500px]'}
+                    type={type}
+                    disabled={disabled}
                 />
-            }
+            )}
         />
     )
 }
 
+ 
 export const FormFieldDatePicker = ({
     form,
     name,
@@ -169,7 +178,7 @@ export const FormFieldDatePicker = ({
                             className="w-48 justify-between font-normal"
                         >
                             {field.value ? new Date(field.value).toLocaleDateString() : "Select date"}
-                            <ChevronDownIcon className='opacity-25'/>
+                            <ChevronDownIcon className='opacity-25' />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto overflow-hidden p-0" align="start">
@@ -190,7 +199,7 @@ export const FormFieldDatePicker = ({
     )
 }
 
-const emptyFlag={value: "-----empty-----", label: '-- None --'}
+const emptyFlag = { value: "-----empty-----", label: '-- None --' }
 
 export const FormFieldSelect = ({
     form,
@@ -222,9 +231,9 @@ export const FormFieldSelect = ({
                     disabled={disabled}
                     name={field.name}
                     value={field.value === null ? (nullForEmpty ? emptyFlag.value : "") : (typeof field.value === 'number' ? field.value.toString() : field.value)}
-                    onValueChange={ (v) => field.onChange(convertFormValue( v === emptyFlag.value ? "" : v, nullForEmpty, valueAsNumber))}
+                    onValueChange={(v) => field.onChange(convertFormValue(v === emptyFlag.value ? "" : v, nullForEmpty, valueAsNumber))}
                 >
-                   
+
                     <SelectTrigger
                         id={id}
                         aria-invalid={fieldState.invalid}
@@ -241,10 +250,10 @@ export const FormFieldSelect = ({
                         )}
                         {options.map(o => (
                             <SelectItem key={Array.isArray(o) ? o[0] : o} value={Array.isArray(o) ? o[0] : (typeof o === 'number' ? o.toString() : o)}>
-                                {Array.isArray(o) ? o[1] : (typeof o === 'number' ? o.toString() : o)} 
+                                {Array.isArray(o) ? o[1] : (typeof o === 'number' ? o.toString() : o)}
                             </SelectItem>
                         ))}
-                    </SelectContent>                
+                    </SelectContent>
                 </Select>
             }
         />

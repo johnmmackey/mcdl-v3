@@ -16,6 +16,11 @@ export default async function Page() {
 
     return (
         <Suspense fallback={Loading()} >
+            <div className="flex justify-end mb-4">
+                <Link href={`/seasons/_/edit`} >
+                    <Button variant="destructive" >New</Button>
+                </Link>
+            </div>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -23,6 +28,7 @@ export default async function Page() {
                         <TableHead>Start Date</TableHead>
                         <TableHead>End Date</TableHead>
                         <TableHead>Week 1 Date</TableHead>
+                        <TableHead>Number of Meets</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -31,7 +37,7 @@ export default async function Page() {
                             <TableCell>
                                 {s.id}
                                 {s.id === currentSeasonId &&
-                                    <span className='mx-2'>(active)</span>
+                                    <span className='mx-2'>(current)</span>
                                 }
                             </TableCell>
 
@@ -43,8 +49,10 @@ export default async function Page() {
                             </TableCell>
                             <TableCell className=''>
                                 {new Date(s.week1Date).toLocaleDateString()}
+                                </TableCell>
+                            <TableCell className=''>
+                                {s._count.meets}
                             </TableCell>
-
                         </LinkTableRow>
 
                     )}

@@ -1,7 +1,8 @@
 'use server'
 
 import { auth } from "@/auth"
-import { GroupedStandings, Season, Division, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState } from "./definitions";
+import { notFound } from "next/navigation"
+import { GroupedStandings, Season, Division, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState, TeamSeasonCreateInput, SeasonCreateUpdateInput } from "./definitions";
 
 import jwt from "jsonwebtoken";
 import { updateTag } from "next/cache";
@@ -12,8 +13,20 @@ import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'data' })
 
 import { logEvent } from "./dynamoEventLog";
+import { SetStateAction } from "react";
 
-
+const throwingFetch = async (url: string, options?: RequestInit) => {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        if(response.status === 404) {
+            notFound();
+        } else {
+            const text = await response.text();
+            throw new Error(`Error fetching ${url}: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`);
+        }
+    }
+    return response;
+}
 
 export async function accessToken(): Promise<string> {
     const session = await auth();
@@ -30,11 +43,11 @@ export async function fetchCurrentSeasonId(): Promise<number> {
 }
 
 export async function fetchSeasons(): Promise<Season[]> {
-    return (await fetch(`${process.env.DATA_URL}/seasons`, { next: { revalidate: 30 } })).json();
+    return (await fetch(`${process.env.DATA_URL}/seasons`, { next: { revalidate: 30, tags: ['seasons']  } })).json();
 }
 
 export async function fetchSeason(seasonId: number): Promise<Season> {
-    return (await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, { next: { revalidate: 30 } })).json();
+    return (await throwingFetch(`${process.env.DATA_URL}/seasons/${seasonId}`, { next: { revalidate: 30, tags: [`season:${seasonId}`] } })).json();
 }
 
 export async function fetchDivisions(): Promise<Division[]> {
@@ -42,19 +55,19 @@ export async function fetchDivisions(): Promise<Division[]> {
 }
 
 export async function fetchTeams(): Promise<Team[]> {
-    return await (await fetch(`${process.env.DATA_URL}/teams`, { next: { revalidate: 30 } })).json();
+    return  (await fetch(`${process.env.DATA_URL}/teams`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchTeamsForSeason(seasonId: number): Promise<TeamSeason[]> {
-    return await (await fetch(`${process.env.DATA_URL}/team-seasons?season-id=${seasonId}&include-team-detail=1`, { next: { revalidate: 30 } })).json();
+    return  (await fetch(`${process.env.DATA_URL}/team-seasons?season-id=${seasonId}&include-team-detail=1`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchAgeGroups(): Promise<AgeGroup[]> {
-    return await (await fetch(`${process.env.DATA_URL}/agegroups`, { next: { revalidate: 30 } })).json();
+    return (await fetch(`${process.env.DATA_URL}/agegroups`, { next: { revalidate: 30 } })).json();
 }
 
 export async function fetchMeets(seasonId: number): Promise<Meet[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30, tags: ['meets'] } })).json();
+    return (await fetch(`${process.env.DATA_URL}/meets?season-id=${seasonId}`, { next: { revalidate: 30, tags: ['meets'] } })).json();
 }
 
 export async function fetchMeet(meetId: number): Promise<Meet> {
@@ -62,15 +75,15 @@ export async function fetchMeet(meetId: number): Promise<Meet> {
     if (!r.ok)
         throw new Error(`Error retrieving meet ${meetId}: ${r.statusText}`);
 
-    return (await r.json());
+    return r.json();
 }
 
 export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
+    return  (await fetch(`${process.env.DATA_URL}/meets/${meetId}/results`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
 export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
-    return await (await fetch(`${process.env.DATA_URL}/meets/${meetId}/entries`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
+    return  (await fetch(`${process.env.DATA_URL}/meets/${meetId}/entries`, { next: { revalidate: 30, tags: [`meet:${meetId}`] } })).json();
 }
 
 export async function fetchStandings(seasonId: number): Promise<GroupedStandings> {
@@ -190,4 +203,82 @@ export async function deleteMeet(meetId: number): Promise<GenericServerActionSta
     }
 }
 
+export async function createSeason(seasonId: number, season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
+    const t = await accessToken();
+    const r = await fetch(`${process.env.DATA_URL}/seasons`, {
+        method: 'POST',
+        body: JSON.stringify({...season, id: seasonId}),
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
+        },
+    });
 
+    if (r.ok) {
+        updateTag(`seasons`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
+}
+
+export async function updateSeason(seasonId: number, season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
+    const t = await accessToken();
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(season),
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
+        },
+    });
+
+    if (r.ok) {
+        updateTag(`seasons`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
+}
+
+export async function makeSeasonCurrent(seasonId: number): Promise<GenericServerActionState<null>> {
+    const t = await accessToken();
+    const r = await fetch(`${process.env.DATA_URL}/seasons/current-season-id`, {
+        method: 'POST',
+        body: JSON.stringify({ id: seasonId }),
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
+        },
+    });
+
+    if (r.ok) {
+        updateTag(`seasons`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
+}
+
+export async function deleteSeason(seasonId: number): Promise<GenericServerActionState<Season>> {
+
+    const t = await accessToken();
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, {
+        method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
+        },
+    });
+
+    if (r.ok) {
+        updateTag(`seasons`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
+}

@@ -77,7 +77,7 @@ export const TestDnD = ({
     const [assignedTeamsMappedByCompositeId, setAssignedTeamsMappedByCompositeId] = useState<{ [key: string]: DivSlotNode }>({});
 
     function handleDragEnd(event: any) {
-        console.log(event);
+
         let draggedTeam = teams.find(t => t.id === event.active.id);
         if (!draggedTeam) throw new Error('Dragged team not found: ' + event.active.id);
 

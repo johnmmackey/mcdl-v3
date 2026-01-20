@@ -34,7 +34,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 
-import { Team, Season, Division, TeamSeason } from '@/app/lib/definitions';
+import { Team, Season, Division, TeamSeason, TeamSeasonCreateInput, DivisionAssignment } from '@/app/lib/definitions';
 
 type divSlotCount = {
     divId: number,
@@ -82,12 +82,14 @@ export const DivisionAssignments = ({
     teams,
     divisions,
     divAssignments = [],
-    newSeason = false
+    editMode = false,
+    onChange
 }: Readonly<{
     teams: Team[],
     divisions: Division[],
-    divAssignments: TeamSeason[],
-    newSeason: boolean
+    divAssignments: DivisionAssignment[],
+    editMode?: boolean,
+    onChange?: (newAssignments: TeamSeasonCreateInput[]) => void   
 }>) => {
     // build a array of divisions and slot counts based on divAssignments
     const [divSlotCounts, setDivSlotsCounts] = useState(divisions
@@ -99,7 +101,6 @@ export const DivisionAssignments = ({
         .filter(dsc => dsc.slotCount)
     );
     const [orderedTeams, setOrderedTeams] = useState(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
-    const [editMode, setEditMode] = useState(!newSeason);
 
     const teamsKeyedById: Record<string, Team> = teams.reduce((acc, team) => {
         acc[team.id] = team;
@@ -114,12 +115,12 @@ export const DivisionAssignments = ({
         setDivSlotsCounts(newDSC)
         // potentially truncate the teams array (if there are less slots available now)
         setOrderedTeams(orderedTeams.slice(0, totalSeedSlots(divSlotCounts)));
+
     }
 
     const handleDragEnd = (event: DragEndEvent) => {
         let newArr = [...orderedTeams];
         let indexOfDragged = orderedTeams.indexOf(event.active.id as string);
-        console.log(indexOfDragged);
 
         // if currently seeded, pull it out of old spot
         if (indexOfDragged >= 0)
@@ -130,7 +131,22 @@ export const DivisionAssignments = ({
             newArr.splice(Number(event.over.id), 0, event.active.id as string);
 
         // possible we have pushed beyond the end of the available slots so truncate
-        setOrderedTeams(newArr.slice(0, totalSeedSlots(divSlotCounts)));
+        newArr.slice(0, totalSeedSlots(divSlotCounts))
+        setOrderedTeams(newArr);
+
+        // set up a data structure to send to the onChange handler
+        if (onChange) {
+            let newAssignments: TeamSeasonCreateInput[] = [];
+            newArr.forEach((teamId, index) => {
+                let [divId, seed] = transformIndexToDivSeed(index, divSlotCounts);
+                newAssignments.push({
+                  teamId: teamId,
+                    divisionId: divId,
+                    seed: seed,
+                });
+            })
+            onChange(newAssignments);
+        }
         return;
     }
 
@@ -149,10 +165,9 @@ export const DivisionAssignments = ({
         <DndContext onDragEnd={handleDragEnd} id={'DndContext'}>    {/*id seems to prevent SSR errors. Consider SSR: false */}
             {editMode &&
                 <div className='flex justify-center gap-2 mb-4'>
-                    <Button variant='outline' onClick={clearAll}>Clear All</Button>
-                    <Button variant='outline' onClick={addDivision}>Add A Division</Button>
-                    <Button variant='outline' onClick={deleteLastDivision}>Delete Last Division</Button>
-                    <Button variant='destructive' onClick={() => setEditMode(false)}>Save</Button>
+                    <Button variant='outline' type='button' onClick={clearAll}>Clear All</Button>
+                    <Button variant='outline' type='button' onClick={addDivision}>Add A Division</Button>
+                    <Button variant='outline' type='button' onClick={deleteLastDivision}>Delete Last Division</Button>
                 </div>
             }
 
@@ -160,7 +175,7 @@ export const DivisionAssignments = ({
             <div className='w-full flex gap-0' >
                 <Box xtraClassName='hidden sm:block'>&nbsp;</Box>
                 {divSlotCounts.map(d =>
-                    <Box key={d.divId}>Div {d.divId}</Box>
+                    <Box key={d.divId}><span className='hidden xl:block'>Division</span><span className='hidden max-xl:block'>Div</span>&nbsp;{d.divId}</Box>
                 )}
             </div>
 
@@ -171,7 +186,7 @@ export const DivisionAssignments = ({
                     {divSlotCounts.map(d =>
                         <Box key={d.divId}>
                             <div>
-                                <div className='flex justify-center text-sm'># Teams:</div>
+                                <div className='flex justify-center text-sm'># Teams</div>
                                 <div className='flex justify-center mb-4' >
                                     <Select
                                         key={d.divId}
@@ -280,7 +295,7 @@ function DraggableTeam(props: { id: string, label: string, fullName: string, dra
             style={style}
             {...listeners}
             {...attributes}
-            className='w-16 xl:w-40 m-2 p-2 text-center cursor-move border-2 border-solid rounded-lg bg-slate-200' // border-grey-500/50'
+            className={'w-16 xl:w-40 m-2 p-2 text-center border-2 border-solid rounded-lg bg-slate-200 ' + (props.draggable ? 'cursor-move' : '')}
         >
             <div >{props.label}</div>
             <div className='max-xl:hidden mx-2 text-sm truncate'>{props.fullName}</div>
