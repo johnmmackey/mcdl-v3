@@ -125,15 +125,14 @@ export const MeetForm = ({
         <form id='meetForm' onSubmit={form.handleSubmit(handleSubmit)}>
             <FormFieldSelect form={form} name="seasonId" label="Season ID" options={sortedSeasons.map(s => s.toString())} valueAsNumber />
             <FormFieldDatePicker name="meetDate" label="Meet Date" form={form} />
-            <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star']} />
+            <FormFieldSelect form={form} name="meetType" label="Meet Type" options={['Dual', 'Qual', 'Div', 'Star', 'Exhib']} />
 
             {
                 ['Dual', 'Div'].includes(meetType) &&
                 <FormFieldSelect form={form} name="divisionId" label="Division" options={['1', '2', '3', '4', '5']} valueAsNumber />
             }
 
-            {(divisionId || ['Qual', 'Star'].includes(meetType)) &&
-                <>
+
                     <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
 
 
@@ -149,8 +148,7 @@ export const MeetForm = ({
                     }
 
                     <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
-                </>
-            }
+
 
             <div className='flex mx-4 my-4 gap-x-4'>
                 <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>

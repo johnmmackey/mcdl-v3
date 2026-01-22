@@ -3,6 +3,7 @@
 import { auth } from "@/auth"
 import { notFound } from "next/navigation"
 import { GroupedStandings, Season, Division, Team, Meet, DiverScore, Entry, DiverWithSeason, AgeGroup, TeamSeason, MeetUpdateInput, GenericServerActionState, TeamSeasonCreateInput, SeasonCreateUpdateInput } from "./definitions";
+import omit from 'lodash/omit';
 
 import jwt from "jsonwebtoken";
 import { updateTag } from "next/cache";
@@ -203,11 +204,11 @@ export async function deleteMeet(meetId: number): Promise<GenericServerActionSta
     }
 }
 
-export async function createSeason(seasonId: number, season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
+export async function createSeason(season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
     const t = await accessToken();
-    const r = await fetch(`${process.env.DATA_URL}/seasons`, {
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${season.id}`, {
         method: 'POST',
-        body: JSON.stringify({...season, id: seasonId}),
+        body: JSON.stringify(omit(season, ['id'])),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t
@@ -223,11 +224,11 @@ export async function createSeason(seasonId: number, season: SeasonCreateUpdateI
     }
 }
 
-export async function updateSeason(seasonId: number, season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
+export async function updateSeason(season: SeasonCreateUpdateInput): Promise<GenericServerActionState<Season>> {
     const t = await accessToken();
-    const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, {
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${season.id}`, {
         method: 'PATCH',
-        body: JSON.stringify(season),
+        body: JSON.stringify(omit(season, ['id'])),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t
@@ -268,6 +269,26 @@ export async function deleteSeason(seasonId: number): Promise<GenericServerActio
     const t = await accessToken();
     const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}`, {
         method: 'DELETE',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + t
+        },
+    });
+
+    if (r.ok) {
+        updateTag(`seasons`);
+        return { error: null, data: null }
+    } else {
+        const text = await r.text();
+        return { error: { msg: r.statusText + (text ? `: ${text}` : ''), seq: Date.now() }, data: null };
+    }
+}
+
+export async function createStandardMeets(seasonId: number): Promise<GenericServerActionState<null>> {
+    const t = await accessToken();
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}/create-standard-meets`, {
+        method: 'POST',
+        body: JSON.stringify({}),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t

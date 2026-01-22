@@ -17,7 +17,6 @@ import { Season, Team, DivisionAssignment, Division, TeamSeasonCreateInput } fro
 import { createSeason, updateSeason, deleteSeason } from '@/app/lib/data';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
-import { start } from 'node:repl';
 
 const inputSchema = z.object({
     id: z.coerce.number(),
@@ -57,6 +56,7 @@ export const SeasonForm = ({
     const handleDivAssignmentChange = (newAssignments: TeamSeasonCreateInput[]) => {
         // handle the updated division assignments here
         setDivisionAssignments(newAssignments);
+        console.log("Updated Division Assignments:", newAssignments);
     }
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
@@ -68,7 +68,8 @@ export const SeasonForm = ({
                 endDate: new Date(season.id, 7, 1).toISOString(),
                 divisionAssignments 
             };
-           let r = await (newSeason ? createSeason(data.id, extendedData) : updateSeason(season.id,extendedData));
+            console.log(divisionAssignments)
+           let r = await (newSeason ? createSeason(extendedData) : updateSeason(extendedData));
             r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/seasons`);
         });
     }

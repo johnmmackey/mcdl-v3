@@ -4,6 +4,7 @@ import { Meet } from '@/app/lib/definitions'
 
 
 import { MeetForm } from './MeetForm'
+import { de } from 'date-fns/locale';
 
 export default async function Page(props: {
     params: Promise<{ meetId: string }>,
@@ -13,13 +14,16 @@ export default async function Page(props: {
     const currentSeasonId = await fetchCurrentSeasonId();
     const meetId = parseInt(params.meetId) || null;
 
+    let defaultDate = new Date();
+    defaultDate.setHours(0,0,0,0);
+
     const meet: Meet = meetId ? await fetchMeet(meetId) : {
         id:null,
         seasonId: currentSeasonId,
         name: "",
         parentMeet: null,
-        meetDate: new Date().toISOString(),
-        entryDeadline: new Date().toISOString(),
+        meetDate: defaultDate.toISOString(),
+        entryDeadline: defaultDate.toISOString(),
         hostPool: null,
         coordinatorPool: null,
         meetType: 'Dual',

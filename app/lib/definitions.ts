@@ -225,6 +225,7 @@ export type TeamSeason = {
 }
 
 export type SeasonCreateUpdateInput = {
+    id: number,
     name: string,
     startDate: string,
     endDate: string,

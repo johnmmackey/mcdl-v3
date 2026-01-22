@@ -100,7 +100,25 @@ export const DivisionAssignments = ({
         }))
         .filter(dsc => dsc.slotCount)
     );
-    const [orderedTeams, setOrderedTeams] = useState(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
+    const [orderedTeams, setOrderedTeamsLocally] = useState(divAssignments.toSorted((a, b) => a.divisionId - b.divisionId || a.seed - b.seed).map(ts => ts.teamId));
+
+    const setOrderedTeams = (newOrderedTeams: string[]) => {
+        setOrderedTeamsLocally(newOrderedTeams);
+        // set up a data structure to send to the onChange handler
+        if (onChange) {
+            let newAssignments: TeamSeasonCreateInput[] = [];
+            newOrderedTeams.forEach((teamId, index) => {
+                let [divId, seed] = transformIndexToDivSeed(index, divSlotCounts);
+                newAssignments.push({
+                  teamId: teamId,
+                    divisionId: divId,
+                    seed: seed,
+                });
+            })
+            onChange(newAssignments);
+        }
+        return;
+    }
 
     const teamsKeyedById: Record<string, Team> = teams.reduce((acc, team) => {
         acc[team.id] = team;
@@ -133,21 +151,6 @@ export const DivisionAssignments = ({
         // possible we have pushed beyond the end of the available slots so truncate
         newArr.slice(0, totalSeedSlots(divSlotCounts))
         setOrderedTeams(newArr);
-
-        // set up a data structure to send to the onChange handler
-        if (onChange) {
-            let newAssignments: TeamSeasonCreateInput[] = [];
-            newArr.forEach((teamId, index) => {
-                let [divId, seed] = transformIndexToDivSeed(index, divSlotCounts);
-                newAssignments.push({
-                  teamId: teamId,
-                    divisionId: divId,
-                    seed: seed,
-                });
-            })
-            onChange(newAssignments);
-        }
-        return;
     }
 
     const clearAll = () => setOrderedTeams([]);
@@ -257,7 +260,7 @@ export const DivisionAssignments = ({
 
 const Box = (props: { xtraClassName?: string | undefined, ref?: React.Ref<HTMLDivElement>, style?: Record<string, any>, children?: React.ReactNode }) => {
     return (
-        <div className={'w-full min-h-[62px] p-0 m-1 flex justify-center items-center ' + (props.xtraClassName || '')} ref={props.ref} style={props.style} >
+        <div className={'w-full max-w-50 min-h-[62px] p-0 m-1 flex justify-center items-center ' + (props.xtraClassName || '')} ref={props.ref} style={props.style} >
             {props.children}
         </div>
     )

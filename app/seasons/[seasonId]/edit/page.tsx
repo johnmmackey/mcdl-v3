@@ -19,11 +19,14 @@ export default async function Page(props: {
         // new season
         const currentSeasonId = await fetchCurrentSeasonId();
         divAssignments = calcNextSeasonDivAssignments(await fetchTeamsForSeason(currentSeasonId));
+        let defaultDate = new Date();
+        defaultDate.setHours(0, 0, 0, 0);
+
         season = {
             id: currentSeasonId + 1,
-            startDate: new Date().toISOString(),
-            endDate: new Date().toISOString(),
-            week1Date: new Date().toISOString(),
+            startDate: defaultDate.toISOString(),
+            endDate: defaultDate.toISOString(),
+            week1Date: defaultDate.toISOString(),
         } as Season;
     } else if (!isNaN(parseInt(params.seasonId))) {
         season = await fetchSeason(parseInt(params.seasonId))
@@ -43,7 +46,7 @@ const calcNextSeasonDivAssignments = (currentSeason: TeamSeason[]): DivisionAssi
     // check if the current season is valid. If not, not much to be done...
     if (!validateDivisionAssignments(currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }))))
         return [];
-    
+
     // check if the current season is COMPLETE. If not, used old data
     if (!validateDivisionAssignments(currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.fsRank }))))
         return currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }));
