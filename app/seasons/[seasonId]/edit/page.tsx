@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId } from '@/app/lib/data';
+import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId, fetchSeasons } from '@/app/lib/data';
 
 import { SeasonForm } from "./SeasonForm";
 import { Season, DivisionAssignment, TeamSeason } from '@/app/lib/definitions';
@@ -17,13 +17,15 @@ export default async function Page(props: {
 
     if (params.seasonId === '_') {
         // new season
-        const currentSeasonId = await fetchCurrentSeasonId();
-        divAssignments = calcNextSeasonDivAssignments(await fetchTeamsForSeason(currentSeasonId));
+        const seasons = await(fetchSeasons());
+        // Fix. Problem for new season when no seasons exist
+        const maxSeasonId = Math.max(...seasons.map(s => s.id), 1970);
+        divAssignments = calcNextSeasonDivAssignments(await fetchTeamsForSeason(maxSeasonId));
         let defaultDate = new Date();
         defaultDate.setHours(0, 0, 0, 0);
 
         season = {
-            id: currentSeasonId + 1,
+            id: maxSeasonId + 1,
             startDate: defaultDate.toISOString(),
             endDate: defaultDate.toISOString(),
             week1Date: defaultDate.toISOString(),

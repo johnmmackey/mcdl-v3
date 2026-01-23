@@ -61,37 +61,37 @@ export const SeasonForm = ({
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
-            const extendedData = { 
+            const extendedData = {
                 ...data,
                 name: `Season ${season.id}`,
                 startDate: new Date(season.id, 5, 1).toISOString(),
                 endDate: new Date(season.id, 7, 1).toISOString(),
-                divisionAssignments 
+                divisionAssignments
             };
-            console.log(divisionAssignments)
-           let r = await (newSeason ? createSeason(extendedData) : updateSeason(extendedData));
+
+            let r = await (newSeason ? createSeason(extendedData) : updateSeason(extendedData));
             r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/seasons`);
         });
     }
 
-    
+
     const handleDelete = () => {
-            startTransition(async () => {
+        startTransition(async () => {
             let r = await deleteSeason(season.id);
             r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/seasons`);
         });
     }
-        
+
 
     return (
         <form id='seasonForm' onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='max-w-40'>
-            <FormFieldInput form={form} name="id" label="Season ID" disabled={!newSeason} type='number' className='w-full'/>
-            <FormFieldDatePicker name="week1Date" label="Week 1 Date" form={form} />
+                <FormFieldInput form={form} name="id" label="Season ID" disabled={!newSeason} type='number' className='w-full' />
+                <FormFieldDatePicker name="week1Date" label="Week 1 Date" form={form} />
             </div>
 
             <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} onChange={handleDivAssignmentChange} editMode />
-        
+
 
             <div className='flex mx-4 my-4 gap-x-4'>
                 <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
@@ -102,7 +102,7 @@ export const SeasonForm = ({
                     Submit
                 </Button>
 
-                {!newSeason && 
+                {!newSeason &&
                     <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this season?" onConfirm={handleDelete} >
                         <Button type="button" variant="destructive" >Delete Season</Button>
                     </AreYouSure>

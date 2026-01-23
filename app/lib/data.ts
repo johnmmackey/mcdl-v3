@@ -246,9 +246,10 @@ export async function updateSeason(season: SeasonCreateUpdateInput): Promise<Gen
 
 export async function makeSeasonCurrent(seasonId: number): Promise<GenericServerActionState<null>> {
     const t = await accessToken();
-    const r = await fetch(`${process.env.DATA_URL}/seasons/current-season-id`, {
+console.log("Making season current:", seasonId);
+    const r = await fetch(`${process.env.DATA_URL}/seasons/${seasonId}/current-season-id`, {
         method: 'POST',
-        body: JSON.stringify({ id: seasonId }),
+        //body: JSON.stringify({ id: seasonId }),
         headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + t
