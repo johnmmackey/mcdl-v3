@@ -14,6 +14,7 @@ import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
 import { MeetDropDownMenu } from './MeetDropDownMenu';
+import { MeetDisplayName } from './components/MeetDisplayName';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -51,21 +52,14 @@ async function MeetList(props: {
     const smeets = sortBy(meets, ['meetDate', 'divisionId']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
-    const meetName = (m: Meet) => {
-        if (m.name)
-            return m.name;
-
-        const visitingTeams = m.teams.filter(e => e.teamId !== m.hostPool).map(t => kteams[t.teamId].name);
-        return visitingTeams.join(', ') + (m.hostPool ? ' @ ' + kteams[m.hostPool!].name : '');
-    }
     const scoreStr = (m: Meet) => {
         if (!m.scoresPublished || !m.teams.length)
             return '';
         if (m.teams.length > 2)
             return 'Results';
-        return (m.teams.find(e => e.teamId !== m.hostPool)?.score || 0)
+        return (m.teams.find(e => e.teamId !== m.hostPoolId)?.score || 0)
             + ' - '
-            + ((m.teams.find(e => e.teamId === m.hostPool)?.score) || 0);
+            + ((m.teams.find(e => e.teamId === m.hostPoolId)?.score) || 0);
     }
 
     return (
@@ -81,18 +75,16 @@ async function MeetList(props: {
                         <div className='text-center font-semibold'>Score</div>
                     </div>
                     {meets.map((m, k2) =>
-                        <div key={k2} className='group hover:bg-slate-200 grid grid-cols-6 gap-4' >
+                        <Link href={'/meets/' + m.id} key={m.id} className='group hover:bg-slate-200 grid grid-cols-6 gap-4' >
                             <div className='text-center'>{m.divisionId && m.divisionId < 99 ? m.divisionId : 'NDM'}</div>
                             <div className='col-span-3'>
-                                <div>{meetName(m)}</div>
+                                <MeetDisplayName meet={m} />
                             </div>
                             <div className='text-center'>
                                 <div>{scoreStr(m)}</div>
                             </div>
-                            <div className='text-center'>
-                                <MeetDropDownMenu meet={m} />
-                            </div>
-                        </div>
+
+                        </Link>
 
                     )}
                 </div >

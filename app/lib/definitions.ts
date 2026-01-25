@@ -39,7 +39,7 @@ export type Meet = {
     parentMeet: number | null,
     meetDate: string,
     entryDeadline: string | null,
-    hostPool: string | null,
+    hostPoolId: string | null,
     coordinatorPool: string | null,
     meetType: string,
     divisionId: number | null,

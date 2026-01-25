@@ -1,4 +1,5 @@
-import { DivisionAssignment } from "@/app/lib/definitions"
+import { DivisionAssignment, Meet, Team } from "@/app/lib/definitions"
+import { fetchTeams } from "@/app/lib/api";
 
 export function validateDivisionAssignments(divAssignments: DivisionAssignment[]): boolean {
     // tests:
@@ -25,3 +26,12 @@ export function validateDivisionAssignments(divAssignments: DivisionAssignment[]
     }
     return true; // All validations passed
 }
+
+export function mapTeamsById(teams: Team[]): Map<string, Team> {
+    const teamMap = new Map<string, Team>();
+    teams.forEach(team => {
+        teamMap.set(team.id, team);
+    });
+    return teamMap;
+}
+

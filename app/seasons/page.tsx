@@ -1,13 +1,12 @@
 import { Suspense } from 'react';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button'
+import { ActionButton } from '@/app/ui/StandardButtons';
 
 import { fetchTeams, fetchSeasons, fetchDivisions, fetchCurrentSeasonId, fetchTeamsForSeason } from '@/app/lib/data';
-import { SeasonDropDownMenu } from './SeasonDropDownMenu';
 import Loading from '@/app/ui/Loading'
 import { LinkTableRow } from '../ui/LinkTableRow';
-
+import { IconPlus } from '@tabler/icons-react';
 
 
 export default async function Page() {
@@ -18,7 +17,7 @@ export default async function Page() {
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-4">
                 <Link href={`/seasons/_/edit`} >
-                    <Button variant="destructive" >New</Button>
+                    <ActionButton><IconPlus size={24} />New</ActionButton>
                 </Link>
             </div>
             <Table>
