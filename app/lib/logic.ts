@@ -1,4 +1,4 @@
-import { DivisionAssignment, Meet, Team } from "@/app/lib/definitions"
+import { DivisionAssignment, Team } from "@/app/lib/definitions"
 import { fetchTeams } from "@/app/lib/api";
 
 export function validateDivisionAssignments(divAssignments: DivisionAssignment[]): boolean {

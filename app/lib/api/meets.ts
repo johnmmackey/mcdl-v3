@@ -1,7 +1,7 @@
 'use server'
 
 import { updateTag } from "next/cache"
-import { Meet, MeetUpdateInput, DiverScore, Entry, GenericServerActionState } from "../definitions"
+import { MeetWithTeams, MeetUpdateInput, DiverScore, Entry, GenericServerActionState } from "../definitions"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
 import { logEvent } from "../dynamoEventLog"
 import { loggerFactory } from '../logger'
@@ -11,15 +11,15 @@ const logger = loggerFactory({ module: 'meets-api' })
 /**
  * Fetch all meets for a season
  */
-export async function fetchMeets(seasonId: number): Promise<Meet[]> {
-    return apiFetch<Meet[]>(`/meets?season-id=${seasonId}`, { tags: ['meets'] });
+export async function fetchMeets(seasonId: number): Promise<MeetWithTeams[]> {
+    return apiFetch<MeetWithTeams[]>(`/meets?season-id=${seasonId}`, { tags: ['meets'] });
 }
 
 /**
  * Fetch a single meet by ID
  */
-export async function fetchMeet(meetId: number): Promise<Meet> {
-    return apiFetch<Meet>(`/meets/${meetId}`, { tags: [`meet:${meetId}`] });
+export async function fetchMeet(meetId: number): Promise<MeetWithTeams> {
+    return apiFetch<MeetWithTeams>(`/meets/${meetId}`, { tags: [`meet:${meetId}`] });
 }
 
 /**
@@ -39,7 +39,7 @@ export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
 /**
  * Create a new meet
  */
-export async function createMeet(meet: MeetUpdateInput): Promise<GenericServerActionState<Meet>> {
+export async function createMeet(meet: MeetUpdateInput): Promise<GenericServerActionState<MeetWithTeams>> {
     const response = await apiMutate('/meets', 'POST', meet);
 
     if (response.ok) {
@@ -47,13 +47,13 @@ export async function createMeet(meet: MeetUpdateInput): Promise<GenericServerAc
         await logEvent({ eventType: 'app', eventSubType: 'create', text: 'Meet created' });
     }
 
-    return handleMutationResponse<Meet>(response);
+    return handleMutationResponse<MeetWithTeams>(response);
 }
 
 /**
  * Update an existing meet
  */
-export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<GenericServerActionState<Meet>> {
+export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise<GenericServerActionState<MeetWithTeams>> {
     const response = await apiMutate(`/meets/${meetId}`, 'PATCH', meet);
 
     if (response.ok) {
@@ -62,13 +62,13 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
         await logEvent({ eventType: 'app', eventSubType: 'update', text: `Meet ${meetId} updated` });
     }
 
-    return handleMutationResponse<Meet>(response);
+    return handleMutationResponse<MeetWithTeams>(response);
 }
 
 /**
  * Delete a meet
  */
-export async function deleteMeet(meetId: number): Promise<GenericServerActionState<Meet>> {
+export async function deleteMeet(meetId: number): Promise<GenericServerActionState<MeetWithTeams>> {
     const response = await apiMutate(`/meets/${meetId}`, 'DELETE');
 
     if (response.ok) {
@@ -76,7 +76,7 @@ export async function deleteMeet(meetId: number): Promise<GenericServerActionSta
         await logEvent({ eventType: 'app', eventSubType: 'delete', text: `Meet ${meetId} deleted` });
     }
 
-    return handleMutationResponse<Meet>(response);
+    return handleMutationResponse<MeetWithTeams>(response);
 }
 
 /**

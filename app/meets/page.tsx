@@ -8,12 +8,12 @@ import { format } from 'date-fns';
 
 import { Button } from "@/components/ui/button"
 
-import { Meet } from '@/app/lib/definitions'
+import { MeetWithTeams } from '@/app/lib/definitions'
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
-import { MeetDropDownMenu } from './MeetDropDownMenu';
+
 import { MeetDisplayName } from './components/MeetDisplayName';
 
 export default async function Page(props: {
@@ -52,7 +52,7 @@ async function MeetList(props: {
     const smeets = sortBy(meets, ['meetDate', 'divisionId']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
 
-    const scoreStr = (m: Meet) => {
+    const scoreStr = (m: MeetWithTeams) => {
         if (!m.scoresPublished || !m.teams.length)
             return '';
         if (m.teams.length > 2)
@@ -75,7 +75,7 @@ async function MeetList(props: {
                         <div className='text-center font-semibold'>Score</div>
                     </div>
                     {meets.map((m, k2) =>
-                        <Link href={'/meets/' + m.id} key={m.id} className='group hover:bg-slate-200 grid grid-cols-6 gap-4' >
+                        <Link href={'/meets/' + m.id} key={m.id} className='group hover:bg-slate-200 grid grid-cols-6 gap-4 py-1 border-t' >
                             <div className='text-center'>{m.divisionId && m.divisionId < 99 ? m.divisionId : 'NDM'}</div>
                             <div className='col-span-3'>
                                 <MeetDisplayName meet={m} />

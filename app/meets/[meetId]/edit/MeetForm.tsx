@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
 import { Toaster, toast } from 'sonner'
 
-import { Meet, Season } from '@/app/lib/definitions'
+import { MeetWithTeams, Season } from '@/app/lib/definitions'
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
@@ -70,7 +70,7 @@ export const MeetForm = ({
     meet,
     seasons,
 }: Readonly<{
-    meet: Omit<Meet, 'teams'> & { teamList: string[] },
+    meet: Omit<MeetWithTeams, 'teams'> & { teamList: string[] },
     seasons: Season[]
 }>) => {
 
@@ -82,7 +82,7 @@ export const MeetForm = ({
 
     const form = useForm({
         resolver: zodResolver(formValidationSchema),
-        defaultValues: inputSchema.decode(meet)//inputSchema.decode(meet)
+        defaultValues: inputSchema.parse(meet)//inputSchema.decode(meet)
     });
 
     const [seasonId, meetType, divisionId] = useWatch({

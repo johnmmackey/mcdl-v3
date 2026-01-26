@@ -1,4 +1,7 @@
-import { Session } from "next-auth"
+/***
+ * Definitions of types used throughout the application
+ * @deprecated Import from '@/app/lib/types' instead
+ */
 
 export type Team = {
     id: string,
@@ -12,7 +15,16 @@ export type Team = {
     archived: boolean
 }
 
-export type MeetTeam = {
+
+
+// types for joined queries
+type TeamName = {
+    team: {
+        name: string
+    }
+}
+
+type MeetTeam = {
     id: number,
     meetId: number,
     teamId: string,
@@ -22,17 +34,20 @@ export type MeetTeam = {
     meetRankPoints: number
 }
 
-
-export type MeetTeamUpdateInput = {
-    meetId?: number,
-    teamId?: string,
-    score?: number,
-    meetRank?: number,
-    meetRankPeers?: number,
-    meetRankPoints?: number
+type MeetTeamsWithDetail = {
+    teams: (MeetTeam & TeamName)[]
 }
 
-export type Meet = {
+
+
+// For joining host pool name
+type HostPool = {
+    hostPool: {
+        name: string
+    }
+}
+
+type Meet = {
     id: number | null,
     seasonId: number,
     name: string | null,
@@ -43,9 +58,13 @@ export type Meet = {
     coordinatorPool: string | null,
     meetType: string,
     divisionId: number | null,
-    scoresPublished: Date | null,
-    teams: MeetTeam[]
-}
+    scoresPublished: Date | null
+} 
+
+export type MeetWithTeams = Meet & HostPool & MeetTeamsWithDetail;
+
+
+// Create and Update Types
 
 export type MeetCreateInput = {
     seasonId: number,
@@ -75,6 +94,17 @@ export type MeetUpdateInput = {
     //scoresPublished?: string | null
 }
 
+export type MeetTeamUpdateInput = {
+    meetId?: number,
+    teamId?: string,
+    score?: number,
+    meetRank?: number,
+    meetRankPeers?: number,
+    meetRankPoints?: number
+}
+
+
+// Diver Types
 export type DiverSeason = {
     id: number,
     diverId: number,
