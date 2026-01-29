@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/field";
 
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 
 import {
     Select,
@@ -49,12 +50,14 @@ const FormFieldGeneric = ({
     form,
     name,
     label,
+    checkbox = false,
     options,
     render
 }: Readonly<{
     form: UseFormReturn<any>,
     name: string,
     label: string,
+    checkbox?: boolean,
     options?: string[],
     render: (id: string, field: any, fieldState: any) => React.ReactNode
 }>) => {
@@ -68,20 +71,26 @@ const FormFieldGeneric = ({
             render={({ field, fieldState }) => (
                 <Field
                     className='mb-4'
-                    orientation="vertical"
+                    orientation={checkbox ? "horizontal" : "vertical"}
                     data-invalid={fieldState.invalid}
                 >
 
-                    <FieldLabel htmlFor={id}>
-                        {label}
-                    </FieldLabel>
+                    {!checkbox &&
+                        <FieldLabel htmlFor={id}>
+                            {label}
+                        </FieldLabel>
+                    }
 
                     {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />
                     )}
 
-
                     {render(id, field, fieldState)}
+                    {checkbox &&
+                        <FieldLabel htmlFor={id}>
+                            {label}
+                        </FieldLabel>
+                    }
                 </Field>
             )}
         />
@@ -150,7 +159,7 @@ export const FormFieldInput = ({
     )
 }
 
- 
+
 export const FormFieldDatePicker = ({
     form,
     name,
@@ -295,6 +304,31 @@ export const FormFieldMultiSelect = ({
                     </MultiSelectContent>
                 </MultiSelect>
 
+            }
+        />
+    )
+}
+
+export const FormFieldCheckBox = ({
+    form,
+    name,
+    label,
+    disabled = false,
+}: Readonly<{
+    form: UseFormReturn<any>,
+    name: string,
+    label: string,
+    disabled?: boolean
+}>) => {
+
+    return (
+        <FormFieldGeneric
+            form={form}
+            name={name}
+            label={label}
+            checkbox={true}
+            render={(id, field, fieldState) =>
+                <Checkbox id={id} {...field} disabled={disabled} checked={field.value} />
             }
         />
     )

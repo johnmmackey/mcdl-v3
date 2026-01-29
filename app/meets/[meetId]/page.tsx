@@ -52,9 +52,11 @@ export default async function Page(props: {
                     <TabsTrigger value="roster" className='text-lg'>Roster</TabsTrigger>
                     <TabsTrigger value="reports" className='text-lg'>Reports</TabsTrigger>
                 </TabsList>
+                {meet.scoresPublished &&
                 <TabsContent value="results">
                     <MeetResults meet={meet} />
                 </TabsContent>
+                }
                 <TabsContent value="entries">
                     <MeetEntries meet={meet} />
                 </TabsContent>

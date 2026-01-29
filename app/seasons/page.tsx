@@ -41,10 +41,10 @@ export default async function Page() {
                             </TableCell>
 
                             <TableCell className=''>
-                                {new Date(s.startDate).toLocaleDateString()}
+                                {new Date(s.safeStartDate).toLocaleDateString()}
                             </TableCell>
                             <TableCell className=''>
-                                {new Date(s.endDate).toLocaleDateString()}
+                                {new Date(s.safeEndDate).toLocaleDateString()}
                             </TableCell>
                             <TableCell className=''>
                                 {new Date(s.week1Date).toLocaleDateString()}

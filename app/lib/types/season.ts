@@ -41,8 +41,8 @@ export type GroupedStandings = {
 export type Season = {
     id: number,
     name: string,
-    startDate: string,
-    endDate: string,
+    safeStartDate: string,
+    safeEndDate: string,
     week1Date: string
     _count: {
         meets: number

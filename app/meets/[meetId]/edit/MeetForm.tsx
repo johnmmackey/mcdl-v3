@@ -9,9 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from '@/components/ui/button'
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
-import { Toaster, toast } from 'sonner'
+import { toast } from 'sonner'
 
-import { MeetWithTeams, Season } from '@/app/lib/definitions'
+import { MeetEditable } from '@/app/lib/types/meet'
+import { Season } from '@/app/lib/types/season';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
@@ -59,7 +60,7 @@ const formValidationSchema = inputSchema
         if (val.hostPoolId && !val.teamList.includes(val.hostPoolId))
             ctx.addIssue({
                 code: "custom",
-                path: ['hostPool'],
+                path: ['hostPoolId'],
                 message: `Host Pool is not a meet participant`,
             });
     });;
@@ -70,7 +71,7 @@ export const MeetForm = ({
     meet,
     seasons,
 }: Readonly<{
-    meet: Omit<MeetWithTeams, 'teams'> & { teamList: string[] },
+    meet: MeetEditable,
     seasons: Season[]
 }>) => {
 
@@ -133,7 +134,7 @@ export const MeetForm = ({
             }
 
 
-            <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+            <FormFieldSelect form={form} name="hostPoolId" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
 
             {/*
             <FormFieldInput form={form} name="defaultName" label="Default Meet Name" disabled/>
@@ -144,7 +145,7 @@ export const MeetForm = ({
             {['Div', 'Star'].includes(meetType) &&
                 <>
                     <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                    <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+                    <FormFieldSelect form={form} name="coordinatorPoolId" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
                 </>
             }
 

@@ -1,7 +1,7 @@
 'use server'
 
 import { updateTag } from "next/cache"
-import { MeetWithTeams, MeetUpdateInput } from '@/app/lib/types/meet';
+import { MeetWithTeams, MeetUpdateInput, MeetCreateInput } from '@/app/lib/types/meet';
 import  {DiverScore, Entry} from '@/app/lib/types/diver';
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
@@ -41,7 +41,7 @@ export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
 /**
  * Create a new meet
  */
-export async function createMeet(meet: MeetUpdateInput): Promise<GenericServerActionState<MeetWithTeams>> {
+export async function createMeet(meet: MeetCreateInput): Promise<GenericServerActionState<MeetWithTeams>> {
     const response = await apiMutate('/meets', 'POST', meet);
 
     if (response.ok) {

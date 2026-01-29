@@ -11,7 +11,7 @@
 import * as api from './api'
 
 // Re-export types
-export type { GenericServerActionState } from './definitions'
+export type { GenericServerActionState } from './types/baseTypes'
 
 // Client utilities
 export async function accessToken() {

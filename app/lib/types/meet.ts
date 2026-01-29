@@ -41,42 +41,39 @@ type HostPool = {
 // Combined Types used in application
 export type MeetWithTeams = Meet & HostPool & MeetTeamsWithDetail;
 
+// Combined Type for Meet Form
+export type MeetEditable = Omit<Meet, 'id' |'teams' > & {
+    id: number | null
+    teamList: string[]
+}
 
 // Create and Update Types
-
 export type MeetCreateInput = {
     seasonId: number,
-    name?: string | null,
+    customName?: string | null,
     parentMeet?: number | null,
-    meetDate?: string,
+    meetDate: string,
     entryDeadline?: string | null,
-    hostPool?: string | null,
-    coordinatorPool?: string | null,
-    meetType?: string,
+    hostPoolId?: string | null,
+    coordinatorPoolId?: string | null,
+    meetType: string,
     divisionId?: number | null,
     teamList: string[]
-    //scoresPublished?: string | null
+
 }
 
 export type MeetUpdateInput = {
     seasonId?: number,
-    name?: string | null,
+    customName?: string | null,
     parentMeet?: number | null,
     meetDate?: string,
     entryDeadline?: string | null,
-    hostPool?: string | null,
-    coordinatorPool?: string | null,
+    hostPoolId?: string | null,
+    coordinatorPoolId?: string | null,
     meetType?: string,
     divisionId?: number | null,
     teamList: string[]
-    //scoresPublished?: string | null
 }
 
-export type MeetTeamUpdateInput = {
-    meetId?: number,
-    teamId?: string,
-    score?: number,
-    meetRank?: number,
-    meetRankPeers?: number,
-    meetRankPoints?: number
-}
+
+

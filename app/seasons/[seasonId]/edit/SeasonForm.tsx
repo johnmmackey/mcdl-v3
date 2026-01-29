@@ -8,12 +8,13 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from '@/components/ui/button'
-import { FormFieldInput, FormFieldDatePicker } from '@/app/ui/FormFields';
+import { FormFieldInput, FormFieldDatePicker, FormFieldCheckBox } from '@/app/ui/FormFields';
 import { Toaster, toast } from 'sonner'
 
 import { DivisionAssignments } from '../DivisionAssignments';
 
-import { Season, Team, DivisionAssignment, Division, TeamSeasonCreateInput } from '@/app/lib/definitions'
+import { Season, DivisionAssignment, Division, TeamSeasonCreateInput } from '@/app/lib/types/season';
+import { Team } from '@/app/lib/types/team';
 import { createSeason, updateSeason, deleteSeason } from '@/app/lib/data';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
@@ -21,6 +22,7 @@ import { Processing, AreYouSure } from "@/app/ui/Processing"
 const inputSchema = z.object({
     id: z.coerce.number(),
     week1Date: z.iso.datetime({ offset: true }),
+    createStandardMeets: z.boolean().optional().default(true),
 });
 
 // define the schema for the form
@@ -91,6 +93,10 @@ export const SeasonForm = ({
             </div>
 
             <DivisionAssignments teams={teams} divisions={divisions} divAssignments={divAssignments} onChange={handleDivAssignmentChange} editMode />
+
+            <div>
+                <FormFieldCheckBox form={form} name="createStandardMeets" label="Create Standard Meets" />
+            </div>
 
 
             <div className='flex mx-4 my-4 gap-x-4'>

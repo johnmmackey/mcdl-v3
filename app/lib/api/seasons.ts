@@ -2,7 +2,8 @@
 
 import { updateTag } from "next/cache"
 import omit from 'lodash/omit'
-import { Season, TeamSeason, SeasonCreateUpdateInput, GenericServerActionState } from "../definitions"
+import { Season, TeamSeason, SeasonCreateUpdateInput } from "../types/season"
+import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse, createErrorResult } from "./client"
 import { logEvent } from "../dynamoEventLog"
 
@@ -74,7 +75,7 @@ export async function updateSeason(season: SeasonCreateUpdateInput): Promise<Gen
  * Delete a season
  */
 export async function deleteSeason(seasonId: number): Promise<GenericServerActionState<Season>> {
-    const response = await apiMutate(`/seasons/${seasonId}`, 'DELETE');
+    const response = await apiMutate(`/seasons/${seasonId}?force=1`, 'DELETE');
 
     if (response.ok) {
         updateTag('seasons');

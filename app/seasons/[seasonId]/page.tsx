@@ -14,7 +14,6 @@ import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurr
 import { DivisionAssignments } from './DivisionAssignments';
 import { MakeSeasonCurrent } from "./MakeCurrentSeason";
 import { DeleteSeason } from "./DeleteSeason";
-import { CreateStandardMeets } from "./CreateStandardMeets";
 
 
 export default async function Page(props: {
@@ -50,11 +49,9 @@ export default async function Page(props: {
                 {seasonId !== currentSeasonId && season._count.meets > 0 &&
                     <MakeSeasonCurrent seasonId={seasonId} />
                 }
-                {season._count.meets === 0 &&
-                    <CreateStandardMeets seasonId={seasonId} />
-                }
 
-                {seasonId !== currentSeasonId && season._count.meets === 0 &&
+                {/* FIX */}
+                {seasonId !== currentSeasonId && //season._count.meets === 0 &&
                     <DeleteSeason seasonId={seasonId} />
                 }
 
