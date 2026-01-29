@@ -21,12 +21,12 @@ const inputSchema = z.object({
     meetDate: z.iso.datetime({ offset: true }),
     meetType: z.string(),
 
-    name: z.string().nullable(),
+    customName: z.string().nullable(),
 
     entryDeadline: z.iso.datetime({ offset: true }).nullable(),
     divisionId: z.number().nullable(),
-    hostPool: z.string().nullable(),
-    coordinatorPool: z.string().nullable(),
+    hostPoolId: z.string().nullable(),
+    coordinatorPoolId: z.string().nullable(),
 
     teamList: z.string().array()
 });
@@ -56,7 +56,7 @@ const formValidationSchema = inputSchema
                 message: `This meet type must have at least 2 teams`,
             });
         }
-        if (val.hostPool && !val.teamList.includes(val.hostPool))
+        if (val.hostPoolId && !val.teamList.includes(val.hostPoolId))
             ctx.addIssue({
                 code: "custom",
                 path: ['hostPool'],
@@ -99,10 +99,10 @@ export const MeetForm = ({
                 //const ts = r.map(r => ([r.teamId, r.team.name])).sort((a, b) => a[0].localeCompare(b[0]));
                 const ts = r.filter(r => !divisionId || r.divisionId === divisionId).map(r => r.teamId).sort((a, b) => a.localeCompare(b));
                 setActiveTeamIds(ts);
-                if (form.getValues('hostPool') && !ts.includes(form.getValues('hostPool')!))
-                    form.setValue('hostPool', null);
-                if (form.getValues('coordinatorPool') && !ts.includes(form.getValues('coordinatorPool')!))
-                    form.setValue('coordinatorPool', null);
+                if (form.getValues('hostPoolId') && !ts.includes(form.getValues('hostPoolId')!))
+                    form.setValue('hostPoolId', null);
+                if (form.getValues('coordinatorPoolId') && !ts.includes(form.getValues('coordinatorPoolId')!))
+                    form.setValue('coordinatorPoolId', null);
                 form.setValue('teamList', form.getValues('teamList').filter((e: string) => ts.includes(e)));
             });
     }, [seasonId, divisionId, meetType]);
@@ -133,21 +133,22 @@ export const MeetForm = ({
             }
 
 
-                    <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+            <FormFieldSelect form={form} name="hostPool" label="Host Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+
+            {/*
+            <FormFieldInput form={form} name="defaultName" label="Default Meet Name" disabled/>
+            */}
+            <FormFieldInput form={form} name="customName" label="Custom Meet Name" />
 
 
-                    {meetType !== 'Dual' &&
-                        <FormFieldInput form={form} name="name" label="Meet Name" />
-                    }
+            {['Div', 'Star'].includes(meetType) &&
+                <>
+                    <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
+                    <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
+                </>
+            }
 
-                    {['Div', 'Star'].includes(meetType) &&
-                        <>
-                            <FormFieldDatePicker name="entryDeadline" label="Entry Deadline" form={form} />
-                            <FormFieldSelect form={form} name="coordinatorPool" label="Coordinator Pool" options={[...activeTeamIds]} includeEmptyChoice nullForEmpty />
-                        </>
-                    }
-
-                    <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
+            <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
 
 
             <div className='flex mx-4 my-4 gap-x-4'>

@@ -6,4 +6,4 @@
  */
 
 
-export { MeetHeading, MeetScore, AgeGroupGrid } from '../[meetId]/MeetComponents';
+export { MeetScore, AgeGroupGrid } from './MeetResultComponents';

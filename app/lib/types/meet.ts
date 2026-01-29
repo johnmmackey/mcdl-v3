@@ -2,14 +2,15 @@ import { TeamName } from "./team";
 
 /* Base Meet and Meet Team Types from DB */
 type Meet = {
-    id: number | null,
+    id: number,
     seasonId: number,
-    name: string | null,
+    customName: string | null,
+    defaultName: string,
     parentMeet: number | null,
     meetDate: string,
     entryDeadline: string | null,
     hostPoolId: string | null,
-    coordinatorPool: string | null,
+    coordinatorPoolId: string | null,
     meetType: string,
     divisionId: number | null,
     scoresPublished: Date | null

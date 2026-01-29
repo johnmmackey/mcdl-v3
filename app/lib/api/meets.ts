@@ -1,7 +1,9 @@
 'use server'
 
 import { updateTag } from "next/cache"
-import { MeetWithTeams, MeetUpdateInput, DiverScore, Entry, GenericServerActionState } from "../definitions"
+import { MeetWithTeams, MeetUpdateInput } from '@/app/lib/types/meet';
+import  {DiverScore, Entry} from '@/app/lib/types/diver';
+import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
 import { logEvent } from "../dynamoEventLog"
 import { loggerFactory } from '../logger'

@@ -31,7 +31,7 @@ export async function fetchSeason(seasonId: number): Promise<Season> {
  * Fetch team-season assignments for a given season
  */
 export async function fetchTeamsForSeason(seasonId: number): Promise<TeamSeason[]> {
-    return apiFetch<TeamSeason[]>(`/team-seasons?season-id=${seasonId}&include-team-detail=1`);
+    return apiFetch<TeamSeason[]>(`/team-seasons?season-id=${seasonId}`);
 }
 
 /**

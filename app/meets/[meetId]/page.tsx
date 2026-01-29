@@ -4,7 +4,10 @@ import { Button } from '@/components/ui/button';
 import { fetchCurrentSeasonId, fetchMeet, fetchSeasons, fetchTeams } from '@/app/lib/api';
 import { MeetWithTeams } from '@/app/lib/types/meet';
 import { MeetProfileCard } from '@/app/meets/components/MeetProfileCard';
-import { mapTeamsById } from '@/app/lib/logic';
+
+import { MeetResults } from '../components/MeetResults';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MeetEntries } from '../components/MeetEntries';
 
 /**
  * Fetches and displays details of a specific meet.
@@ -37,31 +40,42 @@ export default async function Page(props: {
     return (
 
         <div>
-            <MeetProfileCard meet={meet} />
+            <MeetProfileCard meet={meet} className="mb-8" />
+
+            <Tabs defaultValue="results">
+                <TabsList variant="line">
+                    {meet.scoresPublished &&
+                        <TabsTrigger value="results" className='text-lg'>Results</TabsTrigger>
+                    }
+                    <TabsTrigger value="entries" className='text-lg'>Entries</TabsTrigger>
+                    <TabsTrigger value="scoring" className='text-lg'>Scoring</TabsTrigger>
+                    <TabsTrigger value="roster" className='text-lg'>Roster</TabsTrigger>
+                    <TabsTrigger value="reports" className='text-lg'>Reports</TabsTrigger>
+                </TabsList>
+                <TabsContent value="results">
+                    <MeetResults meet={meet} />
+                </TabsContent>
+                <TabsContent value="entries">
+                    <MeetEntries meet={meet} />
+                </TabsContent>
+
+                <TabsContent value="reports" >
+                    <Link href={`/meets/${meetId}/enter`}>
+                        <Button>Enter Divers</Button>
+                    </Link>
+                    <Link href={`/meets/${meetId}/scoring`}>
+                        <Button>Enter Scores</Button>
+                    </Link>
+                    <Link href={`/meets/${meetId}/roster`}>
+                        <Button>Roster</Button>
+                    </Link>
+                    <Link href={`/meets/${meetId}/labels`}>
+                        <Button>Print Labels</Button>
+                    </Link>
+                </TabsContent>
+            </Tabs>
 
 
-            {/* Additional meet details and edit form can be added here */}
-            <div>
-                <Link href={`/meets/${meetId}/enter`}>
-                    <Button>Enter Divers</Button>
-                </Link>
-                <Link href={`/meets/${meetId}/scoring`}>
-                    <Button>Enter Scores</Button>
-                </Link>
-                <Link href={`/meets/${meetId}/roster`}>
-                    <Button>Roster</Button>
-                </Link>
-                <Link href={`/meets/${meetId}/labels`}>
-                    <Button>Print Labels</Button>
-                </Link>
-                <Link href={`/meets/${meetId}/results`}>
-                    <Button>View Results</Button>
-                </Link>
-
-                <Link href={`/meets/${meetId}/edit`}>
-                    <Button>Edit Meet</Button>
-                </Link>
-            </div>
         </div>
     )
 }

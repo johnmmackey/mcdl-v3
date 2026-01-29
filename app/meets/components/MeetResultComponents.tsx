@@ -1,53 +1,26 @@
 
 import React from 'react';
-import { format } from 'date-fns';
-import { AgeGroup, DiverScore, Meet, Team, Entry } from '@/app/lib/definitions';
-
-export const MeetHeading = ({
-    meet,
-    teams,
-    children,
-}: Readonly<{
-    meet: Meet,
-    teams: Team[],
-    children?: React.ReactNode
-}>) => (
-    <div className="sticky top-0 z-50 bg-white">
-        <h1 className="text-center text-2xl text-bold pt-2">
-            {
-                meet.name
-                || (meet.meetType === 'Dual' && `${team(teams, meet.visitingPool || null)?.name} (${meet.visitingPool}) at ${team(teams, meet.hostPool)?.name} (${meet.hostPool})`)
-                || `Meet ID ${meet.id}`
-            }
-        </h1>
-        <h2 className="text-center text-bold">
-            {format(meet.meetDate, 'PPP')}
-        </h2>
-        <h2 className="text-center text-2xl text-bold py-4">
-            {children}
-        </h2>
-    </div>
-)
+import { MeetWithTeams } from '@/app/lib/types/meet';
+import { AgeGroup } from '@/app/lib/types/diver';
 
 
 export const MeetScore = ({
     meet,
-    teams,
-    children,
 }: Readonly<{
-    meet: Meet,
-    teams: Team[],
-    children?: React.ReactNode
+    meet: MeetWithTeams
 }>) => (
-    <div style={{ maxWidth: '300px' }} className="border-solid border-2 p-4">
+    <div style={{ width: '300px' }} className="border-solid border-2 p-4">
         {meet
             .teams
             .sort((a, b) => b.score - a.score)
             .map((ts, k) =>
-                <div key={k} className='grid grid-cols-4'>
-                    <div className='col-span-3 text-left font-semibold'>
-                        {team(teams, ts.teamId)?.name}</div>
-                    <div className='col-span-1 text-right font-semibold'>{ts.score.toFixed(1)}</div>
+                <div key={k} className='grid grid-cols-4 '>
+                    <div className='col-span-3 text-left font-semibold '>
+                        <span >{ts.team.name}</span>
+                    </div>
+                    <div className='col-span-1 text-right font-semibold font-mono mt-0.5   '>
+                        <span >{ts.score.toFixed(1)}</span>
+                    </div>
                 </div>
             )
         }
@@ -105,5 +78,4 @@ const Placeholder = ({
     )
 }
 
-const team = (teams: Team[], teamId: string | null) => teams.find(e => e.id === teamId);
 
