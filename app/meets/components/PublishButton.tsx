@@ -4,7 +4,7 @@ import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose, DialogFooter } from '@/components/ui/dialog';
 import { Meet } from '@/app/lib/definitions';
-import { setPublishedStatus } from '@/app/lib/data';
+import { setPublishedStatus } from '@/app/lib/api';
 import { useRouter } from 'next/navigation';
 import { meetPermissions } from '@/app/lib/userCan';
 

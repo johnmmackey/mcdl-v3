@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { Button } from "@/components/ui/button"
 
 import { MeetWithTeams } from '@/app/lib/definitions'
-import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/data';
+import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/api';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'

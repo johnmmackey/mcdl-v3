@@ -5,8 +5,7 @@
  * Components are co-located with the season routes for better organization.
  */
 
-export { DivisionAssignments } from '../[seasonId]/DivisionAssignments';
-export { CreateStandardMeets } from '../[seasonId]/CreateStandardMeets';
-export { DeleteSeason } from '../[seasonId]/DeleteSeason';
-export { MakeSeasonCurrent } from '../[seasonId]/MakeCurrentSeason';
-export { SeasonDropDownMenu } from '../SeasonDropDownMenu';
+export { DivisionAssignments } from './DivisionAssignments';
+export { DeleteSeason } from './DeleteSeason';
+export { MakeSeasonCurrent } from './MakeCurrentSeason';
+export { SeasonForm } from './SeasonForm';

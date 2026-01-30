@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { fetchCurrentSeasonId } from '@/app/lib/data';
+import { fetchCurrentSeasonId } from '@/app/lib/api';
  
 export const RedirectToMeets = async () => {
   const csId = await fetchCurrentSeasonId();

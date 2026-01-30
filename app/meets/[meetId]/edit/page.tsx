@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { fetchCurrentSeasonId, fetchMeet, fetchSeasons } from '@/app/lib/data';
+import { fetchCurrentSeasonId, fetchMeet, fetchSeasons } from '@/app/lib/api';
 import {  MeetEditable } from '@/app/lib/types/meet';
 import { MeetForm } from '@/app/meets/[meetId]/edit/MeetForm';
 

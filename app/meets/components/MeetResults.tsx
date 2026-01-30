@@ -1,4 +1,4 @@
-import { fetchTeams, fetchMeet, fetchMeetResults, fetchAgeGroups } from '@/app/lib/data';
+import { fetchTeams, fetchMeet, fetchMeetResults, fetchAgeGroups } from '@/app/lib/api';
 import { MeetScore, AgeGroupGrid } from '@/app/meets/components/MeetResultComponents';
 import { DiverScore, AgeGroup } from '@/app/lib/definitions'
 import { PublishButton } from '@/app/meets/components/PublishButton';

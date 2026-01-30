@@ -3,7 +3,7 @@ import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@
 import Link from 'next/link';
 import { ActionButton } from '@/app/ui/StandardButtons';
 
-import { fetchTeams, fetchSeasons, fetchDivisions, fetchCurrentSeasonId, fetchTeamsForSeason } from '@/app/lib/data';
+import { fetchTeams, fetchSeasons, fetchCurrentSeasonId } from '@/app/lib/api';
 import Loading from '@/app/ui/Loading'
 import { LinkTableRow } from '../ui/LinkTableRow';
 import { IconPlus } from '@tabler/icons-react';
@@ -16,7 +16,7 @@ export default async function Page() {
     return (
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-4">
-                <Link href={`/seasons/_/edit`} >
+                <Link href={`/seasons/new`} >
                     <ActionButton><IconPlus size={24} />New</ActionButton>
                 </Link>
             </div>

@@ -1,9 +1,7 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
-import { fetchTeams, } from '@/app/lib/data';
+import { fetchTeams, } from '@/app/lib/api';
 import Loading from '@/app/ui/Loading'
-import { Team } from '@/app/lib/definitions'
 
 import { LinkTableRow } from '../ui/LinkTableRow';
 

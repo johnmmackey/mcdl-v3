@@ -1,6 +1,6 @@
 
 
-import { fetchMeetEntries, fetchAgeGroups } from '@/app/lib/data';
+import { fetchMeetEntries, fetchAgeGroups } from '@/app/lib/api';
 import strcmp from '@/app/lib/strcmp';
 import { MeetWithTeams } from '@/app/lib/types';
 import { Entry, AgeGroup } from '@/app/lib/types/diver'

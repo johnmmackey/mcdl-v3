@@ -1,11 +1,8 @@
 import { redirect } from 'next/navigation';
-import { startOfDay, addDays, getDay } from 'date-fns';
-import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId, fetchSeasons } from '@/app/lib/data';
+import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason } from '@/app/lib/api';
 
-import { SeasonForm } from "./SeasonForm";
-import { Season, DivisionAssignment, TeamSeason } from '@/app/lib/types/season';
-import { validateDivisionAssignments } from '@/app/lib/logic';
-import { date } from 'zod';
+import { SeasonForm } from "@/app/seasons/components";
+import { Season, DivisionAssignment } from '@/app/lib/types/season';
 
 export default async function Page(props: {
     params: Promise<{ seasonId: string }>,
@@ -17,26 +14,8 @@ export default async function Page(props: {
     let divAssignments: DivisionAssignment[] = [];
     let season: Season;
 
-    if (params.seasonId === '_') {
-        // new season
-        const seasons = await(fetchSeasons());
-        // Fix. Problem for new season when no seasons exist
-        const maxSeasonId = Math.max(...seasons.map(s => s.id), 1970);
-        divAssignments = calcNextSeasonDivAssignments(await fetchTeamsForSeason(maxSeasonId));
 
-        let week1Date = new Date(maxSeasonId + 1, 5, 14);    // Default to June 14th of next year
-        const dayOfWeek = getDay(week1Date); // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-        const daysUntilNextSunday = (7 - dayOfWeek) % 7; // Calculate days until the next Sunday
-        week1Date = addDays(week1Date, daysUntilNextSunday); // Add the days to the current date
-        week1Date = startOfDay(week1Date)
-
-        season = {
-            id: maxSeasonId + 1,
-            //startDate: defaultDate.toISOString(),
-            //endDate: defaultDate.toISOString(),
-            week1Date: week1Date.toISOString(),
-        } as Season;
-    } else if (!isNaN(parseInt(params.seasonId))) {
+    if (!isNaN(parseInt(params.seasonId))) {
         season = await fetchSeason(parseInt(params.seasonId))
         divAssignments = (await fetchTeamsForSeason(parseInt(params.seasonId))).map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }));
     } else {
@@ -44,50 +23,6 @@ export default async function Page(props: {
     }
 
     return (
-        <SeasonForm teams={teams} divisions={divisions} season={season} divAssignments={divAssignments} newSeason={params.seasonId === '_'} />
+        <SeasonForm teams={teams} divisions={divisions} season={season} divAssignments={divAssignments} newSeason={false} />
     )
-}
-
-
-const calcNextSeasonDivAssignments = (currentSeason: TeamSeason[]): DivisionAssignment[] => {
-
-    // check if the current season is valid. If not, not much to be done...
-    if (!validateDivisionAssignments(currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }))))
-        return [];
-
-    // check if the current season is COMPLETE. If not, used old data
-    if (!validateDivisionAssignments(currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.fsRank }))))
-        return currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }));
-
-    const activeDivisions = Array.from(new Set(currentSeason.map(da => da.divisionId)));
-
-    const maxSeedByDivision: { [divisionId: number]: number } = {};
-    currentSeason.forEach(da => {
-        if (!maxSeedByDivision[da.divisionId] || da.seed > maxSeedByDivision[da.divisionId]) {
-            maxSeedByDivision[da.divisionId] = da.seed;
-        }
-    });
-
-    // Simple logic, layout per fsrank: promote top from each division, relegate bottom from each division
-    const newAssignments = currentSeason.map(da => {
-        let newDivisionId = da.divisionId;
-        let newSeed = da.fsRank;
-        // Promote if top seed and not already in top division
-        if (da.fsRank === 1 && da.divisionId > 1) {
-            newDivisionId = da.divisionId - 1;
-            newSeed = maxSeedByDivision[newDivisionId];
-        }
-        // Relegate if bottom seed and not already in bottom division
-        else if (da.fsRank === maxSeedByDivision[da.divisionId] && da.divisionId < activeDivisions.length) {
-            newDivisionId = da.divisionId + 1;
-            newSeed = 1;
-        }
-        return {
-            teamId: da.teamId,
-            divisionId: newDivisionId,
-            seed: newSeed
-        } as DivisionAssignment;
-    })
-
-    return newAssignments;
 }

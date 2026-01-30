@@ -1,18 +1,11 @@
 import Link from 'next/link';
-import { fetchSeasons } from '@/app/lib/data';
+import { fetchSeasons } from '@/app/lib/api';
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -28,8 +21,8 @@ export const SeasonSelector = async ({
 }>) => {
 
   const sortedSeasons = (await fetchSeasons()).sort((a, b) => {
-    if (a.startDate < b.startDate) return 1;
-    if (a.startDate > b.startDate) return -1;
+    if (a.safeStartDate < b.safeStartDate) return 1;
+    if (a.safeStartDate > b.safeStartDate) return -1;
     return 0;
   });
 

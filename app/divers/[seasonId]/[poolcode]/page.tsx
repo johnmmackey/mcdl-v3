@@ -4,7 +4,7 @@ import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 
 import { LinkTableRow } from '@/app/ui/LinkTableRow';
-import { fetchAgeGroups, fetchDivers } from '@/app/lib/data';
+import { fetchAgeGroups, fetchDivers } from '@/app/lib/api';
 
 export default async function Page(props: { params: Promise<{ seasonId: number, teamId: string }> }) {
     const params = await props.params;

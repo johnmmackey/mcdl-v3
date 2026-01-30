@@ -1,4 +1,4 @@
-import { fetchStandings, fetchCurrentSeasonId } from '@/app/lib/data';
+import { fetchStandings, fetchCurrentSeasonId } from '@/app/lib/api';
 import { Fragment } from 'react';
 import {
   Table,

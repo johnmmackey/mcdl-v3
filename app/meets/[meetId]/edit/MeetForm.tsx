@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 
 import { MeetEditable } from '@/app/lib/types/meet'
 import { Season } from '@/app/lib/types/season';
-import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/data';
+import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/api';
 
 import { Processing, AreYouSure } from "@/app/ui/Processing"
 

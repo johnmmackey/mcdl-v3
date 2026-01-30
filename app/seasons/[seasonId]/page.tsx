@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 
-import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId } from '@/app/lib/data';
-import { DivisionAssignments } from './DivisionAssignments';
-import { MakeSeasonCurrent } from "./MakeCurrentSeason";
-import { DeleteSeason } from "./DeleteSeason";
+import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId } from '@/app/lib/api';
+import { DivisionAssignments, MakeSeasonCurrent, DeleteSeason } from '@/app/seasons/components';
 
 
 export default async function Page(props: {

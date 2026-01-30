@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
 import { AgeGroupGrid, } from '../MeetComponents';
 import { Meet, AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
-import { scoreMeet } from '@/app/lib/data'
+import { scoreMeet } from '@/app/lib/api'
 import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
 import { Divide } from 'lucide-react';
