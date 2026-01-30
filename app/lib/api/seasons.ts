@@ -103,20 +103,3 @@ export async function makeSeasonCurrent(seasonId: number): Promise<GenericServer
     return handleMutationResponse<null>(response);
 }
 
-/**
- * Create standard meets for a season
- */
-export async function createStandardMeets(seasonId: number): Promise<GenericServerActionState<null>> {
-    const response = await apiMutate(
-        `/seasons/${seasonId}/create-standard-meets`,
-        'POST',
-        {}
-    );
-
-    if (response.ok) {
-        updateTag('seasons');
-        await logEvent({ eventType: 'app', eventSubType: 'create', text: `Standard meets created for season ${seasonId}` });
-    }
-
-    return handleMutationResponse<null>(response);
-}

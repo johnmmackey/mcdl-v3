@@ -20,6 +20,7 @@ export const loggerFactory = ({ module, subModule }: { module: string, subModule
       ? "debug"
       : process.env.LOG_LEVEL ?? 'info'
   });
+  console.log(`Logger initialized for module: ${module}, level: ${mlogger.level}`);
   return mlogger;
 }
 

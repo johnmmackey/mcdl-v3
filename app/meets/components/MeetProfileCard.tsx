@@ -9,6 +9,8 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
+import { LabelValue } from "@/app/ui/LabelValue";
+
 import { MeetWithTeams } from "@/app/lib/types/meet";
 import { MeetDisplayName } from "./MeetDisplayName";
 
@@ -33,52 +35,18 @@ export const MeetProfileCard = async (props: {
                 </CardAction>
             </CardHeader>
             <CardContent>
-                <div className="flex justify-start gap-1">
-                    <div className="w-24">
-                        <strong>Date:</strong>
-                    </div>
-                    <div className="w-full">
-                        {new Date(props.meet.meetDate).toLocaleDateString()}
-                    </div>
-                </div>
-                <div className="flex justify-start gap-1">
-                    <div className="w-24">
-                        <strong>Type:</strong>
-                    </div>
-                    <div className="w-full">
-                        {props.meet.meetType}
-                    </div>
-                </div>
-                <div className="flex justify-start gap-1">
-                    <div className="w-24">
-                        <strong>Host Pool:</strong>
-                    </div>
-                    <div className="w-full">
-                        {props.meet.hostPool?.name || 'Not set'}
-                    </div>
-                </div>
-                <div className="flex justify-start gap-1">
-                    <div className="w-24">
-                        <strong>Teams:</strong>
-                    </div>
-                    <div className="w-full">
-                        {props.meet.teams.map(t => t.team.name).join(', ')}
-                    </div>
-                </div>
+                <LabelValue label="Date" labelWidth={24} value={new Date(props.meet.meetDate).toLocaleDateString()} />
+                <LabelValue label="Type" labelWidth={24} value={props.meet.meetType} />
+                <LabelValue label="Host Pool" labelWidth={24} value={props.meet.hostPoolId ? teamCompoundName (props.meet.hostPoolId, props.meet.hostPool.name) : 'TBD'} />
+                <LabelValue label="Teams" labelWidth={24} value={props.meet.teams.map(t => teamCompoundName(t.teamId, t.team.name)).join(', ')} />
 
                 {['Div', 'Star'].includes(props.meet.meetType) &&
-                    <div className="flex justify-start gap-1">
-                        <div className="w-24">
-                            <strong>Entry Deadline:</strong>
-                        </div>
-                        <div className="w-full">
-                            {props.meet.entryDeadline && <p><strong>Entry Deadline:</strong> {new Date(props.meet.entryDeadline).toLocaleDateString()}</p>}
-                        </div>
-                    </div>
+                    <LabelValue label="Entry Deadline" labelWidth={24} value={props.meet.entryDeadline ? new Date(props.meet.entryDeadline).toLocaleDateString() : 'n/a'} />
                 }
 
-        </CardContent>
+            </CardContent>
         </Card >
     );
 }
 
+const teamCompoundName = (id: string, name: string) => `${name} (${id})`

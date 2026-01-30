@@ -30,9 +30,7 @@ export const {
   providers: [
     Cognito({
       profile(profile) {
-        console.log('in cognito callback');
-        console.log(profile);
-        logger.debug(profile, 'in cognito callback')
+        logger.debug('in cognito callback', profile)
         return {
           id: profile.sub, // required by the db adapter, ignored if JWT
           sub: profile.sub,
@@ -61,9 +59,11 @@ export const {
     },
 
     async session({ session, user, token }) {
+      // Believe this is called by auth() to get the session object.
+      // Not sure where the user or token come from
       // session in a basic session, user comes from the db adapter (if present), token comes from the jwt callback below
       // copy all the user details in the token to the session user prop
-      // logger.debug({session, user, token}, 'in session callback')
+      logger.debug('in session callback', {session, user, token})
       session.user.id = token.id as string;
       session.user.sub = token.sub as string;
       session.user.givenName = token.givenName as string;
