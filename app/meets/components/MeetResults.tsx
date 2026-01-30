@@ -1,6 +1,6 @@
-import { fetchTeams, fetchMeet, fetchMeetResults, fetchAgeGroups } from '@/app/lib/api';
+import { fetchMeetResults, fetchAgeGroups } from '@/app/lib/api';
 import { MeetScore, AgeGroupGrid } from '@/app/meets/components/MeetResultComponents';
-import { DiverScore, AgeGroup } from '@/app/lib/definitions'
+import { DiverScore, AgeGroup } from '@/app/lib/types/diver';
 import { PublishButton } from '@/app/meets/components/PublishButton';
 import { MeetWithTeams } from '@/app/lib/types';
 
@@ -70,7 +70,9 @@ const ResultsElement = ({ result, meetType, ag }: { result: DiverScore, meetType
         <div className='grid grid-cols-8 hover:bg-slate-200'>
             <div className='col-span-1'>{result.teamId}</div>
             <div className='col-span-3'><span className="font-semibold">{result.diver.lastName}</span>, {result.diver.firstName}</div>
-            <div className='col-span-1 text-right font-mono'>{result.score.toFixed(2)}</div>
+            <div className='col-span-1 text-right'>
+                <span className='font-mono'>{result.score.toFixed(2)}</span>
+            </div>
             <div className="col-span-1 text-center">
                 {meetType != 'Star' &&
                     <span className='font-mono'>{result.points || ''}</span>

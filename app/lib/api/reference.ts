@@ -1,6 +1,6 @@
 'use server'
 
-import { Division, Team, AgeGroup, GroupedStandings, DiverWithSeason } from "../definitions"
+import { Division, Team, AgeGroup, GroupedStandings, DiverWithSeason } from "@/app/lib/types"
 import { apiFetch, getAuthToken } from "./client"
 
 const API_BASE_URL = process.env.DATA_URL;

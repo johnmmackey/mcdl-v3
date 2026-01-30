@@ -11,7 +11,7 @@ import { logEvent } from "../dynamoEventLog"
  * Fetch the current season ID
  */
 export async function fetchCurrentSeasonId(): Promise<number> {
-    return apiFetch<number>('/current-season-id');
+    return apiFetch<number>('/current-season-id', { tags: ['current-season'] });
 }
 
 /**
@@ -96,6 +96,7 @@ export async function makeSeasonCurrent(seasonId: number): Promise<GenericServer
 
     if (response.ok) {
         updateTag('seasons');
+        updateTag('current-season');
         await logEvent({ eventType: 'app', eventSubType: 'update', text: `Season ${seasonId} set as current` });
     }
 

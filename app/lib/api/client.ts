@@ -3,7 +3,7 @@
 import { auth } from "@/auth"
 import { notFound } from "next/navigation"
 import { getAccessToken } from "@/app/lib/accessTokens"
-import { GenericServerActionState } from "../definitions"
+import { GenericServerActionState } from "../types/baseTypes"
 
 /**
  * Base API configuration

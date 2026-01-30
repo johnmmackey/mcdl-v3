@@ -34,7 +34,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 
-import { Team, Season, Division, TeamSeason, TeamSeasonCreateInput, DivisionAssignment } from '@/app/lib/definitions';
+import { Team, Season, Division, TeamSeason, TeamSeasonCreateInput, DivisionAssignment } from '@/app/lib/types';
 
 type divSlotCount = {
     divId: number,

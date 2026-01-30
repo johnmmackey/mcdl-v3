@@ -7,7 +7,6 @@
     "dev-pretty": "next dev --turbopack | pino-pretty",
     "build": "next build",
     "start": "next start",
-    "start-pretty": "next start | pino-pretty",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch"

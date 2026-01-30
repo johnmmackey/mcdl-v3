@@ -18,8 +18,8 @@ export const MeetScore = ({
                     <div className='col-span-3 text-left font-semibold '>
                         <span >{ts.team.name}</span>
                     </div>
-                    <div className='col-span-1 text-right font-semibold font-mono mt-0.5   '>
-                        <span >{ts.score.toFixed(1)}</span>
+                    <div className='col-span-1 text-right font-semibold'>
+                        <span className='font-mono'>{ts.score.toFixed(1)}</span>
                     </div>
                 </div>
             )

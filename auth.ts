@@ -81,7 +81,7 @@ export const {
       // account is the cognito return, with the tokens
       // profile is the cognito profile
       if(user)
-        logger.debug({token, user, account, profile, isNewUser}, 'in jwt callback')
+        logger.debug('in jwt callback', {token, user, account, profile, isNewUser})
       // expose all the Cognito user profile to the token.
       if(user?.id && account)
         await storeAccount(user.id, account);

@@ -3,14 +3,14 @@ import { useState, useOptimistic, useTransition, use } from 'react';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogClose, DialogFooter } from '@/components/ui/dialog';
-import { Meet } from '@/app/lib/definitions';
+import { MeetWithTeams } from '@/app/lib/types';
 import { setPublishedStatus } from '@/app/lib/api';
 import { useRouter } from 'next/navigation';
 import { meetPermissions } from '@/app/lib/userCan';
 
 
 
-export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
+export const PublishButton = (props: { meet: MeetWithTeams, onClick?: () => void }) => {
     const [isPending, startTransition] = useTransition();
     const [opened, setOpended] = useState(false);   
     const open = () => setOpended(true);
@@ -78,7 +78,7 @@ export const PublishButton = (props: { meet: Meet, onClick?: () => void }) => {
     )
 }
 
-export const PublishButton2 = (props: { meet: Meet }) => {
+export const PublishButton2 = (props: { meet: MeetWithTeams }) => {
     const [published, setPublished] = useState(!!props.meet.scoresPublished)
     const publishAction = async () => {
         await setPublishedStatus(props.meet.id, !published)

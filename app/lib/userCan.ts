@@ -1,5 +1,5 @@
 import { Session } from "next-auth";
-import { Meet } from '@/app/lib/definitions';
+import { MeetWithTeams } from '@/app/lib/types';
 
 type Permissions = Record<string, Record<string, (target: any, loggedIn: boolean, roles: Record<string, any>) => boolean>>
 
@@ -10,10 +10,10 @@ const permissions: Permissions = {
     'diver': {}
 }
 
-export function meetPermissions(session: Session | null, meet: Meet) {
+export function meetPermissions(session: Session | null, meet: MeetWithTeams) {
     if (session?.user?.groups?.includes('admin'))
         return (['viewRoster', 'enterScores'])
-    if (session?.user?.groups?.includes(meet.hostPool || ''))
+    if (session?.user?.groups?.includes(meet.hostPoolId || ''))
         return (['viewRoster', 'enterScores'])
     if (session?.user)
         return (['viewRoster'])

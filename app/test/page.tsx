@@ -1,9 +1,8 @@
-import {  accessToken } from '@/app/lib/data';
-
+import { getAccessToken } from "@/app/lib/accessTokens"
 export default async function Page() {
-    const t = await accessToken();
+    //const t = await getAccessToken();
 
     return (
-        <div>Access Token: {t}</div>
+        <div>Access Token: </div>
     )
 }

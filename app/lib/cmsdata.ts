@@ -1,4 +1,4 @@
-import { Posts, Menus, GraphQLPosts, GraphQLMenus } from '@/app/lib/definitions';
+import { Posts, Menus, GraphQLPosts, GraphQLMenus } from '@/app/lib/types';
 
 const postsQuery = new URLSearchParams({
     query: '{posts{edges{node{postacf{expiry order supressTitle template titleIcon} title content}}}}'

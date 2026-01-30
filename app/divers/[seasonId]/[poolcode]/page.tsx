@@ -16,6 +16,7 @@ export default async function Page(props: { params: Promise<{ seasonId: number, 
     //const gDivers = groupBy(sDivers, e => e.ageGroupId);
 
     return (
+        <p>Nothing for now
         {/*
         ageGroups.map((ag, k) =>
             <div key={k} className='my-8'>
@@ -48,6 +49,7 @@ export default async function Page(props: { params: Promise<{ seasonId: number, 
             </div>
         )
             */}
+            </p>
             
     )
 }

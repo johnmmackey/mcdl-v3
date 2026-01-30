@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups, fetchMeetResults } from '@/app/lib/api';
 import ScoreForm from './WrappedScoreForm';
-import { MeetHeading } from '@/app/meets/[meetId]/MeetComponents'
+
 
 export default async function Page(props: { params: Promise<{ meetId: number }> }) {
     const params = await props.params;
@@ -19,7 +19,7 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
     );
     return (
         <div style={{ maxWidth: '800px' }}>
-            <MeetHeading meet={meet} teams={teams}>Meet Scoring</MeetHeading>
+
             {!meet.scoresPublished && !meet.parentMeet &&
                 <ScoreForm meet={meet} ageGroups={ageGroups} meetEntries={meetEntries} meetResults={meetResults} />
             }

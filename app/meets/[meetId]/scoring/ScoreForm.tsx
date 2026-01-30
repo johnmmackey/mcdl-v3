@@ -4,8 +4,9 @@ import React, { useEffect, } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useForm, SubmitHandler, useWatch, UseFormReturn } from "react-hook-form"
-import { AgeGroupGrid, } from '../MeetComponents';
-import { Meet, AgeGroup, Entry, DiverScore } from '@/app/lib/definitions';
+import { AgeGroupGrid, } from '@/app/meets/components';
+import { MeetWithTeams, } from '@/app/lib/types/meet';
+import { AgeGroup, Entry, DiverScore } from '@/app/lib/types/diver';
 import { scoreMeet } from '@/app/lib/api'
 import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
@@ -34,7 +35,7 @@ const ScoreForm = ({
     meetEntries,
     meetResults
 }: Readonly<{
-    meet: Meet,
+    meet: MeetWithTeams,
     ageGroups: AgeGroup[],
     meetEntries: Entry[],
     meetResults: DiverScore[]
@@ -102,7 +103,7 @@ const ScoringHeader = () => (
     </div>
 )
 
-const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, meet: Meet }) => {
+const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: EntryWithResult, k: number, form: UseFormReturn, meet: MeetWithTeams }) => {
     const iV = entry.result;
     const errors = (form.formState.errors?.f as unknown as Array<any>)?.[ag.id]?.[k];
 

@@ -1,5 +1,5 @@
 import { validateDivisionAssignments } from '@/app/lib/logic';
-import { DivisionAssignment } from '@/app/lib/definitions';
+import { DivisionAssignment } from '@/app/lib/types';
 
 describe('validateDivisionAssignments', () => {
   it('should return true for valid division assignments', () => {
