@@ -77,14 +77,6 @@ export const SeasonForm = ({
     }
 
 
-    const handleDelete = () => {
-        startTransition(async () => {
-            let r = await deleteSeason(season.id);
-            r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/seasons`);
-        });
-    }
-
-
     return (
         <form id='seasonForm' onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='max-w-40'>
@@ -108,11 +100,6 @@ export const SeasonForm = ({
                     Submit
                 </Button>
 
-                {!newSeason &&
-                    <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this season?" onConfirm={handleDelete} >
-                        <Button type="button" variant="destructive" >Delete Season</Button>
-                    </AreYouSure>
-                }
             </div>
 
 

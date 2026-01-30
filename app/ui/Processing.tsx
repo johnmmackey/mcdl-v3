@@ -21,7 +21,7 @@ export const Processing = ({
     return (
         <>
             {open &&
-                <div className='absolute top-0 left-0 w-full h-full bg-stone-100/70 z-100 flex justify-center items-center'>
+                <div className='fixed inset-0 bg-stone-100/70 z-100 flex justify-center items-center'>
                     <IconRefresh className="animate-spin text-gray-300" size={128} />
                 </div>
             }

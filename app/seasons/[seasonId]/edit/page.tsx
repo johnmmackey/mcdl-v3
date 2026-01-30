@@ -1,9 +1,11 @@
 import { redirect } from 'next/navigation';
+import { startOfDay, addDays, getDay } from 'date-fns';
 import { fetchTeams, fetchDivisions, fetchSeason, fetchTeamsForSeason, fetchCurrentSeasonId, fetchSeasons } from '@/app/lib/data';
 
 import { SeasonForm } from "./SeasonForm";
-import { Season, DivisionAssignment, TeamSeason } from '@/app/lib/definitions';
+import { Season, DivisionAssignment, TeamSeason } from '@/app/lib/types/season';
 import { validateDivisionAssignments } from '@/app/lib/logic';
+import { date } from 'zod';
 
 export default async function Page(props: {
     params: Promise<{ seasonId: string }>,
@@ -21,14 +23,18 @@ export default async function Page(props: {
         // Fix. Problem for new season when no seasons exist
         const maxSeasonId = Math.max(...seasons.map(s => s.id), 1970);
         divAssignments = calcNextSeasonDivAssignments(await fetchTeamsForSeason(maxSeasonId));
-        let defaultDate = new Date();
-        defaultDate.setHours(0, 0, 0, 0);
+
+        let week1Date = new Date(maxSeasonId + 1, 5, 14);    // Default to June 14th of next year
+        const dayOfWeek = getDay(week1Date); // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+        const daysUntilNextSunday = (7 - dayOfWeek) % 7; // Calculate days until the next Sunday
+        week1Date = addDays(week1Date, daysUntilNextSunday); // Add the days to the current date
+        week1Date = startOfDay(week1Date)
 
         season = {
             id: maxSeasonId + 1,
-            startDate: defaultDate.toISOString(),
-            endDate: defaultDate.toISOString(),
-            week1Date: defaultDate.toISOString(),
+            //startDate: defaultDate.toISOString(),
+            //endDate: defaultDate.toISOString(),
+            week1Date: week1Date.toISOString(),
         } as Season;
     } else if (!isNaN(parseInt(params.seasonId))) {
         season = await fetchSeason(parseInt(params.seasonId))

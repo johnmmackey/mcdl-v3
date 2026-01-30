@@ -56,7 +56,7 @@ export default async function Page(props: {
                 }
 
                 <Link href={`/seasons/${params.seasonId}/edit`}>
-                    <Button variant="destructive" className="justify-self-end">Edit</Button>
+                    <Button variant="outline" className="justify-self-end">Edit</Button>
                 </Link>
             </div>
 

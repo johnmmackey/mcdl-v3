@@ -26,7 +26,7 @@ export const MakeSeasonCurrent = ({
 
     return (
         <>
-            <Button variant='destructive' onClick={handleClick}>Set As Current Season</Button>
+            <Button variant='outline' onClick={handleClick}>Set As Current Season</Button>
             <Processing open={isPending} />
         </>
     )
