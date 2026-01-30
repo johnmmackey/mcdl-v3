@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { fetchCurrentSeasonId, fetchMeet, fetchSeasons } from '@/app/lib/api';
-import {  MeetEditable } from '@/app/lib/types/meet';
-import { MeetForm } from '@/app/meets/[meetId]/edit/MeetForm';
+import { fetchMeet, fetchSeasons } from '@/app/lib/api';
+import { MeetEditable } from '@/app/lib/types/meet';
+import { MeetForm } from '@/app/meets/components';
 
 
 export default async function Page(props: {
@@ -9,41 +9,21 @@ export default async function Page(props: {
 }) {
     const params = await props.params;
     const seasons = await fetchSeasons();
-    const currentSeasonId = await fetchCurrentSeasonId();
-    const meetId = parseInt(params.meetId) || 0;
+    const meetId = parseInt(params.meetId);
+
+    if (!meetId) 
+        notFound();
 
     let meetEditable: MeetEditable;
 
-    if (meetId) {
-        const meet = await fetchMeet(meetId);
-        if (!meet) {
-            notFound();
-        }
-        meetEditable = {
-            ...meet,
-            teamList: meet.teams.map(t => t.teamId)
-        };
-    } else {
-        let defaultDate = new Date();
-        defaultDate.setHours(0, 0, 0, 0);
+    const meet = await fetchMeet(meetId);
+    if (!meet) 
+        notFound();
 
-        meetEditable = {
-            id: null,
-            seasonId: currentSeasonId,
-            customName: "",
-            defaultName: "",
-            parentMeet: null,
-            meetDate: defaultDate.toISOString(),
-            entryDeadline: defaultDate.toISOString(),
-            hostPoolId: null,
-            coordinatorPoolId: null,
-            meetType: 'Dual',
-            divisionId: null,
-            scoresPublished: null,
-            teamList: []
-        };
-    }
-
+    meetEditable = {
+        ...meet,
+        teamList: meet.teams.map(t => t.teamId)
+    };
 
     return (
         <MeetForm meet={meetEditable} seasons={seasons} />

@@ -6,15 +6,16 @@ import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 
-import { Button } from "@/components/ui/button"
+import { ActionButton } from '@/app/ui/StandardButtons';
+import { IconPlus } from '@tabler/icons-react';
 
-import { MeetWithTeams } from '@/app/lib/definitions'
+import { MeetWithTeams } from '@/app/lib/types/meet'
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/api';
 import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
 
-import { MeetDisplayName } from './components/MeetDisplayName';
+import { MeetDisplayName } from './components';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -26,14 +27,12 @@ export default async function Page(props: {
 
     return (
         <>
-            <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-3">
-                    <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-                </div>
+            <div className="flex justify-between mb-4">
+                <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
+                <Link href={`/meets/new`} >
+                    <ActionButton><IconPlus size={24} />New</ActionButton>
+                </Link>
 
-                <div className="col-span-3">
-                    <Link href={"/meets/_/edit"}><Button variant='outline'>Add New</Button></Link>
-                </div>
             </div>
 
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
@@ -63,7 +62,7 @@ async function MeetList(props: {
     }
 
     return (
-        <div style={{ maxWidth: '1000px' }}>
+        <div style={{ maxWidth: '1200px' }}>
             {Object.entries(gmeets).map(([dt, meets], k1) =>
                 <div key={k1} className="border-2 m-8 p-4" >
 
