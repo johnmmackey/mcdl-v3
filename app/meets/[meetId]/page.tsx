@@ -6,6 +6,7 @@ import { MeetWithTeams } from '@/app/lib/types/meet';
 import { MeetProfileCard } from '@/app/meets/components/MeetProfileCard';
 
 import { MeetResults } from '../components/MeetResults';
+import { MeetScore } from '@/app/meets/components/MeetResultComponents';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MeetEntries } from '../components/MeetEntries';
 
@@ -42,8 +43,11 @@ export default async function Page(props: {
         <div>
             <MeetProfileCard meet={meet} className="mb-8" />
 
-            <Tabs defaultValue="results">
+            <Tabs defaultValue="scores">
                 <TabsList variant="line">
+                    {meet.scoresPublished &&
+                        <TabsTrigger value="scores" className='text-lg'>Team Scores</TabsTrigger>
+                    }
                     {meet.scoresPublished &&
                         <TabsTrigger value="results" className='text-lg'>Results</TabsTrigger>
                     }
@@ -53,9 +57,14 @@ export default async function Page(props: {
                     <TabsTrigger value="reports" className='text-lg'>Reports</TabsTrigger>
                 </TabsList>
                 {meet.scoresPublished &&
-                <TabsContent value="results">
-                    <MeetResults meet={meet} />
-                </TabsContent>
+                    <TabsContent value="scores">
+                        <MeetScore meet={meet} />
+                    </TabsContent>
+                }
+                {meet.scoresPublished &&
+                    <TabsContent value="results">
+                        <MeetResults meet={meet} />
+                    </TabsContent>
                 }
                 <TabsContent value="entries">
                     <MeetEntries meet={meet} />

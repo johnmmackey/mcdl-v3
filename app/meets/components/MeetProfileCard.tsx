@@ -13,6 +13,7 @@ import { LabelValue } from "@/app/ui/LabelValue";
 
 import { MeetWithTeams } from "@/app/lib/types/meet";
 import { MeetDisplayName } from "./MeetDisplayName";
+import { MeetScore } from "./MeetResultComponents";
 
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,18 +36,33 @@ export const MeetProfileCard = async (props: {
                 </CardAction>
             </CardHeader>
             <CardContent>
-                <LabelValue label="Date" labelWidth={24} value={new Date(props.meet.meetDate).toLocaleDateString()} />
-                <LabelValue label="Type" labelWidth={24} value={props.meet.meetType} />
-                <LabelValue label="Host Pool" labelWidth={24} value={props.meet.hostPoolId ? teamCompoundName (props.meet.hostPoolId, props.meet.hostPool.name) : 'TBD'} />
-                <LabelValue label="Teams" labelWidth={24} value={props.meet.teams.map(t => teamCompoundName(t.teamId, t.team.name)).join(', ')} />
+                <div className="flex gap-16 justify-start flex-wrap">
+                    <div>
+                        <LabelValue label="Date" labelClassName="w-32" value={new Date(props.meet.meetDate).toLocaleDateString()} />
+                        <LabelValue label="Type" labelClassName="w-32" value={props.meet.meetType} />
+                        <LabelValue label="Host Pool" labelClassName="w-32" value={props.meet.hostPoolId ? <TeamCompoundName id={props.meet.hostPoolId} name={props.meet.hostPool.name} /> : 'TBD'} />
+                        <LabelValue label="Teams" labelClassName="w-32" value={props.meet.teams.map(t => <TeamCompoundName id={t.teamId} name={t.team.name} />)} />
 
-                {['Div', 'Star'].includes(props.meet.meetType) &&
-                    <LabelValue label="Entry Deadline" labelWidth={24} value={props.meet.entryDeadline ? new Date(props.meet.entryDeadline).toLocaleDateString() : 'n/a'} />
-                }
+                        {['Div', 'Star'].includes(props.meet.meetType) &&
+                            <LabelValue label="Entry Deadline" labelClassName="w-32" value={props.meet.entryDeadline ? new Date(props.meet.entryDeadline).toLocaleDateString() : 'n/a'} />
+                        }
+                    </div>
+                </div>
 
             </CardContent>
         </Card >
     );
 }
 
-const teamCompoundName = (id: string, name: string) => `${name} (${id})`
+const TeamCompoundName = (props: { id: string, name: string }) => {
+    return (
+        <>
+            <span className="hidden md:inline">
+                {`${props.name} (${props.id})`}
+            </span>
+            <span className="inline md:hidden">
+                {`${props.id}`}
+            </span>
+        </>
+    );
+}

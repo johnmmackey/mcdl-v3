@@ -20,13 +20,7 @@ export async function MeetResults(props: { meet: MeetWithTeams }) {
             {/* Fix: authorization issue here */}
             <div className='flex justify-between'>
  
-                <div>
-                    {/* Team Score */}
-                    {props.meet.meetType != 'Star' &&
 
-                        <MeetScore meet={props.meet} />
-                    }
-                </div>
                                <PublishButton meet={props.meet} />
             </div>
             <AgeGroupGrid

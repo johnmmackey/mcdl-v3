@@ -53,7 +53,7 @@ export const storeAccount = async (userId: string, account: Account): Promise<vo
   logger.debug(`storing account`);
 
   await client.set(
-    process.env.UPSTASH_BASE_KEY_PREFIX + userId,
+    process.env.REDIS_KEY_PREFIX  ?? '' + userId,
     JSON.stringify(account),
     {
       EXAT: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60)
@@ -69,7 +69,7 @@ let activeRefreshes: ActiveRefresh[] = [];
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (userId: string): Promise<string | undefined> => {
   logger.debug(`getting access token`);
-  let account:Account = JSON.parse(await client.get(process.env.UPSTASH_BASE_KEY_PREFIX + userId) as string);
+  let account:Account = JSON.parse(await client.get(process.env.REDIS_KEY_PREFIX  ?? '' + userId) as string);
   logger.debug(`access token found`); 
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
@@ -95,7 +95,7 @@ export const getAccessToken = async (userId: string): Promise<string | undefined
   const newTokens = await promiseOfRefreshedTokens;
 
   const newAccount = { ...account, id_token: newTokens.id_token, access_token: newTokens.access_token, expires_at: Math.floor(Date.now() / 1000) + newTokens.expires_in };
-  await storeAccount(process.env.UPSTASH_BASE_KEY_PREFIX + userId, newAccount);
+  await storeAccount(process.env.REDIS_KEY_PREFIX  ?? '' + userId, newAccount);
 
   // all cleaned up with new kv in redis, so can allow new token refreshes
   // race condition potential here, but I believe this works
