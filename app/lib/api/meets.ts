@@ -120,3 +120,16 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
         text: `Meet ${meetId} ${status ? 'published' : 'unpublished'}`
     });
 }
+
+
+export async function fetchLabels(meetId: number, options: Record<string, unknown>): Promise<Blob> {
+    return apiFetch<Blob>(`/meets/${meetId}/labels?${toQueryString(options)}`, { cache: 'no-store', blob: true });
+}
+
+function toQueryString(params: Record<string, unknown>): string {
+  return new URLSearchParams(
+    Object.entries(params)
+      .filter(([, value]) => value !== undefined && value !== null && value !== false)
+      .map(([key, value]) => [key, String(value)])
+  ).toString();
+}

@@ -21,7 +21,6 @@ export {
     updateSeason,
     deleteSeason,
     makeSeasonCurrent,
-    createStandardMeets
 } from './seasons';
 
 // Meet operations
@@ -34,7 +33,8 @@ export {
     updateMeet,
     deleteMeet,
     scoreMeet,
-    setPublishedStatus
+    setPublishedStatus,
+    fetchLabels
 } from './meets';
 
 // Reference data

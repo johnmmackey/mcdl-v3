@@ -22,7 +22,7 @@ const DEFAULT_CACHE_CONFIG = {
  */
 export async function apiFetch<T>(
     endpoint: string,
-    options?: RequestInit & { tags?: string[] }
+    options?: RequestInit & { tags?: string[], blob?: boolean }
 ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     const { tags, ...fetchOptions } = options || {};
@@ -42,8 +42,7 @@ export async function apiFetch<T>(
         const text = await response.text();
         throw new Error(`Error fetching ${url}: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`);
     }
-
-    return response.json();
+    return options?.blob ? response.blob() as Promise<T> : response.json();
 }
 
 /**

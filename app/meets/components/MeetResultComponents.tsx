@@ -3,6 +3,7 @@ import React from 'react';
 import { MeetWithTeams } from '@/app/lib/types/meet';
 import { AgeGroup } from '@/app/lib/types/diver';
 import { LabelValue } from '@/app/ui/LabelValue';
+import { TeamCompoundName } from '@/app/teams/components/TeamCompoundName';
 
 
 export const MeetScore = ({
@@ -10,42 +11,42 @@ export const MeetScore = ({
 }: Readonly<{
     meet: MeetWithTeams
 }>) => (
-        <div className='grid grid-cols-[auto_auto_1fr] gap-x-4 gap-y-0 mt-8 mx-8'>
-            {meet
-                .teams
-                .sort((a, b) => b.score - a.score)
-                .map((ts, k) =>
-                    <>
+    <div className='inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-0 mt-8 mx-8'>
+        {meet
+            .teams
+            .sort((a, b) => b.score - a.score)
+            .map((ts, k) =>
+                <LabelValue
+                    key={ts.teamId}
+                    label={<TeamCompoundName id={ts.teamId} name={ts.team.name} />}
+                    value={<span className='font-mono'>{ts.score.toFixed(1)}</span>}
+                />
+            )
+        }
+    </div>
+)
+
+export const MeetScoreX = ({
+    meet,
+}: Readonly<{
+    meet: MeetWithTeams
+}>) => (
+    <div className='inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-0 mt-8 mx-8'>
+        {meet
+            .teams
+            .sort((a, b) => b.score - a.score)
+            .map((ts, k) =>
+                <>
                     <div key={ts.teamId} className=''>
                         <strong>{ts.team.name}</strong>
                     </div>
                     <div key={ts.teamId + '-score'} className='text-right '>
                         <span className='font-mono'>{ts.score.toFixed(1)}</span>
                     </div>
-                    <div key={ts.teamId + '-padding'} className='text-left '>
-                        <span className='font-mono'>&nbsp;</span>
-                    </div>
-                    </>
-                )
-            }
-        </div>
-)
-
-export const MeetScore2 = ({
-    meet,
-}: Readonly<{
-    meet: MeetWithTeams
-}>) => (
-<div className="grid grid-cols-[auto_1fr] gap-4">
-  <div className="bg-gray-200 p-4">
-
-    This column adjusts to the size of its content.
-  </div>
-  <div className="bg-gray-300 p-4">
-
-    This column takes up the remaining space.
-  </div>
-</div>
+                </>
+            )
+        }
+    </div>
 )
 
 export const AgeGroupGrid = ({
