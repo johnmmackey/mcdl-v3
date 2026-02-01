@@ -2,7 +2,6 @@ import NextAuth from "next-auth"
 import Cognito from "next-auth/providers/cognito"
 import { Account } from "@auth/core/types"
 import { storeAccount } from "./app/lib/accessTokens"
-import { Redis } from "@upstash/redis"
 import { loggerFactory } from '@/app/lib/logger'
 
 const logger = loggerFactory({module: 'auth'})
@@ -25,7 +24,6 @@ export const {
   handlers: { GET, POST },
   auth,
 } = NextAuth({
-  //adapter: UpstashRedisAdapter(redis, upStashOpt) as Adapter,
   debug: false,
   providers: [
     Cognito({

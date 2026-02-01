@@ -38,8 +38,16 @@ type HostPool = {
     }
 }
 
+// for score count
+type ScoreCount = {
+    _count: {
+        scores: number
+    }
+}
+
 // Combined Types used in application
 export type MeetWithTeams = Meet & HostPool & MeetTeamsWithDetail;
+export type MeetWithTeamsAndScoreCount = Meet & HostPool & MeetTeamsWithDetail & ScoreCount;
 
 // Combined Type for Meet Form
 export type MeetEditable = Omit<Meet, 'id' |'teams' > & {

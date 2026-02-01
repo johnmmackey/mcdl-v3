@@ -11,19 +11,28 @@ export const MeetScore = ({
 }: Readonly<{
     meet: MeetWithTeams
 }>) => (
-    <div className='inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-0 mt-8 mx-8'>
-        {meet
-            .teams
-            .sort((a, b) => b.score - a.score)
-            .map((ts, k) =>
-                <LabelValue
-                    key={ts.teamId}
-                    label={<TeamCompoundName id={ts.teamId} name={ts.team.name} />}
-                    value={<span className='font-mono'>{ts.score.toFixed(1)}</span>}
-                />
-            )
-        }
-    </div>
+    <>
+        <div>
+            <strong>
+                {!meet.scoresPublished && 
+                    '(Unpublished) '}
+                Team Scores:
+            </strong>
+        </div>
+        <div className='inline-grid grid-cols-[auto_auto] gap-x-4 gap-y-0 mx-8'>
+            {meet
+                .teams
+                .sort((a, b) => b.score - a.score)
+                .map((ts, k) =>
+                    <LabelValue
+                        key={ts.teamId}
+                        label={<><TeamCompoundName id={ts.teamId} name={ts.team.name} />:</>}
+                        value={<span className='font-mono'>{ts.score.toFixed(1)}</span>}
+                    />
+                )
+            }
+        </div>
+    </>
 )
 
 export const MeetScoreX = ({

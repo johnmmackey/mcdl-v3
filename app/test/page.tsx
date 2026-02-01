@@ -1,8 +1,18 @@
+
+import { auth } from "@/auth";
 import { getAccessToken } from "@/app/lib/accessTokens"
 export default async function Page() {
-    //const t = await getAccessToken();
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Authentication required');
+    }
+    const token = await getAccessToken(session.user.id as string);
 
     return (
-        <div>Access Token: </div>
+        <>
+        
+            <div className="w-full text-wrap wrap-break-word">Access Token: {token}</div>
+            
+        </>
     )
 }

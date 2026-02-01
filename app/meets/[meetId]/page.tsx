@@ -43,11 +43,8 @@ export default async function Page(props: {
         <div>
             <MeetProfileCard meet={meet} className="mb-8" />
 
-            <Tabs defaultValue="scores">
+            <Tabs defaultValue="results">
                 <TabsList variant="line">
-                    {meet.scoresPublished &&
-                        <TabsTrigger value="scores" className='text-lg'>Team Scores</TabsTrigger>
-                    }
                     {meet.scoresPublished &&
                         <TabsTrigger value="results" className='text-lg'>Results</TabsTrigger>
                     }
@@ -56,11 +53,7 @@ export default async function Page(props: {
                     <TabsTrigger value="roster" className='text-lg'>Roster</TabsTrigger>
                     <TabsTrigger value="reports" className='text-lg'>Reports</TabsTrigger>
                 </TabsList>
-                {meet.scoresPublished &&
-                    <TabsContent value="scores">
-                        <MeetScore meet={meet} />
-                    </TabsContent>
-                }
+
                 {meet.scoresPublished &&
                     <TabsContent value="results">
                         <MeetResults meet={meet} />

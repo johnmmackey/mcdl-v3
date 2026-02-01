@@ -1,7 +1,7 @@
 'use server'
 
 import { updateTag } from "next/cache"
-import { MeetWithTeams, MeetUpdateInput, MeetCreateInput } from '@/app/lib/types/meet';
+import { MeetWithTeams, MeetWithTeamsAndScoreCount, MeetUpdateInput, MeetCreateInput } from '@/app/lib/types/meet';
 import  {DiverScore, Entry} from '@/app/lib/types/diver';
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
@@ -20,8 +20,8 @@ export async function fetchMeets(seasonId: number): Promise<MeetWithTeams[]> {
 /**
  * Fetch a single meet by ID
  */
-export async function fetchMeet(meetId: number): Promise<MeetWithTeams> {
-    return apiFetch<MeetWithTeams>(`/meets/${meetId}`, { tags: [`meet:${meetId}`] });
+export async function fetchMeet(meetId: number): Promise<MeetWithTeamsAndScoreCount> {
+    return apiFetch<MeetWithTeamsAndScoreCount>(`/meets/${meetId}`, { tags: [`meet:${meetId}`] });
 }
 
 /**
