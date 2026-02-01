@@ -5,20 +5,19 @@ import { loggerFactory } from '@/app/lib/logger'
 const id = Date.now();
 const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
 
-const client = createClient({
+const globalForRedis = global;
+const client = globalForRedis.redis || createClient({
   username: process.env.REDIS_USERNAME!,
   password: process.env.REDIS_PASSWORD!,
   socket: {
     host: process.env.REDIS_HOST!,
     port: parseInt(process.env.REDIS_PORT!),
   },
-
 });
 
+if (process.env.NODE_ENV !== 'production') globalForRedis.redis = client;
+
 client.on('error', err => logger.error('Redis Client Error:' +err));
-logger.debug('creating REDIS client...');
-logger.debug({a:1, b:2});
-logger.debug('combo message',{a:1, b:2})
 await client.connect();
 
 interface RefreshResponse extends Record<string, string | number> {
