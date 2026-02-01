@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link"
-
+import { useRouter } from "next/navigation";
 
 import {
     DropdownMenu,
@@ -29,12 +29,12 @@ import {
 import { ActionButton } from "@/app/ui/StandardButtons";
 import { MeetWithTeams } from "@/app/lib/types";
 
-import { fetchLabels } from "@/app/lib/api/meets"
+import { fetchLabels, deleteMeet } from "@/app/lib/api/meets"
 import { saveToFile } from "@/app/lib/saveToFile"
 import { ActionDialog } from "@/app/ui/ActionDialog";
 import { ChevronDown } from "lucide-react";
 
-type DialogNames = 'labels' | 'billing' | 'subscription' | null;
+type DialogNames = 'labels' | 'billing' | 'delete' | null;
 
 export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
     const [openDialog, setOpenDialog] = useState(null as DialogNames);
@@ -64,7 +64,7 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Subscription</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOpenDialog('delete')}>Delete</DropdownMenuItem>
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -72,6 +72,11 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
             <LabelsDialog
                 isOpen={openDialog === 'labels'}
                 onOpenChange={(open) => setOpenDialog(open ? 'labels' : null)}
+                meetId={meet.id}
+            />
+            <DeleteDialog
+                isOpen={openDialog === 'delete'}
+                onOpenChange={(open) => setOpenDialog(open ? 'delete' : null)}
                 meetId={meet.id}
             />
 
@@ -150,6 +155,39 @@ const LabelsDialog = ({
                     </FieldGroup>
                 </FieldSet>
             </FieldGroup>
+        </ActionDialog>
+    )
+};
+
+
+const DeleteDialog = ({
+    isOpen,
+    meetId,
+    onOpenChange,
+
+}: {
+    isOpen: boolean;
+    meetId: number;
+    onOpenChange: (open: boolean) => void;
+}) => {
+    const router = useRouter();
+
+    const actionHandler = async () => {
+        await deleteMeet(meetId);
+        router.back();
+    }
+
+    return (
+        <ActionDialog
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+            title="Delete Meet"
+            description="Are you sure you want to delete this meet?"
+            actionName="Delete"
+            actionHandler={actionHandler}
+            dangerMode={true}
+        >
+            <p className="text-red-600">This action cannot be undone.</p>
         </ActionDialog>
     )
 };

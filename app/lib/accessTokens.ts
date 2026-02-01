@@ -1,24 +1,61 @@
 import { Account } from "@auth/core/types"
-import { createClient } from '@redis/client';
+import { createClient, RedisClientType } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
 
 const id = Date.now();
 const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
 
-const globalForRedis = global;
-const client = globalForRedis.redis || createClient({
-  username: process.env.REDIS_USERNAME!,
-  password: process.env.REDIS_PASSWORD!,
-  socket: {
-    host: process.env.REDIS_HOST!,
-    port: parseInt(process.env.REDIS_PORT!),
-  },
-});
+console.log(`AccessTokens module initialized with id ${id}`);
 
-if (process.env.NODE_ENV !== 'production') globalForRedis.redis = client;
+// Extend global type for TypeScript
+declare global {
+  // eslint-disable-next-line no-var
+  var redis: RedisClientType | undefined;
+}
 
-client.on('error', err => logger.error('Redis Client Error:' +err));
-await client.connect();
+async function createRedisClient(): Promise<RedisClientType> {
+  console.log('Creating new Redis client');
+  const client = createClient({
+    username: process.env.REDIS_USERNAME!,
+    password: process.env.REDIS_PASSWORD!,
+    socket: {
+      host: process.env.REDIS_HOST!,
+      port: parseInt(process.env.REDIS_PORT!),
+    },
+  });
+
+  client.on('error', err => logger.error('Redis Client Error:' + err));
+  await client.connect();
+  return client as RedisClientType;
+}
+
+async function getRedisClient(): Promise<RedisClientType> {
+  if (global.redis) {
+    console.log('Reusing existing Redis client');
+    return global.redis;
+  }
+
+  const client = await createRedisClient();
+  
+  // In development, save to global to persist across hot reloads
+  if (process.env.NODE_ENV !== 'production') {
+    global.redis = client;
+  }
+
+  console.log(`Redis client created and cached: ${!!global.redis}`);
+  return client;
+}
+
+// Lazy-initialized client getter
+const getClient = (() => {
+  let clientPromise: Promise<RedisClientType> | null = null;
+  return () => {
+    if (!clientPromise) {
+      clientPromise = getRedisClient();
+    }
+    return clientPromise;
+  };
+})();
 
 interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
@@ -50,9 +87,10 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
 
 export const storeAccount = async (userId: string, account: Account): Promise<void> => {
   logger.debug(`storing account`);
+  const client = await getClient();
 
   await client.set(
-    process.env.REDIS_KEY_PREFIX  ?? '' + userId,
+    process.env.REDIS_KEY_PREFIX ?? '' + userId,
     JSON.stringify(account),
     {
       EXAT: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60)
@@ -68,8 +106,9 @@ let activeRefreshes: ActiveRefresh[] = [];
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (userId: string): Promise<string | undefined> => {
   logger.debug(`getting access token`);
-  let account:Account = JSON.parse(await client.get(process.env.REDIS_KEY_PREFIX  ?? '' + userId) as string);
-  logger.debug(`access token found`); 
+  const client = await getClient();
+  let account: Account = JSON.parse(await client.get(process.env.REDIS_KEY_PREFIX ?? '' + userId) as string);
+  logger.debug(`access token found`);
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
   if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
@@ -94,7 +133,7 @@ export const getAccessToken = async (userId: string): Promise<string | undefined
   const newTokens = await promiseOfRefreshedTokens;
 
   const newAccount = { ...account, id_token: newTokens.id_token, access_token: newTokens.access_token, expires_at: Math.floor(Date.now() / 1000) + newTokens.expires_in };
-  await storeAccount(process.env.REDIS_KEY_PREFIX  ?? '' + userId, newAccount);
+  await storeAccount(process.env.REDIS_KEY_PREFIX ?? '' + userId, newAccount);
 
   // all cleaned up with new kv in redis, so can allow new token refreshes
   // race condition potential here, but I believe this works

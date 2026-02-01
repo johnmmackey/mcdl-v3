@@ -22,6 +22,7 @@ export const ActionDialog = ({
     description = '',
     actionName = '',
     actionHandler = () => { },
+    dangerMode = false,
 }: {
     isOpen: boolean,
     onOpenChange: (open: boolean) => void,
@@ -30,6 +31,7 @@ export const ActionDialog = ({
     description: string,
     actionName: string,
     actionHandler: () => void,
+    dangerMode?: boolean,
 }) => {
         const [isPending, startTransition] = useTransition();
 
@@ -51,7 +53,7 @@ export const ActionDialog = ({
                 {children}
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button onClick={handleAction} variant="outline">{actionName}</Button>
+                        <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>

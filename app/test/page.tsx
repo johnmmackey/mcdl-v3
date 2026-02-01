@@ -1,4 +1,3 @@
-
 import { auth } from "@/auth";
 import { getAccessToken } from "@/app/lib/accessTokens"
 export default async function Page() {
@@ -10,9 +9,10 @@ export default async function Page() {
 
     return (
         <>
-        
-            <div className="w-full text-wrap wrap-break-word">Access Token: {token}</div>
-            
+            <div className="w-full break-words break-all">
+                Access Token:<br />
+                {token}
+            </div>  
         </>
     )
 }

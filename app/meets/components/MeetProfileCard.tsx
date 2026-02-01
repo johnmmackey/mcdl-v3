@@ -35,10 +35,7 @@ export const MeetProfileCard = async ({
             <CardHeader>
                 <CardTitle><MeetDisplayName meet={meet} /></CardTitle>
                 <CardAction>
-
                     <MeetActionsDropDown meet={meet} />
-
-
                 </CardAction>
             </CardHeader>
             <CardContent>
