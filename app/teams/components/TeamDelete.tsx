@@ -1,35 +1,32 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { ActionDialog } from "@/app/ui/ActionDialog";
 import { useRouter } from "next/navigation";
 import { deleteTeam } from "@/app/lib/api/teams";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-
 export const TeamDelete = ({
-    teamId
+    teamId,
+    children,
 }: {
     teamId: string;
+    children: React.ReactElement<{ onClick?: () => void }>; // Ensure children can accept an onClick prop
 }) => {
-    type DialogNames = 'delete' | null;
 
+    const [isOpen, setOpenDialog] = useState<boolean>(false);
 
-    const [openDialog, setOpenDialog] = useState(null as DialogNames);
-
-    const handleDialogClose = () => {
-        setOpenDialog(null);
+    const handleClick = () => {
+        setOpenDialog(true);
     };
 
     return (
         <>
-            <Button size="icon" variant="outline" onClick={() => setOpenDialog('delete')}><Trash2 /></Button>
+            {React.cloneElement(children, { onClick: handleClick })}
             <DeleteDialog
                 teamId={teamId}
-                isOpen={openDialog === 'delete'}
-                onOpenChange={(open) => setOpenDialog(open ? 'delete' : null)}
+                isOpen={isOpen}
+                onOpenChange={() => setOpenDialog(!isOpen)}
             />
         </>
     );

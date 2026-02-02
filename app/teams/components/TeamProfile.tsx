@@ -4,7 +4,7 @@ import Link from "next/link";
 import { LabelValue } from "@/app/ui/LabelValue";
 
 import { Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, } from "@/components/ui/button";
 import { TeamWithTeamSeasons } from "@/app/lib/types";
 import { TeamDelete } from "./TeamDelete";
 
@@ -35,7 +35,9 @@ export const TeamProfile = async ({
                     <Link href={`/teams/${team.id}/edit`} className="text-sm">
                         <Button size="icon" variant="outline"><Pencil /></Button>
                     </Link>
-                    <TeamDelete teamId={team.id} />
+                    <TeamDelete teamId={team.id} >
+                        <Button size="icon" variant="outline" ><Trash2 /></Button>
+                    </TeamDelete>
                 </CardAction>
             </CardHeader>
             <CardContent>
