@@ -1,3 +1,4 @@
+import React, {useState} from "react";
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button"
@@ -66,24 +67,23 @@ export const ActionDialog = ({
 }
 
 export const ActionDialog2 = ({
-    isOpen,
-    onOpenChange,
     children,
     title = '',
     description = '',
     actionName = '',
     actionHandler = () => { },
     dangerMode = false,
+    trigger
 }: {
-    isOpen: boolean,
-    onOpenChange: (open: boolean) => void,
     children: React.ReactNode,
     title: string,
     description: string,
     actionName: string,
     actionHandler: () => void,
     dangerMode?: boolean,
+    trigger: React.ReactElement<{ onClick?: () => void }>;
 }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const handleAction = () => {
@@ -93,7 +93,11 @@ export const ActionDialog2 = ({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <>
+        {React.cloneElement(trigger, {
+            onClick: () => setIsOpen(true)
+        })}
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
@@ -113,5 +117,6 @@ export const ActionDialog2 = ({
             </DialogContent>
             <Processing open={isPending} />
         </Dialog>
+        </>
     )
 }

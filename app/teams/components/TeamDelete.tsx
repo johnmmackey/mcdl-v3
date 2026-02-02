@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
 
-import { ActionDialog } from "@/app/ui/ActionDialog";
+import { ActionDialog2 } from "@/app/ui/ActionDialog";
 import { useRouter } from "next/navigation";
 import { deleteTeam } from "@/app/lib/api/teams";
 import { toast } from "sonner";
+
 
 export const TeamDelete = ({
     teamId,
@@ -12,35 +13,6 @@ export const TeamDelete = ({
 }: {
     teamId: string;
     children: React.ReactElement<{ onClick?: () => void }>; // Ensure children can accept an onClick prop
-}) => {
-
-    const [isOpen, setOpenDialog] = useState<boolean>(false);
-
-    const handleClick = () => {
-        setOpenDialog(true);
-    };
-
-    return (
-        <>
-            {React.cloneElement(children, { onClick: handleClick })}
-            <DeleteDialog
-                teamId={teamId}
-                isOpen={isOpen}
-                onOpenChange={() => setOpenDialog(!isOpen)}
-            />
-        </>
-    );
-}
-
-const DeleteDialog = ({
-    isOpen,
-    teamId,
-    onOpenChange,
-
-}: {
-    isOpen: boolean;
-    teamId: string;
-    onOpenChange: (open: boolean) => void;
 }) => {
     const router = useRouter();
 
@@ -51,16 +23,15 @@ const DeleteDialog = ({
     }
 
     return (
-        <ActionDialog
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
+        <ActionDialog2
             title="Delete Team"
             description="Are you sure you want to delete this team?"
             actionName="Delete"
             actionHandler={actionHandler}
             dangerMode={true}
+            trigger={children}
         >
             <p className="text-red-600">This action cannot be undone.</p>
-        </ActionDialog>
+        </ActionDialog2>
     )
 };
