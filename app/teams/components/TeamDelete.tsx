@@ -21,6 +21,7 @@ export const TeamDelete = ({
 
     return (
         <ActionDialog2
+            id="team-delete-trigger"
             title="Delete Team"
             description="Are you sure you want to delete this team?"
             actionName="Delete"

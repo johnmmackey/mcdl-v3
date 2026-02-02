@@ -68,6 +68,7 @@ export const ActionDialog = ({
 }
 
 export const ActionDialog2 = ({
+    id,
     children,
     title = '',
     description = '',
@@ -76,6 +77,7 @@ export const ActionDialog2 = ({
     dangerMode = false,
 
 }: {
+    id: string,
     children: React.ReactNode,
     title: string,
     description: string,
@@ -95,39 +97,40 @@ export const ActionDialog2 = ({
 
     const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
 
-    return (
-            <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>{title}</DialogTitle>
-                        <DialogDescription>
-                            {description}
-                        </DialogDescription>
-                    </DialogHeader>
-                    {children}
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                            <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-                <Processing open={isPending} />
-            </Dialog>
+    const handleOpenChange = (open: boolean) => {
+        onOpenChange(open ? id : '');
+    }
 
+    return (
+        <Dialog open={isOpen === id} onOpenChange={handleOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>
+                        {description}
+                    </DialogDescription>
+                </DialogHeader>
+                {children}
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                        <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
+            <Processing open={isPending} />
+        </Dialog>
     )
 }
 
 
-
-
 const ActionDialogContext = React.createContext<{
-    isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
+    isOpen: string;
+    onOpenChange: (open: string) => void;
 }>({
-    isOpen: false,
+    isOpen: '',
     onOpenChange: () => { }
 });
 
@@ -136,9 +139,7 @@ export const ActionDialogProvider = ({
 }: {
     children: React.ReactNode;
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-
+    const [isOpen, setIsOpen] = useState('');
 
     return (
         <ActionDialogContext.Provider value={{ isOpen, onOpenChange: setIsOpen }}>
@@ -148,14 +149,16 @@ export const ActionDialogProvider = ({
 }
 
 export const ActionDialogTrigger = ({
+    id,
     children,
 }: {
+    id: string;
     children: React.ReactElement<{ onClick?: () => void }>;
 }) => {
     const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
 
     const handleClick = () => {
-        onOpenChange(!isOpen);
+        onOpenChange(id);
     };
 
     return React.cloneElement(children, {

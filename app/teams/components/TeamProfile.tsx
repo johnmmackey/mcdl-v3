@@ -17,7 +17,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { ActionDialog2, ActionDialogTrigger, ActionDialogProvider} from "@/app/ui/ActionDialog";
+import { ActionDialog2, ActionDialogTrigger, ActionDialogProvider } from "@/app/ui/ActionDialog";
 
 export const TeamProfile = async ({
     team,
@@ -38,11 +38,11 @@ export const TeamProfile = async ({
                     </Link>
                     <ActionDialogProvider>
 
-                        <ActionDialogTrigger>
+                        <ActionDialogTrigger id='team-delete-trigger'>
                             <Button size="icon" variant="outline" ><Trash2 /></Button>
                         </ActionDialogTrigger>
 
-                            <TeamDelete teamId={team.id} />
+                        <TeamDelete teamId={team.id} />
 
                     </ActionDialogProvider>
 
