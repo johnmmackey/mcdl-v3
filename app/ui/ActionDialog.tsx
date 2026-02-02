@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+"use client";
+import React, { useState } from "react";
 import { useTransition } from "react";
 
 import { Button } from "@/components/ui/button"
@@ -54,7 +55,7 @@ export const ActionDialog = ({
                 {children}
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button  variant="outline">Cancel</Button>
+                        <Button variant="outline">Cancel</Button>
                     </DialogClose>
                     <DialogClose asChild>
                         <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
@@ -73,7 +74,7 @@ export const ActionDialog2 = ({
     actionName = '',
     actionHandler = () => { },
     dangerMode = false,
-    trigger
+
 }: {
     children: React.ReactNode,
     title: string,
@@ -81,9 +82,9 @@ export const ActionDialog2 = ({
     actionName: string,
     actionHandler: () => void,
     dangerMode?: boolean,
-    trigger: React.ReactElement<{ onClick?: () => void }>;
+
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+
     const [isPending, startTransition] = useTransition();
 
     const handleAction = () => {
@@ -92,31 +93,72 @@ export const ActionDialog2 = ({
         });
     };
 
+    const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
+
     return (
-        <>
-        {React.cloneElement(trigger, {
-            onClick: () => setIsOpen(true)
-        })}
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>
-                        {description}
-                    </DialogDescription>
-                </DialogHeader>
-                {children}
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button  variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <DialogClose asChild>
-                        <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-            <Processing open={isPending} />
-        </Dialog>
-        </>
+            <Dialog open={isOpen} onOpenChange={onOpenChange}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{title}</DialogTitle>
+                        <DialogDescription>
+                            {description}
+                        </DialogDescription>
+                    </DialogHeader>
+                    {children}
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <DialogClose asChild>
+                            <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+                <Processing open={isPending} />
+            </Dialog>
+
     )
+}
+
+
+
+
+const ActionDialogContext = React.createContext<{
+    isOpen: boolean;
+    onOpenChange: (open: boolean) => void;
+}>({
+    isOpen: false,
+    onOpenChange: () => { }
+});
+
+export const ActionDialogProvider = ({
+    children,
+}: {
+    children: React.ReactNode;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+
+
+    return (
+        <ActionDialogContext.Provider value={{ isOpen, onOpenChange: setIsOpen }}>
+            {children}
+        </ActionDialogContext.Provider>
+    )
+}
+
+export const ActionDialogTrigger = ({
+    children,
+}: {
+    children: React.ReactElement<{ onClick?: () => void }>;
+}) => {
+    const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
+
+    const handleClick = () => {
+        onOpenChange(!isOpen);
+    };
+
+    return React.cloneElement(children, {
+        onClick: handleClick,
+    });
 }

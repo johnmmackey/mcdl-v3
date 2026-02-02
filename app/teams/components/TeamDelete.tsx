@@ -1,18 +1,15 @@
 "use client";
-import React, { useState } from "react";
 
 import { ActionDialog2 } from "@/app/ui/ActionDialog";
 import { useRouter } from "next/navigation";
 import { deleteTeam } from "@/app/lib/api/teams";
 import { toast } from "sonner";
 
-
 export const TeamDelete = ({
     teamId,
-    children,
+
 }: {
     teamId: string;
-    children: React.ReactElement<{ onClick?: () => void }>; // Ensure children can accept an onClick prop
 }) => {
     const router = useRouter();
 
@@ -29,7 +26,7 @@ export const TeamDelete = ({
             actionName="Delete"
             actionHandler={actionHandler}
             dangerMode={true}
-            trigger={children}
+
         >
             <p className="text-red-600">This action cannot be undone.</p>
         </ActionDialog2>

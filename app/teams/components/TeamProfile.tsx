@@ -17,6 +17,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { ActionDialog2, ActionDialogTrigger, ActionDialogProvider} from "@/app/ui/ActionDialog";
 
 export const TeamProfile = async ({
     team,
@@ -35,9 +36,16 @@ export const TeamProfile = async ({
                     <Link href={`/teams/${team.id}/edit`} className="text-sm">
                         <Button size="icon" variant="outline"><Pencil /></Button>
                     </Link>
-                    <TeamDelete teamId={team.id} >
-                        <Button size="icon" variant="outline" ><Trash2 /></Button>
-                    </TeamDelete>
+                    <ActionDialogProvider>
+
+                        <ActionDialogTrigger>
+                            <Button size="icon" variant="outline" ><Trash2 /></Button>
+                        </ActionDialogTrigger>
+
+                            <TeamDelete teamId={team.id} />
+
+                    </ActionDialogProvider>
+
                 </CardAction>
             </CardHeader>
             <CardContent>
