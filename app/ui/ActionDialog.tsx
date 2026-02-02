@@ -33,7 +33,7 @@ export const ActionDialog = ({
     actionHandler: () => void,
     dangerMode?: boolean,
 }) => {
-        const [isPending, startTransition] = useTransition();
+    const [isPending, startTransition] = useTransition();
 
     const handleAction = () => {
         startTransition(async () => {
@@ -52,6 +52,9 @@ export const ActionDialog = ({
                 </DialogHeader>
                 {children}
                 <DialogFooter>
+                    <DialogClose asChild>
+                        <Button  variant="outline">Cancel</Button>
+                    </DialogClose>
                     <DialogClose asChild>
                         <Button onClick={handleAction} variant={dangerMode ? "destructive" : "outline"}>{actionName}</Button>
                     </DialogClose>

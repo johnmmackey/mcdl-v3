@@ -85,7 +85,7 @@ export const UI = {
     /** Debounce delay for search inputs (ms) */
     SEARCH_DEBOUNCE_MS: 300,
     /** Toast notification duration (ms) */
-    TOAST_DURATION_MS: 5000
+    TOAST_DURATION_MS: 15000
 } as const;
 
 /**

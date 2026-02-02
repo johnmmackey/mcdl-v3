@@ -7,7 +7,8 @@ import { SanityLive } from "@/sanity/live";
 import { auth, } from "@/auth"
 import { MyAppShell } from '@/app/ui/AppShell'
 import { loggerFactory } from '@/app/lib/logger'
-const logger = loggerFactory({module: 'rootLayout'})
+const logger = loggerFactory({ module: 'rootLayout' })
+import { UI } from '@/app/lib/constants'
 
 import "@/app/globals.css";
 
@@ -37,13 +38,13 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
 
-          
-          <MyAppShell session={session}>
-            {children}
-          </MyAppShell>
+
+        <MyAppShell session={session}>
+          {children}
+        </MyAppShell>
 
         <SanityLive />
-        <Toaster richColors closeButton position='top-center' />
+        <Toaster richColors closeButton position='top-center' duration={UI.TOAST_DURATION_MS} />
       </body>
     </html>
   );

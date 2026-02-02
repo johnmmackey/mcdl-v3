@@ -38,10 +38,6 @@ export {
 } from './meets';
 
 // Reference data
-export {
-    fetchDivisions,
-    fetchTeams,
-    fetchAgeGroups,
-    fetchStandings,
-    fetchDivers
-} from './reference';
+export * from './reference';
+
+export * from './teams';

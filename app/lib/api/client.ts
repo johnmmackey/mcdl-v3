@@ -108,5 +108,5 @@ export async function handleMutationResponse<T>(
         return createSuccessResult<T>(null);
     }
     const text = await response.text();
-    return createErrorResult<T>(`${response.statusText}${text ? `: ${text}` : ''}`);
+    return createErrorResult<T>(`${text ? `: ${text}` : `${response.statusText}`}`);
 }

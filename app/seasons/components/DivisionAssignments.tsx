@@ -26,15 +26,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
-
 import { Button } from '@/components/ui/button'
 
-import { Team, Season, Division, TeamSeason, TeamSeasonCreateInput, DivisionAssignment } from '@/app/lib/types';
+import { Team, Season, Division, TeamSeasonWithTeam, TeamSeasonCreateInput, DivisionAssignment } from '@/app/lib/types';
 
 type divSlotCount = {
     divId: number,

@@ -1,3 +1,4 @@
+import type { Team } from './team';
 
 export type Rank = {
     rank: number,
@@ -53,7 +54,7 @@ export type Division = {
     id: number
 }
 
-export type TeamSeason = {
+export type TeamSeason= {
     id: number,
     teamId: string,
     seasonId: number,
@@ -77,17 +78,9 @@ export type TeamSeason = {
     tsCsAcceptedBy: string,
     tsCsAcceptedAt: string,
     seasonComplete: boolean,
-    team: {
-        id: string,
-        name: string,
-        clubName: string,
-        teamName: string,
-        address1: string,
-        address2: string,
-        phone: string,
-        url: string
-    }
 }
+
+export type TeamSeasonWithTeam= TeamSeason & {team: Team};
 
 export type SeasonCreateUpdateInput = {
     id: number,

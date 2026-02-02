@@ -2,7 +2,7 @@
 
 import { updateTag } from "next/cache"
 import omit from 'lodash/omit'
-import { Season, TeamSeason, SeasonCreateUpdateInput } from "../types/season"
+import { Season, TeamSeasonWithTeam, SeasonCreateUpdateInput } from "../types/season"
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse, createErrorResult } from "./client"
 import { logEvent } from "../dynamoEventLog"
@@ -31,8 +31,8 @@ export async function fetchSeason(seasonId: number): Promise<Season> {
 /**
  * Fetch team-season assignments for a given season
  */
-export async function fetchTeamsForSeason(seasonId: number): Promise<TeamSeason[]> {
-    return apiFetch<TeamSeason[]>(`/team-seasons?season-id=${seasonId}`);
+export async function fetchTeamsForSeason(seasonId: number): Promise<TeamSeasonWithTeam[]> {
+    return apiFetch<TeamSeasonWithTeam[]>(`/team-seasons?season-id=${seasonId}`);
 }
 
 /**

@@ -1,5 +1,5 @@
 import {  Team } from "@/app/lib/types/team"
-import { Season, DivisionAssignment, TeamSeason } from '@/app/lib/types/season';
+import { Season, DivisionAssignment, TeamSeasonWithTeam} from '@/app/lib/types/season';
 import { fetchTeams } from "@/app/lib/api";
 
 export function validateDivisionAssignments(divAssignments: DivisionAssignment[]): boolean {
@@ -39,7 +39,7 @@ export function mapTeamsById(teams: Team[]): Map<string, Team> {
 
 
 
-export const calcNextSeasonDivAssignments = (currentSeason: TeamSeason[]): DivisionAssignment[] => {
+export const calcNextSeasonDivAssignments = (currentSeason: TeamSeasonWithTeam[]): DivisionAssignment[] => {
 
     // check if the current season is valid. If not, not much to be done...
     if (!validateDivisionAssignments(currentSeason.map(da => ({ teamId: da.teamId, divisionId: da.divisionId, seed: da.seed }))))

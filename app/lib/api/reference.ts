@@ -12,12 +12,7 @@ export async function fetchDivisions(): Promise<Division[]> {
     return apiFetch<Division[]>('/divisions');
 }
 
-/**
- * Fetch all teams
- */
-export async function fetchTeams(): Promise<Team[]> {
-    return apiFetch<Team[]>('/teams');
-}
+
 
 /**
  * Fetch all age groups

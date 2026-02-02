@@ -320,15 +320,21 @@ export const FormFieldCheckBox = ({
     label: string,
     disabled?: boolean
 }>) => {
-
     return (
         <FormFieldGeneric
             form={form}
             name={name}
             label={label}
             checkbox={true}
-            render={(id, field, fieldState) =>
-                <Checkbox id={id} {...field} disabled={disabled} checked={field.value} />
+            render={(id, field, fieldState) => {
+                return <Checkbox 
+                    id={id} 
+                    disabled={disabled} 
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    ref={field.ref}
+                />
+            }
             }
         />
     )
