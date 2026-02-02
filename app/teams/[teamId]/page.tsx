@@ -1,9 +1,6 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { fetchTeam } from '@/app/lib/api';
 import { TeamProfile } from '@/app/teams/components/TeamProfile';
-import { ActionDialog } from '@/app/ui/ActionDialog';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 

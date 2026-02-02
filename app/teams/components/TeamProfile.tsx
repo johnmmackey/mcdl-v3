@@ -6,7 +6,7 @@ import { LabelValue } from "@/app/ui/LabelValue";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button, } from "@/components/ui/button";
 import { TeamWithTeamSeasons } from "@/app/lib/types";
-import { TeamDelete } from "./TeamDelete";
+import { TeamDeleteAD } from "./TeamDelete";
 
 import {
     Card,
@@ -17,7 +17,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { ActionDialog2, ActionDialogTrigger, ActionDialogProvider } from "@/app/ui/ActionDialog";
 
 export const TeamProfile = async ({
     team,
@@ -36,16 +35,9 @@ export const TeamProfile = async ({
                     <Link href={`/teams/${team.id}/edit`} className="text-sm">
                         <Button size="icon" variant="outline"><Pencil /></Button>
                     </Link>
-                    <ActionDialogProvider>
-
-                        <ActionDialogTrigger id='team-delete-trigger'>
-                            <Button size="icon" variant="outline" ><Trash2 /></Button>
-                        </ActionDialogTrigger>
-
-                        <TeamDelete teamId={team.id} />
-
-                    </ActionDialogProvider>
-
+                        <TeamDeleteAD teamId={team.id}>
+                            <Button size="icon" variant="outline" className="ml-2"><Trash2 /></Button>
+                        </TeamDeleteAD>
                 </CardAction>
             </CardHeader>
             <CardContent>

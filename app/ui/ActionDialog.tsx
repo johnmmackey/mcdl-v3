@@ -67,23 +67,22 @@ export const ActionDialog = ({
     )
 }
 
-export const ActionDialog2 = ({
-    id,
+export const ActionDialog3 = ({
     children,
     title = '',
     description = '',
     actionName = '',
     actionHandler = () => { },
     dangerMode = false,
-
+    trigger,
 }: {
-    id: string,
     children: React.ReactNode,
     title: string,
     description: string,
     actionName: string,
     actionHandler: () => void,
     dangerMode?: boolean,
+    trigger: React.ReactNode,
 
 }) => {
 
@@ -95,14 +94,11 @@ export const ActionDialog2 = ({
         });
     };
 
-    const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
-
-    const handleOpenChange = (open: boolean) => {
-        onOpenChange(open ? id : '');
-    }
-
     return (
-        <Dialog open={isOpen === id} onOpenChange={handleOpenChange}>
+        <Dialog >
+            <DialogTrigger asChild>
+                {trigger}
+            </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
@@ -126,42 +122,3 @@ export const ActionDialog2 = ({
 }
 
 
-const ActionDialogContext = React.createContext<{
-    isOpen: string;
-    onOpenChange: (open: string) => void;
-}>({
-    isOpen: '',
-    onOpenChange: () => { }
-});
-
-export const ActionDialogProvider = ({
-    children,
-}: {
-    children: React.ReactNode;
-}) => {
-    const [isOpen, setIsOpen] = useState('');
-
-    return (
-        <ActionDialogContext.Provider value={{ isOpen, onOpenChange: setIsOpen }}>
-            {children}
-        </ActionDialogContext.Provider>
-    )
-}
-
-export const ActionDialogTrigger = ({
-    id,
-    children,
-}: {
-    id: string;
-    children: React.ReactElement<{ onClick?: () => void }>;
-}) => {
-    const { isOpen, onOpenChange } = React.useContext(ActionDialogContext);
-
-    const handleClick = () => {
-        onOpenChange(id);
-    };
-
-    return React.cloneElement(children, {
-        onClick: handleClick,
-    });
-}
