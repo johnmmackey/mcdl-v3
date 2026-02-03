@@ -23,6 +23,7 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarHeader,
     SidebarMenu,
     SidebarMenuBadge,
     SidebarMenuButton,
@@ -76,19 +77,18 @@ export const MySidebar = () => {
     }
 
     return (
-        <Sidebar >
+        <Sidebar className="top-(--header-height) h-[calc(100svh-var(--header-height))]!">
+            <SidebarHeader>
+                Header
+            </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href='#'>
-                                        <ChartNoAxesCombinedIcon />
-                                        <span>Dashboard</span>
-                                    </a>
+                                    <Link href='/' />
                                 </SidebarMenuButton>
-                                <SidebarMenuBadge className='bg-primary/10 rounded-full'>5</SidebarMenuBadge>
                             </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
