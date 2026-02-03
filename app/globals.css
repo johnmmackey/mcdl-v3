@@ -230,3 +230,7 @@ div.revertstyles p {
     @apply bg-background text-foreground;
   }
 }
+
+.grid-table-header-cells {
+  @apply text-lg font-semibold mb-1;
+}

@@ -1,13 +1,10 @@
 import { Suspense } from 'react';
-import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '@/components/ui/table';
 import Link from 'next/link';
-import { ActionButton } from '@/app/ui/StandardButtons';
-
-import { fetchTeams, fetchSeasons, fetchCurrentSeasonId } from '@/app/lib/api';
-import Loading from '@/app/ui/Loading'
-import { LinkTableRow } from '../ui/LinkTableRow';
 import { IconPlus } from '@tabler/icons-react';
 
+import { ActionButton } from '@/app/ui/StandardButtons';
+import { fetchSeasons, fetchCurrentSeasonId } from '@/app/lib/api';
+import Loading from '@/app/ui/Loading'
 
 export default async function Page() {
     const seasons = (await fetchSeasons()).sort((a, b) => b.id - a.id);
@@ -15,49 +12,42 @@ export default async function Page() {
 
     return (
         <Suspense fallback={Loading()} >
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mb-2">
                 <Link href={`/seasons/new`} >
                     <ActionButton><IconPlus size={24} />New</ActionButton>
                 </Link>
             </div>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead >Season</TableHead>
-                        <TableHead>Start Date</TableHead>
-                        <TableHead>End Date</TableHead>
-                        <TableHead>Week 1 Date</TableHead>
-                        <TableHead>Number of Meets</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {seasons.map(s =>
-                        <LinkTableRow key={s.id} href={`/seasons/${s.id}`}>
-                            <TableCell>
+            <div className='grid grid-cols-5 gap-x-2'>
+
+                <div className='grid-table-header-cells'>Season</div>
+                <div className='grid-table-header-cells'>Start Date</div>
+                <div className='grid-table-header-cells'>End Date</div>
+                <div className='grid-table-header-cells'>Week 1 Date</div>
+                <div className='grid-table-header-cells'># of Meets</div>
+                {seasons.map(s =>
+                    <Link key={s.id} href={`/seasons/${s.id}`} className='col-span-full grid grid-cols-subgrid hover:bg-gray-100 cursor-pointer py-1'>
+                            <div className=''>
                                 {s.id}
                                 {s.id === currentSeasonId &&
                                     <span className='mx-2'>(current)</span>
                                 }
-                            </TableCell>
-
-                            <TableCell className=''>
+                            </div>
+                            <div>
                                 {new Date(s.safeStartDate).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className=''>
+                            </div>
+                            <div className=''   >
                                 {new Date(s.safeEndDate).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className=''>
+                            </div>
+                            <div>
                                 {new Date(s.week1Date).toLocaleDateString()}
-                                </TableCell>
-                            <TableCell className=''>
+                            </div>
+                            <div>
                                 {s._count.meets}
-                            </TableCell>
-                        </LinkTableRow>
-
-                    )}
-                </TableBody>
-            </Table>
-        </Suspense>
+                            </div>
+                    </Link>
+                )}
+            </div>
+        </Suspense >
     )
 }
 
