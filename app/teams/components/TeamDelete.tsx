@@ -1,11 +1,11 @@
 "use client";
 
-import { ActionDialog3} from "@/app/ui/ActionDialog";
+import { ActionDialog } from "@/app/ui/ActionDialog";
 import { useRouter } from "next/navigation";
 import { deleteTeam } from "@/app/lib/api/teams";
 import { toast } from "sonner";
 
-export const TeamDeleteAD = ({
+export const DeleteTeamDialog = ({
     teamId,
     children
 }: {
@@ -14,22 +14,19 @@ export const TeamDeleteAD = ({
 }) => {
     const router = useRouter();
 
-    const actionHandler = async () => {
-        const r = await deleteTeam(teamId);
-        r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/teams`);
-        router.back();
-    }
-
     return (
-        <ActionDialog3
+        <ActionDialog
             title="Delete Team"
             description="Are you sure you want to delete this team?"
             actionName="Delete"
-            actionHandler={actionHandler}
-            dangerMode={true}
-            trigger={children}
+            onAction={async () => {
+                const r = await deleteTeam(teamId);
+                r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/teams`);
+            }}
+            dangerMode
+            content={<p className="text-red-600">This action cannot be undone.</p>}
         >
-            <p className="text-red-600">This action cannot be undone.</p>
-        </ActionDialog3>
-    )
+            {children}
+        </ActionDialog>
+    );
 };

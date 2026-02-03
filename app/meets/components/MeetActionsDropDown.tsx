@@ -33,15 +33,13 @@ import { fetchLabels, deleteMeet } from "@/app/lib/api/meets"
 import { saveToFile } from "@/app/lib/saveToFile"
 import { ActionDialog } from "@/app/ui/ActionDialog";
 import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
-type DialogNames = 'labels' | 'billing' | 'delete' | null;
+
 
 export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
-    const [openDialog, setOpenDialog] = useState(null as DialogNames);
-
-    const handleDialogClose = () => {
-        setOpenDialog(null);
-    };
+    const [showLabelsDialog, setShowLabelsDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     return (
         <>
@@ -54,7 +52,9 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => setOpenDialog('labels')}>Labels</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setShowLabelsDialog(true)}>
+                            Labels
+                        </DropdownMenuItem>
                         <DropdownMenuItem>Billing</DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuGroup>
@@ -64,22 +64,24 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setOpenDialog('delete')}>Delete</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)}>
+                            Delete
+                        </DropdownMenuItem>
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
 
             <LabelsDialog
-                isOpen={openDialog === 'labels'}
-                onOpenChange={(open) => setOpenDialog(open ? 'labels' : null)}
-                meetId={meet.id}
+                meetId={meet.id} 
+                open={showLabelsDialog} 
+                onOpenChange={setShowLabelsDialog} 
             />
-            <DeleteDialog
-                isOpen={openDialog === 'delete'}
-                onOpenChange={(open) => setOpenDialog(open ? 'delete' : null)}
-                meetId={meet.id}
+            
+            <DeleteMeetDialog 
+                meetId={meet.id} 
+                open={showDeleteDialog} 
+                onOpenChange={setShowDeleteDialog} 
             />
-
         </>
     )
 }
@@ -94,13 +96,12 @@ const labelOptions = [
 type LabelOptionId = typeof labelOptions[number]['id'];
 
 const LabelsDialog = ({
-    isOpen,
     meetId,
-    onOpenChange,
-
+    open,
+    onOpenChange
 }: {
-    isOpen: boolean;
     meetId: number;
+    open: boolean;
     onOpenChange: (open: boolean) => void;
 }) => {
 
@@ -115,20 +116,20 @@ const LabelsDialog = ({
         setLabelSettings(prev => ({ ...prev, [id]: checked }));
     };
 
-    const actionHandler = async () => {
-        let l = await fetchLabels(meetId, labelSettings)
-        await saveToFile(l, `meet-${meetId}-labels.pdf`);
-    }
+    if (!open) return null;
 
     return (
         <ActionDialog
-            isOpen={isOpen}
+            isOpen={open}
             onOpenChange={onOpenChange}
             title="Generate Labels"
             description="Generate and download labels for this meet."
             actionName="Generate"
-            actionHandler={actionHandler}
-        >
+            onAction={async () => {
+                let l = await fetchLabels(meetId, labelSettings)
+                await saveToFile(l, `meet-${meetId}-labels.pdf`);
+            }}
+            content={
             <FieldGroup className="w-full max-w-xs">
                 <FieldSet>
                     <FieldDescription>
@@ -155,39 +156,40 @@ const LabelsDialog = ({
                     </FieldGroup>
                 </FieldSet>
             </FieldGroup>
-        </ActionDialog>
+            }
+            />
     )
 };
 
 
-const DeleteDialog = ({
-    isOpen,
-    meetId,
-    onOpenChange,
 
+export const DeleteMeetDialog = ({
+    meetId,
+    open,
+    onOpenChange
 }: {
-    isOpen: boolean;
     meetId: number;
+    open: boolean;
     onOpenChange: (open: boolean) => void;
 }) => {
     const router = useRouter();
 
-    const actionHandler = async () => {
-        await deleteMeet(meetId);
-        router.back();
-    }
+    if (!open) return null;
 
     return (
         <ActionDialog
-            isOpen={isOpen}
+            isOpen={open}
             onOpenChange={onOpenChange}
             title="Delete Meet"
             description="Are you sure you want to delete this meet?"
             actionName="Delete"
-            actionHandler={actionHandler}
-            dangerMode={true}
-        >
-            <p className="text-red-600">This action cannot be undone.</p>
-        </ActionDialog>
-    )
+            onAction={async () => {
+                const r = await deleteMeet(meetId);
+                r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.back();
+            }}
+            content={<p className="text-red-600">This action cannot be undone.</p>}
+            dangerMode
+        />
+    );
 };
+

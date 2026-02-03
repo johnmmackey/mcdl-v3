@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 
 import { LabelValue } from "@/app/ui/LabelValue";
@@ -6,7 +5,7 @@ import { LabelValue } from "@/app/ui/LabelValue";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button, } from "@/components/ui/button";
 import { TeamWithTeamSeasons } from "@/app/lib/types";
-import { TeamDeleteAD } from "./TeamDelete";
+import { DeleteTeamDialog } from "./TeamDelete";
 
 import {
     Card,
@@ -18,15 +17,13 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
-export const TeamProfile = async ({
+export const TeamProfile = ({
     team,
     className
 }: {
     team: TeamWithTeamSeasons,
     className?: string
 }) => {
-
-
     return (
         <Card className={className}>
             <CardHeader>
@@ -35,9 +32,9 @@ export const TeamProfile = async ({
                     <Link href={`/teams/${team.id}/edit`} className="text-sm">
                         <Button size="icon" variant="outline"><Pencil /></Button>
                     </Link>
-                        <TeamDeleteAD teamId={team.id}>
-                            <Button size="icon" variant="outline" className="ml-2"><Trash2 /></Button>
-                        </TeamDeleteAD>
+                    <DeleteTeamDialog teamId={team.id}>
+                        <Button size="icon" variant="outline" className="ml-2"><Trash2 /></Button>
+                    </DeleteTeamDialog>
                 </CardAction>
             </CardHeader>
             <CardContent>
@@ -57,4 +54,3 @@ export const TeamProfile = async ({
         </Card >
     );
 }
-
