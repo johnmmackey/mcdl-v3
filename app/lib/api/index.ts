@@ -9,7 +9,7 @@
  */
 
 // Client utilities
-export { apiFetch, apiMutate, getAuthToken, createSuccessResult, createErrorResult, handleMutationResponse } from './client';
+export { apiFetch, apiMutate, createSuccessResult, createErrorResult, handleMutationResponse } from './client';
 
 // Season operations
 export {

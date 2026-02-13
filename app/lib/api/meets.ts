@@ -35,7 +35,7 @@ export async function fetchMeetResults(meetId: number): Promise<DiverScore[]> {
  * Fetch meet entries
  */
 export async function fetchMeetEntries(meetId: number): Promise<Entry[]> {
-    return apiFetch<Entry[]>(`/meets/${meetId}/entries`, { tags: [`meet:${meetId}`] });
+    return apiFetch<Entry[]>(`/meets/${meetId}/entries`, { tags: [`meet:${meetId}`], includeAuth: true });
 }
 
 /**
@@ -123,7 +123,7 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
 
 
 export async function fetchLabels(meetId: number, options: Record<string, unknown>): Promise<Blob> {
-    return apiFetch<Blob>(`/meets/${meetId}/labels?${toQueryString(options)}`, { cache: 'no-store', blob: true });
+    return apiFetch<Blob>(`/meets/${meetId}/labels?${toQueryString(options)}`, { cache: 'no-store', blob: true, includeAuth: true });
 }
 
 function toQueryString(params: Record<string, unknown>): string {
@@ -132,4 +132,8 @@ function toQueryString(params: Record<string, unknown>): string {
       .filter(([, value]) => value !== undefined && value !== null && value !== false)
       .map(([key, value]) => [key, String(value)])
   ).toString();
+}
+
+export async function fetchMeetPermissions(meetId?: number): Promise<string[]> {
+    return apiFetch<string[]>(`/permissions/meets/${meetId || ''}`, { includeAuth: true, cache: 'no-store' });
 }

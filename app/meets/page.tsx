@@ -1,21 +1,18 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { auth } from '@/auth';
 import sortBy from 'lodash/sortBy';
 import groupBy from 'lodash/groupBy';
 import keyBy from 'lodash/keyBy';
 import { format } from 'date-fns';
 
-import { ActionButton } from '@/app/ui/StandardButtons';
-import { IconPlus } from '@tabler/icons-react';
-
 import { MeetWithTeams } from '@/app/lib/types/meet'
 import { fetchTeams, fetchMeets, fetchCurrentSeasonId } from '@/app/lib/api';
-import { userCan } from '@/app/lib/userCan';
 import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
 
 import { MeetDisplayName } from './components';
+import { NewMeetButton } from './components/NewMeetButton';
+import { Processing } from '../ui/Processing';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -29,10 +26,7 @@ export default async function Page(props: {
         <>
             <div className="flex justify-between mb-4">
                 <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-                <Link href={`/meets/new`} >
-                    <ActionButton><IconPlus size={24} />New</ActionButton>
-                </Link>
-
+                <NewMeetButton />
             </div>
 
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>
@@ -50,6 +44,7 @@ async function MeetList(props: {
     const meets = await fetchMeets(props.season);
     const smeets = sortBy(meets, ['meetDate', 'divisionId']);
     const gmeets = groupBy(smeets, e => format(e.meetDate, 'PPP'));
+
 
     const scoreStr = (m: MeetWithTeams) => {
         if (!m.scoresPublished || !m.teams.length)

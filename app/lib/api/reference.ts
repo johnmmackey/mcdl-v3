@@ -1,7 +1,7 @@
 'use server'
 
 import { Division, Team, AgeGroup, GroupedStandings, DiverWithSeason } from "@/app/lib/types"
-import { apiFetch, getAuthToken } from "./client"
+import { apiFetch } from "./client"
 
 const API_BASE_URL = process.env.DATA_URL;
 
@@ -31,13 +31,20 @@ export async function fetchStandings(seasonId: number): Promise<GroupedStandings
 /**
  * Fetch divers for a team in a season
  */
+// This needs to be refactored to use apiFetch and handle auth token properly
 export async function fetchDivers({ seasonId, teamId }: { seasonId: number, teamId: string }): Promise<DiverWithSeason[]> {
-    const token = await getAuthToken();
+    //const token = await getAuthToken();
 
     const response = await fetch(
         `${API_BASE_URL}/divers/${seasonId}/${teamId}`,
         {
-            headers: { Authorization: `Bearer ${token}` }
+            /*
+            headers: {
+                ...(token && {
+                    "Authorization": `Bearer ${token}`
+                })
+            }
+                */
         }
     );
 

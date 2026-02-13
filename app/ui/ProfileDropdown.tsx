@@ -1,9 +1,8 @@
 'use client';
 
-import crypto from 'crypto';
-
 import { Session } from 'next-auth';
 import { signIn, signOut } from "next-auth/react"
+import { useRouter } from 'next/navigation';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UsersIcon } from 'lucide-react'
@@ -37,7 +36,15 @@ type Props = {
     session: Session
 }
 
+const logoutCognitoUrl = `${process.env.NEXT_PUBLIC_AWS_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}`;
+
 export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session}: Props) => {
+    const router = useRouter();
+    const handleSignOut = async () => {
+        await signOut({ redirect: false });
+        alert('You have been logged out.');
+        router.push(logoutCognitoUrl)
+    }
 
     return (
         <DropdownMenu defaultOpen={defaultOpen}>
@@ -96,7 +103,7 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session}:
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem variant='destructive' className='px-4 py-2.5 text-base' onClick={() => signOut()}>
+                <DropdownMenuItem variant='destructive' className='px-4 py-2.5 text-base' onClick={handleSignOut}>
                     <LogOutIcon className='size-5' />
                     <span>Logout</span>
                 </DropdownMenuItem>
@@ -113,3 +120,5 @@ export const LoginButton = () => {
         </Button>
     )
 }
+
+

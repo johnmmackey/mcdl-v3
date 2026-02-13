@@ -45,7 +45,7 @@ export const TeamProfile = ({
                     <LabelValue label="Address 1:" value={team.address1} />
                     <LabelValue label="Address 2:" value={team.address2} />
                     <LabelValue label="Phone:" value={team.phone} />
-                    <LabelValue label="Website:" value={team.url} />
+                    <LabelValue label="Website:" value={<Link className="text-blue-600 underline" href={team.url || '#'} target="_blank" rel="noopener noreferrer">{team.url}</Link>} />
                     <LabelValue label="Archived:" value={team.archived ? "Yes" : "No"} />
 
                 </div>

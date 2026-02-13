@@ -1,6 +1,8 @@
+"use server"
 import { Account } from "@auth/core/types"
 import { createClient, RedisClientType } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
+import { auth } from "@/auth"
 
 const id = Date.now();
 const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
@@ -36,7 +38,7 @@ async function getRedisClient(): Promise<RedisClientType> {
   }
 
   const client = await createRedisClient();
-  
+
   // In development, save to global to persist across hot reloads
   if (process.env.NODE_ENV !== 'production') {
     global.redis = client;
@@ -90,7 +92,7 @@ export const storeAccount = async (userId: string, account: Account): Promise<vo
   const client = await getClient();
 
   await client.set(
-    process.env.REDIS_KEY_PREFIX ?? '' + userId,
+    (process.env.REDIS_KEY_PREFIX ?? '') + userId,
     JSON.stringify(account),
     {
       EXAT: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60)
@@ -104,15 +106,21 @@ let activeRefreshes: ActiveRefresh[] = [];
 
 
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
-export const getAccessToken = async (userId: string): Promise<string | undefined> => {
+export const getAccessToken = async (): Promise<string | null> => {
+  const session = await auth();
+  if (!session || !session.user) {
+    return null;
+  }
+  const userId = session.user.id as string;
+
   logger.debug(`getting access token`);
   const client = await getClient();
-  let account: Account = JSON.parse(await client.get(process.env.REDIS_KEY_PREFIX ?? '' + userId) as string);
+  let account: Account = JSON.parse(await client.get((process.env.REDIS_KEY_PREFIX ?? '') + userId) as string);
   logger.debug(`access token found`);
 
   //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
   if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
-    return account.access_token;
+    return account.access_token ?? null;
 
   // we need to refresh the token
   // but it might already be underway, so check for that and short circuit if so
