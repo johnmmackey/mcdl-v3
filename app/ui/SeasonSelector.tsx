@@ -6,6 +6,11 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -35,11 +40,32 @@ export const SeasonSelector = async ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuGroup>
-          {sortedSeasons.map((s) =>
-              <DropdownMenuItem key={s.id} asChild>
-                <Link href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
-              </DropdownMenuItem>
+          {sortedSeasons.slice(0, 4).map((s) =>
+            <DropdownMenuItem key={s.id} asChild>
+              <Link href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
+            </DropdownMenuItem>
           )}
+          {sortedSeasons.length > 4 &&
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <div className="w-32 text-center">Older</div>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+
+                    {sortedSeasons.slice(4).map((s) =>
+                      <DropdownMenuItem key={s.id} asChild>
+                        <Link href={base + `?season-id=${s.id}`}><div className="w-32 text-center">{s.id.toString()}</div></Link>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            </>
+
+          }
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
