@@ -134,6 +134,3 @@ function toQueryString(params: Record<string, unknown>): string {
   ).toString();
 }
 
-export async function fetchMeetPermissions(meetId?: number): Promise<string[]> {
-    return apiFetch<string[]>(`/permissions/meets/${meetId || ''}`, { includeAuth: true, cache: 'no-store' });
-}

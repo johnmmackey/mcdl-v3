@@ -1,5 +1,8 @@
 import React from 'react';
+import Link from 'next/link';
+import { IfUserHasPermission } from '@/app/ui/IfUserHasPermission';
 import { Button } from "@/components/ui/button";
+import { IconPlus } from '@tabler/icons-react';
 
 export const ActionButton = ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
     return (
@@ -8,3 +11,14 @@ export const ActionButton = ({ children, ...props }: React.ButtonHTMLAttributes<
         </Button>
     );
 }
+
+
+// because it happens so much
+export const NewButton = ({
+    href
+}: {
+    href: string
+}) => 
+        <Link href={href} >
+            <ActionButton><IconPlus size={24} />New</ActionButton>
+        </Link>

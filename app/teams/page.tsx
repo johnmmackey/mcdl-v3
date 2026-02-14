@@ -3,8 +3,8 @@ import Link from 'next/link';
 
 import { fetchTeams, } from '@/app/lib/api';
 import Loading from '@/app/ui/Loading'
-import { ActionButton } from '@/app/ui/StandardButtons';
-import { IconPlus } from '@tabler/icons-react';
+import { NewButton } from '@/app/ui/StandardButtons';
+import { IfUserHasPermission } from '../ui/IfUserHasPermission';
 
 export default async function Page() {
 
@@ -12,10 +12,9 @@ export default async function Page() {
     return (
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-4">
-                <Link href={`/teams/new`} >
-                    <ActionButton><IconPlus size={24} />New</ActionButton>
-                </Link>
-
+                <IfUserHasPermission objectType="teams" requiredPermission='addOrUpdateTeam' >
+                    <NewButton href={`/teams/new`} />
+                </IfUserHasPermission>
             </div>
             <div className='grid grid-cols-[auto_auto_auto_auto] gap-x-2'>
 

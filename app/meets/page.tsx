@@ -11,8 +11,8 @@ import { SeasonSelector } from '@/app/ui/SeasonSelector';
 import Loading from '@/app/ui/Loading'
 
 import { MeetDisplayName } from './components';
-import { NewMeetButton } from './components/NewMeetButton';
-import { Processing } from '../ui/Processing';
+import { NewButton } from '@/app/ui/StandardButtons';
+import { IfUserHasPermission } from '../ui/IfUserHasPermission';
 
 export default async function Page(props: {
     searchParams: Promise<{ 'season-id': number, active?: Boolean }>
@@ -26,7 +26,9 @@ export default async function Page(props: {
         <>
             <div className="flex justify-between mb-4">
                 <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-                <NewMeetButton />
+                <IfUserHasPermission objectType="meets" requiredPermission='addOrUpdateMeet' >
+                     <NewButton href={`/meets/new`} />
+                </IfUserHasPermission>
             </div>
 
             <Suspense fallback={Loading()} key={`${searchParams['season-id']}`}>

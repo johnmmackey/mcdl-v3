@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UsersIcon } from 'lucide-react'
 import { SettingsIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { toast } from "sonner";
 
 import {
     UserIcon,
@@ -16,7 +17,7 @@ import {
     CirclePlusIcon,
     LogOutIcon
 } from 'lucide-react'
-import {Button} from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -38,11 +39,11 @@ type Props = {
 
 const logoutCognitoUrl = `${process.env.NEXT_PUBLIC_AWS_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}`;
 
-export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session}: Props) => {
+export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
         await signOut({ redirect: false });
-        alert('You have been logged out.');
+        toast.success('You have been logged out.');
         router.push(logoutCognitoUrl)
     }
 
@@ -53,9 +54,9 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session}:
                 <DropdownMenuLabel className='flex items-center gap-4 px-4 py-2.5 font-normal'>
                     <div className='relative'>
                         <Avatar className='size-10'>
-                            <AvatarFallback>{userInitials(session.user?.name ?? '' )}</AvatarFallback>
+                            <AvatarFallback>{userInitials(session.user?.name ?? '')}</AvatarFallback>
                         </Avatar>
-                        
+
                     </div>
                     <div className='flex flex-1 flex-col items-start'>
                         {session && session.user &&

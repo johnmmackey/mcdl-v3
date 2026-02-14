@@ -2,9 +2,10 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { IconPlus } from '@tabler/icons-react';
 
-import { ActionButton } from '@/app/ui/StandardButtons';
+import { ActionButton, NewButton } from '@/app/ui/StandardButtons';
 import { fetchSeasons, fetchCurrentSeasonId } from '@/app/lib/api';
 import Loading from '@/app/ui/Loading'
+import { IfUserHasPermission } from '../ui/IfUserHasPermission';
 
 export default async function Page() {
     const seasons = (await fetchSeasons()).sort((a, b) => b.id - a.id);
@@ -13,9 +14,9 @@ export default async function Page() {
     return (
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-2">
-                <Link href={`/seasons/new`} >
-                    <ActionButton><IconPlus size={24} />New</ActionButton>
-                </Link>
+                <IfUserHasPermission objectType="seasons" requiredPermission='addOrUpdateSeason' >
+                     <NewButton href={`/seasons/new`} />
+                </IfUserHasPermission>
             </div>
             <div className='grid grid-cols-5 gap-x-2'>
 
