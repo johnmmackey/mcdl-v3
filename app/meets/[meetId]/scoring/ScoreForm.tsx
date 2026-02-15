@@ -60,7 +60,7 @@ const ScoreForm = ({
 
         console.log('Results:', results.length);
         return scoreMeet(meet.id, results)
-            .then(() => router.push(`/meets/${meet.id}/results`))
+            .then(() => router.push(`/meets/${meet.id}`))
     }
 
     const entriesWithResults: EntryWithResult[] = meetEntries.map(e =>
@@ -83,10 +83,14 @@ const ScoreForm = ({
                     )
                 }}
             />
-
-            <Button type="submit" disabled={false}>
-                Submit
-            </Button>
+            <div className='flex gap-4 justify-end'>
+                <Button type="submit" disabled={false}>
+                    Submit
+                </Button>
+                <Button type="button" variant="outline" onClick={() => router.push(`/meets/${meet.id}`)}>
+                    Cancel
+                </Button>
+            </div>
         </form>
     )
 }
@@ -131,7 +135,7 @@ const ScoringElement = ({ ag, entry, k, form, meet }: { ag: AgeGroup, entry: Ent
     return (
         <div className='grid grid-cols-10 hover:bg-slate-200'>
             <div className='text-center'>{entry.diver.teamId}</div>
-            <div className=''><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</div>
+            <div className='col-span-3'><span className="text-lg font-semibold">{entry.diver.lastName}</span>, {entry.diver.firstName}</div>
 
             <div className='text-center'>
                 <input type="hidden" {...form.register(fName(ag.id, k, 'diverId'))} value={entry.diverId.toString()} />

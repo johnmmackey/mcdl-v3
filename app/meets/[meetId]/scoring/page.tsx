@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { redirect } from 'next/navigation';
 
 import { fetchTeams, fetchMeet, fetchMeetEntries, fetchAgeGroups, fetchMeetResults } from '@/app/lib/api';
 import ScoreForm from './WrappedScoreForm';
@@ -38,9 +39,9 @@ export default async function Page(props: { params: Promise<{ meetId: number }> 
                 <div>
                     Cannot score a meet that has been published.
                     <br />
-                    <Link href={`/meets/${meet.id}/results`}>
+                    <Link href={`/meets/${meet.id}`}>
                         <Button>
-                            Go to Results
+                            Go to Meet Summary
                         </Button>
                     </Link>
                 </div>

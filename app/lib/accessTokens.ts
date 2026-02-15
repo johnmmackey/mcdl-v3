@@ -2,8 +2,9 @@
 import { Account } from "@auth/core/types"
 import { createClient, RedisClientType } from '@redis/client';
 import { loggerFactory } from '@/app/lib/logger'
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
 import { jwtDecode } from "jwt-decode";
+import { redirect } from "next/navigation";
 
 const id = Date.now();
 const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
@@ -34,7 +35,6 @@ async function createRedisClient(): Promise<RedisClientType> {
 
 async function getRedisClient(): Promise<RedisClientType> {
   if (global.redis) {
-    console.log('Reusing existing Redis client');
     return global.redis;
   }
 
@@ -120,6 +120,7 @@ let activeRefreshes: ActiveRefresh[] = [];
 // IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (): Promise<string | null> => {
   logger.debug(`getting access token starts...`);
+
   const session = await auth();
   if (!session || !session.user) {
     return null;
@@ -127,18 +128,18 @@ export const getAccessToken = async (): Promise<string | null> => {
   const userId = session.user.id as string;
 
   logger.debug(`getting access token for ${userId}`);
+
   const client = await getClient();
   let account: Account = JSON.parse(await client.get((process.env.REDIS_KEY_PREFIX ?? '') + userId) as string);
+
 
   if (account) {
     logger.debug(`access token found for ${userId}: ${!!account.access_token}, expires at ${account.expires_at ? (new Date(account.expires_at * 1000)).toISOString() : 'unknown'}`);
     logger.debug(`token: ${account.access_token}, expires_at: ${account.expires_at}, current time: ${Date.now()}, (in ${account.expires_at ? (account.expires_at * 1000 - Date.now()) / 1000 : 'unknown'} seconds )`);
   } else {
     logger.warn(`no access token found for ${userId}`);
-    throw new Error('no access token found - log out and in again');
-    // FIX make this a server action that logs out the user, but for now just throw an error and let the client handle it
-    // FIX also need to have a dedicated redirect page for being logged out. Cognito client change.
-    //await signOut({redirect: true });
+
+    redirect('/-out');
     return null;
   }
 

@@ -17,7 +17,6 @@ import {
     SquarePenIcon,
     CirclePlusIcon,
     LogOutIcon,
-    ShieldLockIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -39,13 +38,11 @@ type Props = {
     session: Session
 }
 
-const logoutCognitoUrl = `${process.env.NEXT_PUBLIC_AWS_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}/loggedout`;
-
 export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
         await signOut({ redirect: false });
-        router.push(logoutCognitoUrl)
+        router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
     }
 
     return (

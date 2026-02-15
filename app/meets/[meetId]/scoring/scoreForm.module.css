@@ -1,8 +1,11 @@
 .scoreInput[type="number"] {
     width: 5rem;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-right: 0.5rem;
     text-align: right;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .scoreError {
@@ -10,5 +13,5 @@
 }
 
 .scoreInput:disabled {
-    background-color: lightgrey;
+    background-color: whitesmoke;
 }

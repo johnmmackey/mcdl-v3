@@ -114,6 +114,7 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
 
     updateTag(`meet:${meetId}`);
     updateTag('meets');
+
     await logEvent({
         eventType: 'app',
         eventSubType: 'update',

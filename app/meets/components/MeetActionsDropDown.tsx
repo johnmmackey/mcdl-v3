@@ -37,10 +37,12 @@ import { toast } from "sonner";
 import { usePermissions } from "@/app/lib/usePermissions";
 
 
+
 export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
 
     const [openDialog, setOpenDialog] = useState('');
     const [loading, hasPermission] = usePermissions('meets', meet.id);
+    const router = useRouter();
 
     return (
         <>
@@ -64,17 +66,17 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
                             Labels
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem hidden={!hasPermission('meet:scoreMeet')|| !!meet.scoresPublished}>
-                            <Link href={`/meets/${meet.id}/scoring`} className="text-sm">
+                        <DropdownMenuItem hidden={!hasPermission('meet:scoreMeet')|| !!meet.scoresPublished} onClick={() => router.push(`/meets/${meet.id}/scoring`)}>
+
                                 Score
-                            </Link>
+
                         </DropdownMenuItem>
 
                         <DropdownMenuItem onSelect={() => setOpenDialog('publish')} hidden={!!meet.scoresPublished || !hasPermission('meet:publish')}>
                             Publish
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem onSelect={() => setOpenDialog('unpublish')} hidden={!hasPermission('meet:unpublish')}>
+                        <DropdownMenuItem onSelect={() => setOpenDialog('unpublish')} hidden={!meet.scoresPublished || !hasPermission('meet:unpublish')}>
                             Unpublish
                         </DropdownMenuItem>
 
@@ -233,8 +235,6 @@ export const PublishMeetDialog = ({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) => {
-    const router = useRouter();
-
     if (!open) return null;
 
     return (
@@ -246,7 +246,7 @@ export const PublishMeetDialog = ({
             actionName="Publish"
             onAction={async () => {
                 const r = await setPublishedStatus(meetId, true);
-                r.error ? toast.error(`Publish failed: ${r.error.msg}`) : router.back();
+                r.error && toast.error(`Publish failed: ${r.error.msg}`);
             }}
         >
             <p className="">This finalizes the meet and makes the results publically visible.</p>
@@ -276,7 +276,7 @@ export const UnPublishMeetDialog = ({
             actionName="Unpublish"
             onAction={async () => {
                 const r = await setPublishedStatus(meetId, false);
-                r.error ? toast.error(`Unpublish failed: ${r.error.msg}`) : router.back();
+                r.error ?? toast.error(`Unpublish failed: ${r.error!.msg}`) ;
             }}
         >
             <p className="">This allows the meet scores to be changed.</p>

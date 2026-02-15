@@ -26,4 +26,5 @@ export async function logEvent(record: EventRecord): Promise<void> {
   });
 
   await docClient.send(command);
+
 }
