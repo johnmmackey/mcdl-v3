@@ -3,9 +3,10 @@
 import { Session } from 'next-auth';
 import { signIn, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { UsersIcon } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { ShieldAlertIcon, UsersIcon } from 'lucide-react'
 import { SettingsIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { toast } from "sonner";
@@ -15,7 +16,8 @@ import {
     CreditCardIcon,
     SquarePenIcon,
     CirclePlusIcon,
-    LogOutIcon
+    LogOutIcon,
+    ShieldLockIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -37,13 +39,12 @@ type Props = {
     session: Session
 }
 
-const logoutCognitoUrl = `${process.env.NEXT_PUBLIC_AWS_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}`;
+const logoutCognitoUrl = `${process.env.NEXT_PUBLIC_AWS_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}/loggedout`;
 
 export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
         await signOut({ redirect: false });
-        toast.success('You have been logged out.');
         router.push(logoutCognitoUrl)
     }
 
@@ -79,9 +80,11 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }
                         <SettingsIcon className='text-foreground size-5' />
                         <span>Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className='px-4 py-2.5 text-base'>
-                        <CreditCardIcon className='text-foreground size-5' />
-                        <span>Billing</span>
+                    <DropdownMenuItem className='px-4 py-2.5 text-base' onClick={() => router.push('/user-advanced')}>
+                       <ShieldAlertIcon className='text-foreground size-5' />
+                            <span>
+                                 Advanced
+                            </span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
 

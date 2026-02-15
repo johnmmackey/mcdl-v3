@@ -34,7 +34,7 @@ export const SeasonSelector = async ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='outline'>
+        <Button variant='outline' id='season-selector' >
           {selectedSeasonId} <IconChevronDown size={18} stroke={1.5} />
         </Button>
       </DropdownMenuTrigger>

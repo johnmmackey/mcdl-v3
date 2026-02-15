@@ -16,13 +16,6 @@ export async function MeetResults(props: { meet: MeetWithTeams }) {
 
     return (
         <div style={{ maxWidth: '800px' }}>
-
-            {/* Fix: authorization issue here */}
-            <div className='flex justify-between'>
- 
-
-                               <PublishButton meet={props.meet} />
-            </div>
             <AgeGroupGrid
                 GroupHeader={ResultsHeaderHOC(props.meet.meetType)}
                 ageGroups={ageGroups}

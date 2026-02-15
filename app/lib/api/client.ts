@@ -3,7 +3,6 @@
 import { notFound } from "next/navigation"
 import { getAccessToken } from "@/app/lib/accessTokens"
 import { GenericServerActionState } from "../types/baseTypes"
-import { cacheLife } from "next/cache";
 
 /**
  * Base API configuration

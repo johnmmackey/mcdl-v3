@@ -29,22 +29,29 @@ import {
 import { ActionButton } from "@/app/ui/StandardButtons";
 import { MeetWithTeams } from "@/app/lib/types";
 
-import { fetchLabels, deleteMeet } from "@/app/lib/api/meets"
+import { fetchLabels, deleteMeet, setPublishedStatus } from "@/app/lib/api/meets"
 import { saveToFile } from "@/app/lib/saveToFile"
 import { ActionDialog } from "@/app/ui/ActionDialog";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-
+import { usePermissions } from "@/app/lib/usePermissions";
 
 
 export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
-    const [showLabelsDialog, setShowLabelsDialog] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const [openDialog, setOpenDialog] = useState('');
+    const [loading, hasPermission] = usePermissions('meets', meet.id);
 
     return (
         <>
             <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger asChild disabled={loading} hidden={
+                    !hasPermission('meet:generateLabels')
+                    && (!hasPermission('meet:publish') || !!meet.scoresPublished)
+                    && !hasPermission('meet:unpublish')
+                    && !hasPermission('meet:addOrUpdate')
+                    && !hasPermission('meet:delete')
+                }>
                     <ActionButton>
                         <span className="hidden md:inline">Actions</span>
                         <ChevronDown />
@@ -52,35 +59,59 @@ export const MeetActionsDropDown = ({ meet }: { meet: MeetWithTeams }) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onSelect={() => setShowLabelsDialog(true)}>
+
+                        <DropdownMenuItem onSelect={() => setOpenDialog('labels')} hidden={!hasPermission('meet:generateLabels')}>
                             Labels
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Billing</DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+
+                        <DropdownMenuItem hidden={!hasPermission('meet:scoreMeet')|| !!meet.scoresPublished}>
+                            <Link href={`/meets/${meet.id}/scoring`} className="text-sm">
+                                Score
+                            </Link>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onSelect={() => setOpenDialog('publish')} hidden={!!meet.scoresPublished || !hasPermission('meet:publish')}>
+                            Publish
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onSelect={() => setOpenDialog('unpublish')} hidden={!hasPermission('meet:unpublish')}>
+                            Unpublish
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem hidden={!hasPermission('meet:addOrUpdate')}>
                             <Link href={`/meets/${meet.id}/edit`} className="text-sm">
                                 Edit
                             </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setShowDeleteDialog(true)}>
+
+                        <DropdownMenuItem onSelect={() => setOpenDialog('delete')} hidden={!hasPermission('meet:delete')}>
                             Delete
                         </DropdownMenuItem>
+
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
 
             <LabelsDialog
-                meetId={meet.id} 
-                open={showLabelsDialog} 
-                onOpenChange={setShowLabelsDialog} 
+                meetId={meet.id}
+                open={openDialog === 'labels'}
+                onOpenChange={(open) => setOpenDialog(open ? 'labels' : '')}
             />
-            
-            <DeleteMeetDialog 
-                meetId={meet.id} 
-                open={showDeleteDialog} 
-                onOpenChange={setShowDeleteDialog} 
+
+            <DeleteMeetDialog
+                meetId={meet.id}
+                open={openDialog === 'delete'}
+                onOpenChange={(open) => setOpenDialog(open ? 'delete' : '')}
+            />
+            <PublishMeetDialog
+                meetId={meet.id}
+                open={openDialog === 'publish'}
+                onOpenChange={(open) => setOpenDialog(open ? 'publish' : '')}
+            />
+            <UnPublishMeetDialog
+                meetId={meet.id}
+                open={openDialog === 'unpublish'}
+                onOpenChange={(open) => setOpenDialog(open ? 'unpublish' : '')}
             />
         </>
     )
@@ -129,7 +160,7 @@ const LabelsDialog = ({
                 let l = await fetchLabels(meetId, labelSettings)
                 await saveToFile(l, `meet-${meetId}-labels.pdf`);
             }}
-            content={
+        >
             <FieldGroup className="w-full max-w-xs">
                 <FieldSet>
                     <FieldDescription>
@@ -156,8 +187,7 @@ const LabelsDialog = ({
                     </FieldGroup>
                 </FieldSet>
             </FieldGroup>
-            }
-            />
+        </ActionDialog>
     )
 };
 
@@ -187,9 +217,69 @@ export const DeleteMeetDialog = ({
                 const r = await deleteMeet(meetId);
                 r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.back();
             }}
-            content={<p className="text-red-600">This action cannot be undone.</p>}
             dangerMode
-        />
+        >
+            <p className="text-red-600">This action cannot be undone.</p>
+        </ActionDialog>
     );
 };
 
+export const PublishMeetDialog = ({
+    meetId,
+    open,
+    onOpenChange
+}: {
+    meetId: number;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}) => {
+    const router = useRouter();
+
+    if (!open) return null;
+
+    return (
+        <ActionDialog
+            isOpen={open}
+            onOpenChange={onOpenChange}
+            title="Publish Meet"
+            description="Are you sure you want to publish this meet?"
+            actionName="Publish"
+            onAction={async () => {
+                const r = await setPublishedStatus(meetId, true);
+                r.error ? toast.error(`Publish failed: ${r.error.msg}`) : router.back();
+            }}
+        >
+            <p className="">This finalizes the meet and makes the results publically visible.</p>
+        </ActionDialog>
+    );
+};
+
+export const UnPublishMeetDialog = ({
+    meetId,
+    open,
+    onOpenChange
+}: {
+    meetId: number;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}) => {
+    const router = useRouter();
+
+    if (!open) return null;
+
+    return (
+        <ActionDialog
+            isOpen={open}
+            onOpenChange={onOpenChange}
+            title="Unpublish Meet"
+            description="Are you sure you want to UNPUBLISH this meet?"
+            actionName="Unpublish"
+            onAction={async () => {
+                const r = await setPublishedStatus(meetId, false);
+                r.error ? toast.error(`Unpublish failed: ${r.error.msg}`) : router.back();
+            }}
+        >
+            <p className="">This allows the meet scores to be changed.</p>
+        </ActionDialog>
+    );
+};

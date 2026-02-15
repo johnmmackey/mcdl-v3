@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { IfUserHasPermission } from '@/app/ui/IfUserHasPermission';
 import { Button } from "@/components/ui/button";
 import { IconPlus } from '@tabler/icons-react';
 

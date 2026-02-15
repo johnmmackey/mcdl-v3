@@ -32,9 +32,11 @@ export const TeamProfile = ({
                     <Link href={`/teams/${team.id}/edit`} className="text-sm">
                         <Button size="icon" variant="outline"><Pencil /></Button>
                     </Link>
-                    <DeleteTeamDialog teamId={team.id}>
+                    
+                    <DeleteTeamDialog teamId={team.id} trigger={
                         <Button size="icon" variant="outline" className="ml-2"><Trash2 /></Button>
-                    </DeleteTeamDialog>
+                    } />
+
                 </CardAction>
             </CardHeader>
             <CardContent>

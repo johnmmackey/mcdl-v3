@@ -60,7 +60,7 @@ export const ActionDialog = ({
     onAction,
     dangerMode = false,
     children,
-    content,
+    trigger,
 }: {
     isOpen?: boolean,
     onOpenChange?: (open: boolean) => void,
@@ -70,7 +70,7 @@ export const ActionDialog = ({
     onAction: () => Promise<void>;
     dangerMode?: boolean;
     children?: React.ReactNode;
-    content?: React.ReactNode;
+    trigger?: React.ReactNode;
 }) => {
     const [isPending, startTransition] = useTransition();
 
@@ -83,14 +83,14 @@ export const ActionDialog = ({
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                {children}
+                {trigger}
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
-                {content}
+                {children}
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline">Cancel</Button>

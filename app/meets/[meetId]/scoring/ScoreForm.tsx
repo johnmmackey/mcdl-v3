@@ -10,7 +10,6 @@ import { AgeGroup, Entry, DiverScore } from '@/app/lib/types/diver';
 import { scoreMeet } from '@/app/lib/api'
 import strcmp from '@/app/lib/strcmp'
 import styles from './scoreForm.module.css';
-import { Divide } from 'lucide-react';
 
 type Inputs = Record<string, any>
 type EntryWithResult = Entry & { result: DiverScore | null };

@@ -1,7 +1,5 @@
 "use client";
-
-import { useEffect, useState } from 'react';
-import { fetchPermissions } from '@/app/lib/api/reference';
+import { usePermissions } from '@/app/lib/usePermissions';
 
 export const IfUserHasPermission = ({
     children,
@@ -12,20 +10,33 @@ export const IfUserHasPermission = ({
     children?: React.ReactNode,
     objectType: string,
     objectId?: number,
-    requiredPermission?: string
+    requiredPermission: string
 }>) => {
-    const [permissions, setPermissions] = useState<string[] | null>(null);
-
-    useEffect(() => {
-        fetchPermissions(objectType, objectId).then(perms => setPermissions(perms));
-    }, []);
-
+    const [loading, hasPermission] = usePermissions(objectType, objectId);
     return (
         <>
-            {(!requiredPermission || (permissions && permissions.includes(requiredPermission))) &&
+            {(!loading && hasPermission(requiredPermission)) &&
                 children
             }
         </>
     )
 }
 
+
+export const IfUserHasPermission2 = ({
+    children,
+    hasPermission,
+    requiredPermission
+}: Readonly<{
+    children: React.ReactNode,
+    hasPermission: (p: string) => boolean,
+    requiredPermission: string
+}>) => {
+    return (
+        <>
+            {(hasPermission(requiredPermission)) &&
+                children
+            }
+        </>
+    )
+}

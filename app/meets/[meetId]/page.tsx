@@ -2,13 +2,14 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { fetchCurrentSeasonId, fetchMeet, fetchSeasons, fetchTeams } from '@/app/lib/api';
-import { MeetWithTeams } from '@/app/lib/types/meet';
+import { getPermissions } from '@/app/lib/getPermissions';
 import { MeetProfileCard } from '@/app/meets/components/MeetProfileCard';
 
 import { MeetResults } from '../components/MeetResults';
 import { MeetScore } from '@/app/meets/components/MeetResultComponents';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MeetEntries } from '../components/MeetEntries';
+import { has } from 'lodash';
 
 /**
  * Fetches and displays details of a specific meet.
@@ -34,6 +35,7 @@ export default async function Page(props: {
     if (!meet) {
         notFound();
     }
+    const hasPermission = await getPermissions('meets', meetId); 
 
     let defaultDate = new Date();
     defaultDate.setHours(0, 0, 0, 0);
@@ -45,21 +47,23 @@ export default async function Page(props: {
 
             <Tabs defaultValue="results">
                 <TabsList variant="line">
-                    {meet.scoresPublished &&
-                        <TabsTrigger value="results" className='text-lg'>Results</TabsTrigger>
+                    <TabsTrigger value="entries" className='text-lg' hidden={!hasPermission('meet:viewEntries')}>Entries</TabsTrigger>
+                    
+                    {meet._count.scores && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
+                        <TabsTrigger value="results" className='text-lg'>
+                            {meet.scoresPublished ? 'Results' : 'PRELIMINARY Results'}
+                        </TabsTrigger>
                     }
-                    <TabsTrigger value="entries" className='text-lg'>Entries</TabsTrigger>
-                    <TabsTrigger value="scoring" className='text-lg'>Scoring</TabsTrigger>
-                    <TabsTrigger value="roster" className='text-lg'>Roster</TabsTrigger>
-                    <TabsTrigger value="reports" className='text-lg'>Reports</TabsTrigger>
+
+
                 </TabsList>
 
-                {meet.scoresPublished &&
+                {meet._count.scores && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
                     <TabsContent value="results">
                         <MeetResults meet={meet} />
                     </TabsContent>
                 }
-                <TabsContent value="entries">
+                <TabsContent value="entries" hidden={!hasPermission('meet:viewEntries')}>
                     <MeetEntries meet={meet} />
                 </TabsContent>
 
@@ -67,15 +71,9 @@ export default async function Page(props: {
                     <Link href={`/meets/${meetId}/enter`}>
                         <Button>Enter Divers</Button>
                     </Link>
-                    <Link href={`/meets/${meetId}/scoring`}>
-                        <Button>Enter Scores</Button>
-                    </Link>
-                    <Link href={`/meets/${meetId}/roster`}>
-                        <Button>Roster</Button>
-                    </Link>
-                    <Link href={`/meets/${meetId}/labels`}>
-                        <Button>Print Labels</Button>
-                    </Link>
+
+
+
                 </TabsContent>
             </Tabs>
 

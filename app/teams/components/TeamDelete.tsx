@@ -7,10 +7,10 @@ import { toast } from "sonner";
 
 export const DeleteTeamDialog = ({
     teamId,
-    children
+    trigger
 }: {
     teamId: string;
-    children: React.ReactNode;
+    trigger: React.ReactNode;
 }) => {
     const router = useRouter();
 
@@ -24,9 +24,9 @@ export const DeleteTeamDialog = ({
                 r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/teams`);
             }}
             dangerMode
-            content={<p className="text-red-600">This action cannot be undone.</p>}
+            trigger={trigger}
         >
-            {children}
+            <p className="text-red-600">This action cannot be undone.</p>
         </ActionDialog>
     );
 };

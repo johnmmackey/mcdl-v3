@@ -56,5 +56,5 @@ export async function fetchDivers({ seasonId, teamId }: { seasonId: number, team
 }
 
 export async function fetchPermissions(objectType: string, objectId?: number): Promise<string[]> {
-    return apiFetch<string[]>(`/permissions/${objectType}/${objectId || ''}`, { includeAuth: true, cache: 'no-store' });
+    return apiFetch<string[]>(`/permissions/${objectType}/${objectId || ''}`, { includeAuth: true });
 }

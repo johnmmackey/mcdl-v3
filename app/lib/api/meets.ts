@@ -2,7 +2,7 @@
 
 import { updateTag } from "next/cache"
 import { MeetWithTeams, MeetWithTeamsAndScoreCount, MeetUpdateInput, MeetCreateInput } from '@/app/lib/types/meet';
-import  {DiverScore, Entry} from '@/app/lib/types/diver';
+import { DiverScore, Entry } from '@/app/lib/types/diver';
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
 import { logEvent } from "../dynamoEventLog"
@@ -101,7 +101,7 @@ export async function scoreMeet(meetId: number, data: Array<unknown>): Promise<v
 /**
  * Set the published status for a meet's scores
  */
-export async function setPublishedStatus(meetId: number, status: boolean): Promise<void> {
+export async function setPublishedStatus(meetId: number, status: boolean): Promise<GenericServerActionState<void>> {
     const response = await apiMutate(
         `/meets/${meetId}/set-published-status`,
         'POST',
@@ -119,6 +119,7 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
         eventSubType: 'update',
         text: `Meet ${meetId} ${status ? 'published' : 'unpublished'}`
     });
+    return handleMutationResponse<void>(response);
 }
 
 
@@ -127,10 +128,10 @@ export async function fetchLabels(meetId: number, options: Record<string, unknow
 }
 
 function toQueryString(params: Record<string, unknown>): string {
-  return new URLSearchParams(
-    Object.entries(params)
-      .filter(([, value]) => value !== undefined && value !== null && value !== false)
-      .map(([key, value]) => [key, String(value)])
-  ).toString();
+    return new URLSearchParams(
+        Object.entries(params)
+            .filter(([, value]) => value !== undefined && value !== null && value !== false)
+            .map(([key, value]) => [key, String(value)])
+    ).toString();
 }
 

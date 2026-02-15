@@ -44,7 +44,7 @@ export const MyAppShell = ({
                         {session && session.user
                             ? <ProfileDropdown
                                 trigger={
-                                    <Button variant='ghost' size='icon' className='size-9.5'>
+                                    <Button id='profile-dropdown' variant='ghost' size='icon' className='size-9.5'>
                                         <Avatar className='size-9.5 '>
                                             <AvatarFallback>{userInitials(session.user.name ?? '')}</AvatarFallback>
                                         </Avatar>

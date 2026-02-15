@@ -15,9 +15,7 @@ import { MeetWithTeamsAndScoreCount } from "@/app/lib/types/meet";
 import { MeetDisplayName } from "./MeetDisplayName";
 import { TeamCompoundName } from "@/app/teams/components/TeamCompoundName";
 
-import { Pencil } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ActionButton } from "@/app/ui/StandardButtons";
+import { getPermissions } from "@/app/lib/getPermissions";
 import { MeetScore } from "./MeetResultComponents";
 import { MeetActionsDropDown } from "./MeetActionsDropDown";
 
@@ -29,7 +27,7 @@ export const MeetProfileCard = async ({
     className?: string
 }) => {
 
-
+    const hasPermission = await getPermissions('meets', meet.id);
     return (
         <Card className={className}>
             <CardHeader>
@@ -53,11 +51,13 @@ export const MeetProfileCard = async ({
                         }
 
                     </div>
-                    <div>
-                        {meet._count.scores > 0 &&
-                            <MeetScore meet={meet} />
-                        }
-                    </div>
+                    {meet._count.scores > 0 && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
+                        <div>
+                            {meet._count.scores > 0 &&
+                                <MeetScore meet={meet} />
+                            }
+                        </div>
+                    }
                 </div>
             </CardContent>
         </Card >

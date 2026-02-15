@@ -23,6 +23,8 @@ declare module "next-auth" {
 export const {
   handlers: { GET, POST },
   auth,
+  signIn,
+  signOut,
 } = NextAuth({
   debug: false,
   providers: [
