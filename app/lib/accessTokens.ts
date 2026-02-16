@@ -6,10 +6,7 @@ import { auth } from "@/auth"
 import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/navigation";
 
-const id = Date.now();
-const logger = loggerFactory({ module: 'accessTokens', subModule: `${id}` })
-
-console.log(`AccessTokens module initialized with id ${id}`);
+const logger = loggerFactory({ module: 'accessTokens' })
 
 // Extend global type for TypeScript
 declare global {
@@ -88,15 +85,14 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
 }
 
 
+// list of active refreshes
+// only want to do one refresh for a user, so we keep a static list
+let activeRefreshes: ActiveRefresh[] = [];
+
+
 export const storeAccount = async (userId: string, account: Account, refresh?: boolean): Promise<void> => {
-  logger.debug(`storing account for ${userId}, expiry at ${account.expires_at ? (new Date(account.expires_at * 1000)).toISOString() : 'unknown'}`);
-  const at = jwtDecode(account.access_token!) as Record<string, string | number>;
-  logger.debug(`access token expires_at: ${at.exp ? (new Date(Number(at.exp) * 1000)).toISOString() : 'unknown'}, current time: ${Date.now()}, (in ${at.exp ? (Number(at.exp) * 1000 - Date.now()) / 1000 : 'unknown'} seconds )`);
-  const expDelta = Math.abs(at.exp as number - account.expires_at!);
-  logger.debug(`expiry delta: ${expDelta} seconds`);
-  if (expDelta > 60) {
-    logger.warn(`Decoded access token expiration time differs from expected by more than 60 seconds for session ${userId}. Decoded exp: ${at.exp}, expected exp: ${account.expires_at}, delta: ${expDelta} seconds`);
-  }
+
+  logger.debug(`storing account for session ${userId}, expiry at ${account.expires_at ? (new Date(account.expires_at * 1000)).toISOString() : 'unknown'}`);
   const client = await getClient();
 
   await client.set(
@@ -112,19 +108,17 @@ export const storeAccount = async (userId: string, account: Account, refresh?: b
     })
   );
 }
-// list of active refreshes
-// only want to do one refresh for a user, so we keep a static list
-let activeRefreshes: ActiveRefresh[] = [];
 
 
-// IMPORTANT: the userId here is the auth.js user id, NOT the provider ID or the Cognito "sub"
+
+
+// IMPORTANT: the userId here is the auth.js user id (session), NOT the provider ID or the Cognito "sub"
 export const getAccessToken = async (): Promise<string | null> => {
-  logger.debug(`getting access token starts...`);
 
   const session = await auth();
-  if (!session || !session.user) {
-    return null;
-  }
+  if (!session || !session.user)
+   return null;
+
   const userId = session.user.id as string;
 
   logger.debug(`getting access token for ${userId}`);
@@ -132,35 +126,26 @@ export const getAccessToken = async (): Promise<string | null> => {
   const client = await getClient();
   let account: Account = JSON.parse(await client.get((process.env.REDIS_KEY_PREFIX ?? '') + userId) as string);
 
-
-  if (account) {
-    logger.debug(`access token found for ${userId}: ${!!account.access_token}, expires at ${account.expires_at ? (new Date(account.expires_at * 1000)).toISOString() : 'unknown'}`);
-    logger.debug(`token: ${account.access_token}, expires_at: ${account.expires_at}, current time: ${Date.now()}, (in ${account.expires_at ? (account.expires_at * 1000 - Date.now()) / 1000 : 'unknown'} seconds )`);
-  } else {
+  if (!account) {
     logger.warn(`no access token found for ${userId}`);
-
-    redirect('/-out');
-    return null;
+    redirect('/logging-out');
   }
 
-  //logger.debug(`getAccessToken found a token; expires at ${(new Date(account.expires_at * 1000)).toISOString()}`);
   if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
     return account.access_token ?? null;
 
   // we need to refresh the token
   // but it might already be underway, so check for that and short circuit if so
-  //logger.debug('getAccessToken refreshing tokens...');
+  
+  logger.debug(`getAccessToken refreshing tokens for user ${userId}...`);
 
   const existingRefresh = activeRefreshes.find(e => e.userId === userId);
-  if (existingRefresh) {
+  if (existingRefresh)
     return existingRefresh.promiseOfRefreshedTokens.then(r => r.access_token);
-  }
 
   // new one, so lets start it
   if (!account.refresh_token)
     throw new Error('no refresh token available')
-
-  logger.debug('getAccessToken starting new token refresh... for user ' + userId);
 
   const promiseOfRefreshedTokens = getRefreshedTokens(account.refresh_token);
   activeRefreshes.push({ userId, promiseOfRefreshedTokens });
@@ -193,9 +178,9 @@ const getRefreshedTokens = async (refresh_token: string): Promise<RefreshRespons
     },
   });
 
-  // FIX. need to figure out what to do if refresh fails. for now just throw an error, but maybe want to log out user.
+
   if (!response.ok)
-    throw new Error(`Post to COGNITO token endpoint failed: ${response.statusText}: ${await response.text()}`);
+    redirect('/logging-out');
 
   return await response.json();
 }
