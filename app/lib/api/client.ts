@@ -1,6 +1,6 @@
 'use server'
 
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { getAccessToken } from "@/app/lib/accessTokens"
 import { GenericServerActionState } from "../types/baseTypes"
 
@@ -45,6 +45,9 @@ export async function apiFetch<T>(
     if (!response.ok) {
         if (response.status === 404) {
             notFound();
+        } else if (response.status === 401) {
+            // For 401 errors, we want to redirect to the logging out page, which will handle clearing the session and redirecting to the home page afterwards. This is necessary because the 401 could be due to an expired token, and we want to ensure the user is properly logged out and prompted to log in again. 
+            redirect('/logging-out');
         }
         const text = await response.text();
         throw new Error(`Error fetching ${url}: ${response.status} ${response.statusText}${text ? ` - ${text}` : ''}`);

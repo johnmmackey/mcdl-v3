@@ -58,3 +58,8 @@ export async function fetchDivers({ seasonId, teamId }: { seasonId: number, team
 export async function fetchPermissions(objectType: string, objectId?: number): Promise<string[]> {
     return apiFetch<string[]>(`/permissions/${objectType}/${objectId || ''}`, { includeAuth: true });
 }
+
+export async function fetch401(): Promise<void> {
+    console.log('Fetching 401 endpoint to test redirection...');
+    return apiFetch<void>(`/test401`);
+}

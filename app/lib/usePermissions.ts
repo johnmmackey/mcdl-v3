@@ -12,7 +12,6 @@ export const usePermissions = (objectType: string, objectId: number | undefined)
     useEffect(() => {
         fetchPermissions(objectType, objectId)
             .then(perms => {
-                console.log('Permissions for', objectType, objectId, ':', perms);
                 return perms;
             })
             .then(perms => setPermissions(perms))
