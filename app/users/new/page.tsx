@@ -1,5 +1,5 @@
 import React from 'react';
-import UserForm from '../components/userForm'
+import { UserForm } from '../components/UserForm'
 import { User } from '@/app/lib/types/user';
 import { fetchUser } from '@/app/lib/api/users';
 
@@ -7,7 +7,7 @@ import { fetchUser } from '@/app/lib/api/users';
 export default async function Page() {
 
 
-    let user = { givenName: '', familyName: '', email: '' };
+    let user = { sub: '', givenName: '', familyName: '', email: '', note: '', roles: [] };;
 
     return (
         <div>
@@ -15,7 +15,7 @@ export default async function Page() {
                 <div>User not found</div>
             }
             {user &&
-                <UserForm user={user as User} newUser={true} />
+                <UserForm user={user} newUser={true} />
             }
         </div>
     )

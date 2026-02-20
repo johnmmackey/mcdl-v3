@@ -11,7 +11,9 @@ export type User  = {
     givenName: string,
     familyName: string,
     email: string,
-    note?: string,
-    userStatus?: string,
+    note: string,
+    userStatus: string,
     roles: UserRole[]
 }
+
+export type UserCreateUpdateInput = Omit<User, 'sub' | 'userStatus'>;

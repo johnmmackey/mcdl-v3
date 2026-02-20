@@ -7,17 +7,18 @@ import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from '@/components/ui/button'
-import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect } from '@/app/ui/FormFields';
+import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect, FormSubmitCancelButtons } from '@/app/ui/FormFields';
 import { toast } from 'sonner'
 
 import { MeetEditable } from '@/app/lib/types/meet'
 import { Season } from '@/app/lib/types/season';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/api';
 
-import { Processing, AreYouSure } from "@/app/ui/Processing"
+import { Processing } from "@/app/ui/Processing"
 
-const inputSchema = z.object({
+
+// define the schema for the form
+const formValidationSchema = z.object({
     seasonId: z.number(),
     meetDate: z.iso.datetime({ offset: true }),
     meetType: z.string(),
@@ -30,10 +31,7 @@ const inputSchema = z.object({
     coordinatorPoolId: z.string().nullable(),
 
     teamList: z.string().array()
-});
-
-// define the schema for the form
-const formValidationSchema = inputSchema
+})
     .refine((data) => !['Dual', 'Div'].includes(data.meetType) || data.divisionId, {
         message: "Division not specified for Dual/Div meet",
         path: ["divisionId"], // path of error
@@ -83,7 +81,7 @@ export const MeetForm = ({
 
     const form = useForm({
         resolver: zodResolver(formValidationSchema),
-        defaultValues: inputSchema.parse(meet)//inputSchema.decode(meet)
+        defaultValues: meet
     });
 
     const [seasonId, meetType, divisionId] = useWatch({
@@ -151,23 +149,7 @@ export const MeetForm = ({
 
             <FormFieldMultiSelect form={form} name="teamList" label="Teams" options={activeTeamIds} />
 
-
-            <div className='flex mx-4 my-4 gap-x-4'>
-                <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
-                    Cancel
-                </Button>
-
-                <Button type="submit" variant="default" disabled={false} >
-                    Submit
-                </Button>
-
-                {meet.id && !meet.scoresPublished &&
-                    <AreYouSure msg="This action cannot be undone. Are you sure you want to permanently delete this meet?" onConfirm={handleDelete} >
-                        <Button type="button" variant="destructive" >Delete Meet</Button>
-                    </AreYouSure>
-                }
-            </div>
-
+            <FormSubmitCancelButtons cancelHref="/meets" />
 
             <Processing open={isPending} />
         </form>

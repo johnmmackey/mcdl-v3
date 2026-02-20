@@ -49,16 +49,16 @@ type ScoreCount = {
 export type MeetWithTeams = Meet & HostPool & MeetTeamsWithDetail;
 export type MeetWithTeamsAndScoreCount = Meet & HostPool & MeetTeamsWithDetail & ScoreCount;
 
-// Combined Type for Meet Form
+// Type for Meet Form - id is not editable and teams are represented as a list of team IDs for easier form handling
 export type MeetEditable = Omit<Meet, 'id' |'teams' > & {
     id: number | null
     teamList: string[]
 }
 
 // Create and Update Types
-export type MeetCreateInput = {
+export type MeetCreateUpdateInput = {
     seasonId: number,
-    customName?: string | null,
+    customName: string | null,
     parentMeet?: number | null,
     meetDate: string,
     entryDeadline?: string | null,
@@ -69,7 +69,7 @@ export type MeetCreateInput = {
     teamList: string[]
 
 }
-
+/*
 export type MeetUpdateInput = {
     seasonId?: number,
     customName?: string | null,
@@ -84,4 +84,4 @@ export type MeetUpdateInput = {
 }
 
 
-
+*/

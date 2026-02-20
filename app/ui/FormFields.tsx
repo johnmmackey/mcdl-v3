@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useId } from 'react';
-import { Button, } from '@/components/ui/button'
+import { Button, } from '@/components/ui/button';
+import { useRouter } from 'next/navigation'
 
 
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -327,9 +328,9 @@ export const FormFieldCheckBox = ({
             label={label}
             checkbox={true}
             render={(id, field, fieldState) => {
-                return <Checkbox 
-                    id={id} 
-                    disabled={disabled} 
+                return <Checkbox
+                    id={id}
+                    disabled={disabled}
                     checked={field.value}
                     onCheckedChange={field.onChange}
                     ref={field.ref}
@@ -337,5 +338,26 @@ export const FormFieldCheckBox = ({
             }
             }
         />
+    )
+}
+
+export const FormSubmitCancelButtons = ({
+    cancelHref = '/'
+}: Readonly<{
+    cancelHref: string
+}>) => {
+    const router = useRouter();
+
+    return (
+        <div className='flex mx-4 my-4 gap-x-4'>
+            <Button type="button" onClick={() => router.push(cancelHref)} disabled={false} variant='outline'>
+                Cancel
+            </Button>
+
+            <Button type="submit" variant="default" disabled={false} >
+                Submit
+            </Button>
+
+        </div>
     )
 }
