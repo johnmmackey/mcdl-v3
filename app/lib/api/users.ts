@@ -13,7 +13,7 @@ export async function fetchUser(userId: string): Promise<User> {
     return apiFetch<User>(`/users/${userId}`, { cache: 'no-store', includeAuth: true });
 }
 
-export async function addUser(user: UserCreateInput): Promise<GenericServerActionState<User>> {
+export async function createUser(user: UserCreateInput): Promise<GenericServerActionState<User>> {
     const response = await apiMutate(
         `/users`,
         'POST',

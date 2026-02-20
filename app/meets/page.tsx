@@ -26,7 +26,7 @@ export default async function Page(props: {
         <>
             <div className="flex justify-between mb-4">
                 <SeasonSelector base="/meets" selectedSeasonId={selectedSeasonId} />
-                <IfUserHasPermission objectType="meets" requiredPermission='meet:addOrUpdate' >
+                <IfUserHasPermission objectType="meets" requiredPermission='meet:createOrUpdate' >
                      <NewButton href={`/meets/new`} />
                 </IfUserHasPermission>
             </div>

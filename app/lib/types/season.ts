@@ -88,7 +88,8 @@ export type SeasonCreateUpdateInput = {
     startDate: string,
     endDate: string,
     week1Date: string
-    divisionAssignments: TeamSeasonCreateInput[]
+    divisionAssignments: TeamSeasonCreateInput[],
+    createStandardMeets: boolean
 }
 
 

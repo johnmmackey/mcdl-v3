@@ -68,7 +68,7 @@ const meetActions: MeetAction[] = [
     {
         id: 'edit',
         label: 'Edit',
-        requiredPermission: 'meet:addOrUpdate',
+        requiredPermission: 'meet:createOrUpdate',
         requiredMeetState: [MeetState.UNSCORED],
         route: '/edit',
     },

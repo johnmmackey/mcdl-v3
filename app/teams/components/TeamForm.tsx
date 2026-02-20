@@ -8,7 +8,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from '@/components/ui/button'
-import { FormFieldInput, FormFieldCheckBox } from '@/app/ui/FormFields';
+import { FormFieldInput, FormFieldCheckBox, FormSubmitCancelButtons } from '@/app/ui/FormFields';
 import { toast } from 'sonner'
 
 import { Team } from '@/app/lib/types/team'
@@ -16,25 +16,18 @@ import { updateTeam, createTeam } from '@/app/lib/api';
 
 import { Processing } from "@/app/ui/Processing"
 
+// These need to be nullable because the input "team" may have null values for these fields, and react-hook-form will throw an error if the default values don't match the schema
+
 const formValidationSchema = z.object({
     id: z.string().min(1, "Team Code is required").max(5, "Team Code must be at most 5 characters").regex(/^[A-Z]+$/, "Team Code must be uppercase letters only"),
-    name: z.string().min(4, "Team Name is required and must be at least 4 characters").regex(/^[A-Za-z0-9 -]+$/, "Team Name contains invalid characters"),
-    clubName: z.string(),
-    address1: z.string(),
-    address2: z.string(),
-    phone: z.string().max(20, "Phone number must be at most 20 characters"),
-    url: z.url().or(z.literal('')),
+    name: z.string().min(4, "Team Name is required and must be at least 4 characters").regex(/^[A-Za-z0-9 -]+$/, "Team Name contains invalid characters").nullable(),
+    clubName: z.string().nullable(),
+    address1: z.string().nullable(),
+    address2: z.string().nullable(),
+    phone: z.string().max(20, "Phone number must be at most 20 characters").nullable(),
+    url: z.url().or(z.literal('')).nullable(),
     archived: z.boolean(),
 });
-
-const  inputSchema = formValidationSchema
-    .omit({ id: true, name: true })
-    .extend({
-        id: z.string(),
-        name: z.string(),
-    })  
-;
-
 
 export const TeamForm = ({
     team,
@@ -47,9 +40,8 @@ export const TeamForm = ({
 
     const form = useForm({
         resolver: zodResolver(formValidationSchema),
-        defaultValues: inputSchema.parse(team)
+        defaultValues: team// inputSchema.parse(team)
     });
-
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
@@ -71,16 +63,7 @@ export const TeamForm = ({
             <FormFieldCheckBox form={form} name="archived" label="Archived" />
             
 
-            <div className='flex mx-4 my-4 gap-x-4'>
-                <Button type="button" onClick={() => router.push('/teams')} disabled={false} variant='outline'>
-                    Cancel
-                </Button>
-
-                <Button type="submit" variant="default" disabled={false} >
-                    Submit
-                </Button>
-
-            </div>
+            <FormSubmitCancelButtons cancelHref="/teams" />
 
             <Processing open={isPending} />
         </form>

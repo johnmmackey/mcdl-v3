@@ -12,7 +12,7 @@ export default async function Page() {
     return (
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-4">
-                <IfUserHasPermission objectType="teams" requiredPermission='team:addOrUpdate' >
+                <IfUserHasPermission objectType="teams" requiredPermission='team:createOrUpdate' >
                     <NewButton href={`/teams/new`} />
                 </IfUserHasPermission>
             </div>

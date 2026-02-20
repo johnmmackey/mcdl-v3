@@ -10,7 +10,7 @@ export default async function Page() {
     return (
         <>
             <div className="flex justify-end mb-4">
-                <IfUserHasPermission objectType="users" requiredPermission='user:addOrUpdate' >
+                <IfUserHasPermission objectType="users" requiredPermission='user:createOrUpdate' >
                     <NewButton href={`/users/new`} />
                 </IfUserHasPermission>
             </div>

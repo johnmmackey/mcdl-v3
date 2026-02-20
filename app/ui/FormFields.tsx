@@ -45,6 +45,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { ActionButton, CancelButton } from './StandardButtons';
 
 
 const FormFieldGeneric = ({
@@ -349,14 +350,14 @@ export const FormSubmitCancelButtons = ({
     const router = useRouter();
 
     return (
-        <div className='flex mx-4 my-4 gap-x-4'>
-            <Button type="button" onClick={() => router.push(cancelHref)} disabled={false} variant='outline'>
+        <div className='flex justify-end mx-4 my-8 gap-x-4'>
+            <CancelButton type="button" onClick={() => router.push(cancelHref)} >
                 Cancel
-            </Button>
+            </CancelButton>
 
-            <Button type="submit" variant="default" disabled={false} >
+            <ActionButton type="submit" disabled={false} >
                 Submit
-            </Button>
+            </ActionButton>
 
         </div>
     )

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useForm, useWatch } from "react-hook-form"
@@ -7,26 +7,25 @@ import { useForm, useWatch } from "react-hook-form"
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from '@/components/ui/button'
-import { FormFieldInput, FormFieldDatePicker, FormFieldCheckBox } from '@/app/ui/FormFields';
+import { FormFieldInput, FormFieldDatePicker, FormFieldCheckBox, FormSubmitCancelButtons } from '@/app/ui/FormFields';
 import { toast } from 'sonner'
 
 import { DivisionAssignments } from './DivisionAssignments';
 
-import { Season, DivisionAssignment, Division, TeamSeasonCreateInput } from '@/app/lib/types/season';
+import { DivisionAssignment, Division, TeamSeasonCreateInput } from '@/app/lib/types/season';
 import { Team } from '@/app/lib/types/team';
 import { createSeason, updateSeason } from '@/app/lib/api';
 
 import { Processing } from "@/app/ui/Processing"
+import { create } from 'lodash';
 
-const inputSchema = z.object({
-    id: z.coerce.number(),
+const formValidationSchema = z.object({
+    id: z.number(),
     week1Date: z.iso.datetime({ offset: true }),
-    createStandardMeets: z.boolean().optional().default(true),
+    createStandardMeets: z.boolean().optional(),    // optional because it won't be sent when false due to how checkboxes work
 });
 
-// define the schema for the form
-const formValidationSchema = inputSchema;
+type SeasonFormInput = z.infer<typeof formValidationSchema>;
 
 export const SeasonForm = ({
     season,
@@ -35,11 +34,11 @@ export const SeasonForm = ({
     divAssignments,
     newSeason = false
 }: Readonly<{
-    season: Season,
+    season: SeasonFormInput,
     teams: Team[],
     divisions: Division[],
     divAssignments: DivisionAssignment[],
-    newSeason?: boolean
+    newSeason: boolean
 }>) => {
 
     const router = useRouter();
@@ -50,9 +49,9 @@ export const SeasonForm = ({
         seed: da.seed
     })));
 
-    const form = useForm({
+    const form = useForm<SeasonFormInput>({
         resolver: zodResolver(formValidationSchema),
-        defaultValues: inputSchema.parse(season)//inputSchema.decode(meet)
+        defaultValues: season//inputSchema.parse(season)//inputSchema.decode(meet)
     });
 
     const handleDivAssignmentChange = (newAssignments: TeamSeasonCreateInput[]) => {
@@ -62,9 +61,11 @@ export const SeasonForm = ({
     }
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
+        console.log("Form Data:", data);
         startTransition(async () => {
             const extendedData = {
                 ...data,
+                createStandardMeets: data.createStandardMeets || false, // default to false if not provided - damn checkbox
                 name: `Season ${season.id}`,
                 startDate: new Date(season.id, 5, 1).toISOString(),
                 endDate: new Date(season.id, 7, 1).toISOString(),
@@ -90,17 +91,7 @@ export const SeasonForm = ({
                 <FormFieldCheckBox form={form} name="createStandardMeets" label="Create Standard Meets" />
             </div>
 
-
-            <div className='flex mx-4 my-4 gap-x-4'>
-                <Button type="button" onClick={() => router.push('/meets')} disabled={false} variant='outline'>
-                    Cancel
-                </Button>
-
-                <Button type="submit" variant="default" disabled={false} >
-                    Submit
-                </Button>
-
-            </div>
+            <FormSubmitCancelButtons cancelHref="/seasons" />
 
 
             <Processing open={isPending} />

@@ -11,6 +11,15 @@ export const ActionButton = ({ children, ...props }: React.ButtonHTMLAttributes<
     );
 }
 
+export const CancelButton = ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+    return (
+        <Button variant="outline" size="lg" className='border-2' {...props}>
+            {children}
+        </Button>
+    );
+}
+
+
 
 // because it happens so much
 export const NewButton = ({

@@ -14,7 +14,7 @@ export default async function Page() {
     return (
         <Suspense fallback={Loading()} >
             <div className="flex justify-end mb-2">
-                <IfUserHasPermission objectType="seasons" requiredPermission='season:addOrUpdate' >
+                <IfUserHasPermission objectType="seasons" requiredPermission='season:createOrUpdate' >
                      <NewButton href={`/seasons/new`} />
                 </IfUserHasPermission>
             </div>
