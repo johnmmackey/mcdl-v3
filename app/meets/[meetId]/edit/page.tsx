@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { fetchMeet, fetchSeasons } from '@/app/lib/api';
-import { MeetCreateUpdateInput, MeetEditable } from '@/app/lib/types/meet';
+import { MeetCreateUpdateInput } from '@/app/lib/types/meet';
 import { MeetForm } from '@/app/meets/components';
 
 
@@ -14,19 +14,19 @@ export default async function Page(props: {
     if (!meetId) 
         notFound();
 
-    let meetEditable: MeetCreateUpdateInput;
+    let meetdata: MeetCreateUpdateInput;
 
     const meet = await fetchMeet(meetId);
     if (!meet) 
         notFound();
 
-    meetEditable = {
+    meetdata = {
         ...meet,
         teamList: meet.teams.map(t => t.teamId)
     };
 
     return (
-        <MeetForm meet={meetEditable} seasons={seasons} />
+        <MeetForm meetId={meetId} meet={meetdata} seasons={seasons} />
     )
 }
 

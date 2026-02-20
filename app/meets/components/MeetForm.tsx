@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormFieldInput, FormFieldDatePicker, FormFieldSelect, FormFieldMultiSelect, FormSubmitCancelButtons } from '@/app/ui/FormFields';
 import { toast } from 'sonner'
 
-import { MeetEditable } from '@/app/lib/types/meet'
+import { MeetCreateUpdateInput } from '@/app/lib/types/meet'
 import { Season } from '@/app/lib/types/season';
 import { fetchTeamsForSeason, updateMeet, createMeet, deleteMeet } from '@/app/lib/api';
 
@@ -66,10 +66,12 @@ const formValidationSchema = z.object({
 
 
 export const MeetForm = ({
+    meetId,
     meet,
     seasons,
 }: Readonly<{
-    meet: MeetEditable,
+    meetId?: number | null,
+    meet: MeetCreateUpdateInput,
     seasons: Season[]
 }>) => {
 
@@ -108,15 +110,8 @@ export const MeetForm = ({
 
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
-            let r = await (meet.id ? updateMeet(meet.id, data) : createMeet(data));
+            let r = await (meetId ? updateMeet(meetId, data) : createMeet(data));
             r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/meets`);
-        });
-    }
-
-    const handleDelete = () => {
-        startTransition(async () => {
-            let r = await deleteMeet(meet.id!)
-            r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/meets`);
         });
     }
 
