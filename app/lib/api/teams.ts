@@ -5,7 +5,6 @@ import omit from 'lodash/omit'
 import { Team, TeamWithTeamSeasons } from "../types/team"
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
-import { logEvent } from "../dynamoEventLog"
 
 /**
  * Fetch all teams
@@ -30,7 +29,6 @@ export async function createTeam(team: Team): Promise<GenericServerActionState<T
 
     if (response.ok) {
         updateTag('teams');
-        await logEvent({ eventType: 'app', eventSubType: 'create', text: `Team ${team.id} created` });
     }
 
     return handleMutationResponse<Team>(response);
@@ -46,7 +44,6 @@ export async function updateTeam(team: Team): Promise<GenericServerActionState<T
 
     if (response.ok) {
         updateTag('teams');
-        await logEvent({ eventType: 'app', eventSubType: 'update', text: `Team ${team.id} updated` });
     }
 
     return handleMutationResponse<Team>(response);
@@ -60,7 +57,6 @@ export async function deleteTeam(teamId: string): Promise<GenericServerActionSta
 
     if (response.ok) {
         updateTag('teams');
-        await logEvent({ eventType: 'app', eventSubType: 'delete', text: `Team ${teamId} deleted` });
     }
 
     return handleMutationResponse<Team>(response);

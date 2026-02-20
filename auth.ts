@@ -14,9 +14,6 @@ declare module "next-auth" {
     sub: string,
     givenName: string,
     familyName: string,
-    zoneinfo?: string,
-    groups?: string[],
-    serializedGroups?: string,
   }
 }
 
@@ -38,9 +35,6 @@ export const {
           name: profile.given_name + ' ' + profile.family_name,
           givenName: profile.given_name,
           familyName: profile.family_name,
-          zoneinfo: profile.zoneinfo,
-          groups: profile["cognito:groups"],
-          serializedGroups: profile["custom:serialized_groups"],
         }
       },
     })
@@ -68,9 +62,6 @@ export const {
       session.user.sub = token.sub as string;
       session.user.givenName = token.givenName as string;
       session.user.familyName = token.familyName as string;
-      session.user.groups = token.groups as string[];
-      session.user.zoneinfo = token.zoneinfo as string;
-      session.user.serializedGroups = token.serializedGroups as string;
 
       return session
     },

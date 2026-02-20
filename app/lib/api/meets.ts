@@ -5,7 +5,7 @@ import { MeetWithTeams, MeetWithTeamsAndScoreCount, MeetUpdateInput, MeetCreateI
 import { DiverScore, Entry } from '@/app/lib/types/diver';
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
-import { logEvent } from "../dynamoEventLog"
+
 import { loggerFactory } from '../logger'
 
 const logger = loggerFactory({ module: 'meets-api' })
@@ -46,7 +46,6 @@ export async function createMeet(meet: MeetCreateInput): Promise<GenericServerAc
 
     if (response.ok) {
         updateTag('meets');
-        await logEvent({ eventType: 'app', eventSubType: 'create', text: 'Meet created' });
     }
 
     return handleMutationResponse<MeetWithTeams>(response);
@@ -61,7 +60,6 @@ export async function updateMeet(meetId: number, meet: MeetUpdateInput): Promise
     if (response.ok) {
         updateTag(`meet:${meetId}`);
         updateTag('meets');
-        await logEvent({ eventType: 'app', eventSubType: 'update', text: `Meet ${meetId} updated` });
     }
 
     return handleMutationResponse<MeetWithTeams>(response);
@@ -75,7 +73,6 @@ export async function deleteMeet(meetId: number): Promise<GenericServerActionSta
 
     if (response.ok) {
         updateTag('meets');
-        await logEvent({ eventType: 'app', eventSubType: 'delete', text: `Meet ${meetId} deleted` });
     }
 
     return handleMutationResponse<MeetWithTeams>(response);
@@ -95,7 +92,6 @@ export async function scoreMeet(meetId: number, data: Array<unknown>): Promise<v
 
     updateTag(`meet:${meetId}`);
     updateTag('meets');
-    await logEvent({ eventType: 'app', eventSubType: 'update', text: `Scores saved for meet ${meetId}` });
 }
 
 /**
@@ -115,11 +111,6 @@ export async function setPublishedStatus(meetId: number, status: boolean): Promi
     updateTag(`meet:${meetId}`);
     updateTag('meets');
 
-    await logEvent({
-        eventType: 'app',
-        eventSubType: 'update',
-        text: `Meet ${meetId} ${status ? 'published' : 'unpublished'}`
-    });
     return handleMutationResponse<void>(response);
 }
 

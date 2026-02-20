@@ -19,7 +19,7 @@ export const Processing = ({
     return (
         <>
             {open &&
-                <div className='fixed inset-0 bg-stone-100/70 z-100 flex justify-center items-center'>
+                <div className='fixed inset-0 bg-stone-100/70 z-100 flex justify-center items-center h-screen w-screen'>
                     <IconRefresh className="animate-spin text-gray-300" size={128} />
                 </div>
             }

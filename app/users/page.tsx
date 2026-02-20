@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { Button } from "@/components/ui/button"
-import { fetchUsers } from '@/app/lib/userPoolData';
+import { fetchUsers } from '@/app/lib/api/users';
+import { IfUserHasPermission } from '../ui/IfUserHasPermission';
+import { NewButton } from '../ui/StandardButtons';
 
 export default async function Page() {
 
@@ -8,30 +9,29 @@ export default async function Page() {
 
     return (
         <>
-            <Link href='/users/_'>
-                <Button variant='default'>
-                    Add
-                </Button>
-            </Link>
-
-            <div className="grid grid-cols-11 gap-2">
-
-                <div className="col-span-4">Name</div>
-                <div className="col-span-6">Email</div>
-                <div className="col-span-1">Groups</div>
-
+            <div className="flex justify-end mb-4">
+                <IfUserHasPermission objectType="users" requiredPermission='user:addOrUpdate' >
+                    <NewButton href={`/users/new`} />
+                </IfUserHasPermission>
             </div>
-            <hr />
-            {users.map((u, k) =>
-                <Link key={k} href={"/users/"+u.sub}>
-                    <div key={k} className='grid grid-cols-11 gap-2 hover:bg-slate-200 cursor-pointer'>
-                        <div className="col-span-4">{u.familyName}, {u.givenName}</div>
-                        <div className="col-span-6">{u.email}</div>
-                        <div className="col-span-1">{u.serializedGroups}</div>
+            <div className='grid grid-cols-[auto_auto_auto_auto] gap-x-2'>
 
-                    </div>
+                <div >Name</div>
+                <div >Email</div>
+                <div>Groups</div>
+
+
+            {users.map((u, k) =>
+                <Link key={k} href={"/users/"+u.sub} className='col-span-full grid grid-cols-subgrid hover:bg-gray-100 cursor-pointer py-1'>
+
+                        <div >{u.familyName}, {u.givenName}</div>
+                        <div >{u.email}</div>
+                        <div >{u.roles.map(r => `${r.role}:${r.objectType}:${r.objectId}`).join(', ')}</div>
+
+
                 </Link>
             )}
+            </div>
         </>
     )
 }

@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useForm, SubmitHandler } from "react-hook-form"
 import styles from './newUser.module.css';
-import { addUser, delUser, User } from '@/app/lib/userPoolData';
+import type { User } from '@/app/lib/types/user';
 
 export default function Page({ user, newUser }: { user: User, newUser: boolean }) {
 

@@ -23,6 +23,8 @@ export default async function Page() {
                 <div className='grid-table-header-cells'>Archived</div>
                 <div className='grid-table-header-cells'>URL</div>
 
+                                <div className='col-span-full'><hr /></div>
+
                 {teams.map((t, k) =>
                     <Link key={t.id} href={`/teams/${t.id}`} className='col-span-full grid grid-cols-subgrid hover:bg-gray-100 cursor-pointer py-1'>
                         <div>{t.name}</div>

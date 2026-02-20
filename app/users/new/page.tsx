@@ -4,19 +4,18 @@ import { User } from '@/app/lib/types/user';
 import { fetchUser } from '@/app/lib/api/users';
 
 
-export default async function Page(props: { params: Promise<{ userId: string }> }) {
-    const userId = (await props.params).userId;
+export default async function Page() {
 
-    let user = userId === '_' ? ({ givenName: '', familyName: '', email: '' }) : await fetchUser(userId);
+
+    let user = { givenName: '', familyName: '', email: '' };
 
     return (
         <div>
-            asd
             {!user &&
                 <div>User not found</div>
             }
             {user &&
-                <UserForm user={user as User} newUser={userId === '_'} />
+                <UserForm user={user as User} newUser={true} />
             }
         </div>
     )

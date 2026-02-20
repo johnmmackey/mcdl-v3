@@ -5,7 +5,6 @@ import omit from 'lodash/omit'
 import { Season, TeamSeasonWithTeam, SeasonCreateUpdateInput } from "../types/season"
 import { GenericServerActionState } from "@/app/lib/types/baseTypes"
 import { apiFetch, apiMutate, handleMutationResponse, createErrorResult } from "./client"
-import { logEvent } from "../dynamoEventLog"
 
 /**
  * Fetch the current season ID
@@ -47,7 +46,6 @@ export async function createSeason(season: SeasonCreateUpdateInput): Promise<Gen
 
     if (response.ok) {
         updateTag('seasons');
-        await logEvent({ eventType: 'app', eventSubType: 'create', text: `Season ${season.id} created` });
     }
 
     return handleMutationResponse<Season>(response);
@@ -65,7 +63,6 @@ export async function updateSeason(season: SeasonCreateUpdateInput): Promise<Gen
 
     if (response.ok) {
         updateTag('seasons');
-        await logEvent({ eventType: 'app', eventSubType: 'update', text: `Season ${season.id} updated` });
     }
 
     return handleMutationResponse<Season>(response);
@@ -79,7 +76,6 @@ export async function deleteSeason(seasonId: number): Promise<GenericServerActio
 
     if (response.ok) {
         updateTag('seasons');
-        await logEvent({ eventType: 'app', eventSubType: 'delete', text: `Season ${seasonId} deleted` });
     }
 
     return handleMutationResponse<Season>(response);
@@ -97,7 +93,6 @@ export async function makeSeasonCurrent(seasonId: number): Promise<GenericServer
     if (response.ok) {
         updateTag('seasons');
         updateTag('current-season');
-        await logEvent({ eventType: 'app', eventSubType: 'update', text: `Season ${seasonId} set as current` });
     }
 
     return handleMutationResponse<null>(response);
