@@ -12,8 +12,11 @@ export type User  = {
     familyName: string,
     email: string,
     note: string,
-    userStatus: string,
+    status: string;
+    createDate: string;
+    lastModifiedDate: string;
+    enabled: boolean;
     roles: UserRole[]
 }
 
-export type UserCreateUpdateInput = Omit<User, 'sub' | 'userStatus'>;
+export type UserCreateUpdateInput = Omit<User, 'sub' | 'status' | 'createDate' | 'lastModifiedDate'> 

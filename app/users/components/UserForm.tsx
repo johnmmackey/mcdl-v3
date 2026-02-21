@@ -3,13 +3,13 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation'
 
 import * as z from "zod";
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormFieldInput, FormSubmitCancelButtons } from '@/app/ui/FormFields';
+import { FormFieldCheckBox, FormFieldInput, FormSubmitCancelButtons } from '@/app/ui/FormFields';
 import { Processing } from '@/app/ui/Processing';
 import { toast } from 'sonner'
 
-import type { User } from '@/app/lib/types/user';
+import type { User, UserCreateUpdateInput } from '@/app/lib/types/user';
 
 import { createUser, updateUser } from '@/app/lib/api/users';
 
@@ -19,6 +19,7 @@ const formValidationSchema = z.object({
     familyName: z.string().min(1, "Family Name is required"),
     email: z.email(),
     note: z.string(),
+    enabled: z.boolean().optional(),
     roles: z.array(z.object({
         role: z.string(),
         objectType: z.string(),
@@ -26,7 +27,7 @@ const formValidationSchema = z.object({
     }))
 });
 
-export function UserForm({ user, newUser }: { user: User, newUser: boolean }) {
+export function UserForm({ userId, user }: { userId?: string, user: UserCreateUpdateInput }) {
 
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
@@ -37,25 +38,25 @@ export function UserForm({ user, newUser }: { user: User, newUser: boolean }) {
     });
 
     const handleSubmit = (data: z.infer<typeof formValidationSchema>) => {
+        const fdata = {...data,
+            enabled: !!data.enabled
+        }
         startTransition(async () => {
-            let r = await (user.sub ? updateUser(user.sub, data) : createUser(data));
+            let r = await (userId ? updateUser(userId, fdata) : createUser(fdata));
             r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/users`);
         });
     }
 
-
     return (
         <form id="userForm" onSubmit={form.handleSubmit(handleSubmit)} >
-
-            <FormFieldInput
-                name="givenName"
-                label="First Name"
-                form={form}
-            />
-
             <FormFieldInput
                 name="familyName"
                 label="Family Name"
+                form={form}
+            />
+            <FormFieldInput
+                name="givenName"
+                label="First Name"
                 form={form}
             />
 
@@ -71,7 +72,13 @@ export function UserForm({ user, newUser }: { user: User, newUser: boolean }) {
                 form={form}
             />
 
-            <FormSubmitCancelButtons cancelHref="/users" />
+            <FormFieldCheckBox
+                name="enabled"
+                label="Enabled"
+                form={form}
+            />
+
+            <FormSubmitCancelButtons cancelHref="/users"   />
 
             <Processing open={isPending} />
 

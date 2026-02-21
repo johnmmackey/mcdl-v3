@@ -17,7 +17,6 @@ import { Team } from '@/app/lib/types/team';
 import { createSeason, updateSeason } from '@/app/lib/api';
 
 import { Processing } from "@/app/ui/Processing"
-import { create } from 'lodash';
 
 const formValidationSchema = z.object({
     id: z.number(),

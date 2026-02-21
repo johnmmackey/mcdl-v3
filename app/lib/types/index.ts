@@ -4,3 +4,4 @@ export * from './season';
 export * from './meet';
 export * from './diver';
 export * from './post';
+export * from './user';

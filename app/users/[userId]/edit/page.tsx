@@ -1,4 +1,4 @@
-import { UserProfile } from '@/app/users/components/UserProfile'
+import { UserForm } from '@/app/users/components/UserForm'
 import { User } from '@/app/lib/types/user';
 import { fetchUser } from '@/app/lib/api/users';
 import { notFound } from 'next/navigation';
@@ -13,8 +13,9 @@ export default async function Page(props: { params: Promise<{ userId: string }> 
 
     return (
         <div>
-                <UserProfile user={user as User}  />
+                <UserForm user={user as User} userId={user.sub}  />
         </div>
     )
 }
+
 

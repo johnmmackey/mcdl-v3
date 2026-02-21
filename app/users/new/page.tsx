@@ -7,7 +7,7 @@ import { fetchUser } from '@/app/lib/api/users';
 export default async function Page() {
 
 
-    let user = { sub: '', givenName: '', familyName: '', email: '', note: '', roles: [] };;
+    let user = { sub: '', givenName: '', familyName: '', email: '', note: '', userStatus: '', roles: [], enabled: true,};;
 
     return (
         <div>
@@ -15,7 +15,7 @@ export default async function Page() {
                 <div>User not found</div>
             }
             {user &&
-                <UserForm user={user} newUser={true} />
+                <UserForm user={user} />
             }
         </div>
     )

@@ -343,9 +343,11 @@ export const FormFieldCheckBox = ({
 }
 
 export const FormSubmitCancelButtons = ({
-    cancelHref = '/'
+    cancelHref = '/',
+    deleteHandler
 }: Readonly<{
     cancelHref: string
+    deleteHandler?: () => void
 }>) => {
     const router = useRouter();
 
@@ -354,6 +356,12 @@ export const FormSubmitCancelButtons = ({
             <CancelButton type="button" onClick={() => router.push(cancelHref)} >
                 Cancel
             </CancelButton>
+
+            {deleteHandler && (
+                <ActionButton type="button" onClick={deleteHandler} >
+                    Delete
+                </ActionButton>
+            )}
 
             <ActionButton type="submit" disabled={false} >
                 Submit
