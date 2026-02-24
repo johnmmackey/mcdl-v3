@@ -116,7 +116,7 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }
 
 export const LoginButton = () => {
     return (
-        <Button variant='outline' onClick={() => signIn.social({ provider: 'cognito', callbackURL: '/dashboard' })}>
+        <Button variant='outline' onClick={() => signIn.social({ provider: 'cognito', callbackURL: '/' })}>
             Log In
         </Button>
     )

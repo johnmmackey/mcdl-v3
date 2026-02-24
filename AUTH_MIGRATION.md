@@ -114,13 +114,28 @@ const { data: session, isPending } = useSession()
 
 ### 6. **Access Token Management**
 
-Access tokens are now stored in the SQLite database's `account` table. The `getAccessToken()` function in `app/lib/accessTokens.ts` has been updated to:
-1. Query the Better-auth database for the user's account
-2. Check token expiration
-3. Automatically refresh tokens if needed
-4. Update the database with new tokens
+Access tokens are stored in the SQLite database's `account` table and managed by better-auth automatically. The `getAccessToken()` function in `app/lib/accessTokens.ts` uses better-auth's built-in `/get-access-token` API which:
+1. Retrieves the user's Cognito account from the database
+2. Checks if the token is expired (with 5-second buffer)
+3. Automatically refreshes tokens using Cognito's refresh token endpoint if needed
+4. Updates the database with new tokens
+5. Returns the valid access token
 
-The token refresh logic using AWS Cognito's token endpoint remains the same.
+**Implementation**:
+```typescript
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+
+export const getAccessToken = async (): Promise<string | null> => {
+  const result = await auth.api.getAccessToken({
+    body: { providerId: 'cognito' },
+    headers: await headers()
+  })
+  return result?.accessToken || null
+}
+```
+
+This replaces the previous manual implementation that directly queried the database and handled token refresh manually. Better-auth handles all OAuth token lifecycle management internally.
 
 ### 7. **Session Type**
 
