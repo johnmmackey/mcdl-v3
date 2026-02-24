@@ -1,13 +1,8 @@
 import { betterAuth } from "better-auth"
 import Database from "better-sqlite3"
 
-// Extract Cognito configuration from environment
-const cognitoIssuer = process.env.AUTH_COGNITO_ISSUER || ""
-const cognitoRegion = cognitoIssuer.match(/cognito-idp\.([^.]+)\.amazonaws/)?.[1] || ""
-const cognitoUserPoolId = cognitoIssuer.split('/').pop() || ""
-
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   database: new Database("./mcdl-auth.db"),
   
   emailAndPassword: {
@@ -17,11 +12,11 @@ export const auth = betterAuth({
   socialProviders: {
     cognito: {
       enabled: true,
-      clientId: process.env.AUTH_COGNITO_ID!,
-      clientSecret: process.env.AUTH_COGNITO_SECRET!,
-      region: cognitoRegion,
-      userPoolId: cognitoUserPoolId,
-      domain: process.env.AUTH_COGNITO_DOMAIN!,
+      clientId: process.env.COGNITO_CLIENT_ID!,
+      clientSecret: process.env.COGNITO_CLIENT_SECRET!,
+      region: process.env.COGNITO_REGION! ,
+      userPoolId: process.env.COGNITO_USER_POOL_ID!,
+      domain: process.env.COGNITO_DOMAIN!,
       mapProfileToUser: (profile) => ({
         givenName: profile.given_name,
         familyName: profile.family_name,
