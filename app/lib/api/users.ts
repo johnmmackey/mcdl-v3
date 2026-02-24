@@ -4,6 +4,7 @@ import { updateTag } from "next/cache"
 import { apiFetch, apiMutate, handleMutationResponse } from "./client"
 import { User, UserCreateUpdateInput } from "@/app/lib/types/user";
 import type { GenericServerActionState } from "@/app/lib/types/baseTypes";
+import { redirect } from "next/navigation";
 
 export async function fetchUsers(): Promise<User[]> {
     return apiFetch<User[]>(`/users`, { cache: 'no-store', includeAuth: true });
@@ -49,6 +50,7 @@ export async function deleteUser(userId: string): Promise<GenericServerActionSta
 
     if (response.ok) {
         updateTag('users');
+        redirect('/users');
     }
 
     return handleMutationResponse<void>(response);

@@ -1,6 +1,6 @@
 'use server'
 
-import { Division, Team, AgeGroup, GroupedStandings, DiverWithSeason } from "@/app/lib/types"
+import { Division, Team, AgeGroup, GroupedStandings, DiverWithSeason, PermissionOptions } from "@/app/lib/types"
 import { apiFetch } from "./client"
 
 const API_BASE_URL = process.env.DATA_URL;
@@ -57,6 +57,10 @@ export async function fetchDivers({ seasonId, teamId }: { seasonId: number, team
 
 export async function fetchPermissions(objectType: string, objectId?: number): Promise<string[]> {
     return apiFetch<string[]>(`/permissions/${objectType}/${objectId || ''}`, { includeAuth: true });
+}
+
+export async function fetchPermissionOptions(): Promise<PermissionOptions> {
+    return apiFetch<PermissionOptions>(`/permissions/options`);
 }
 
 export async function fetch401(): Promise<void> {

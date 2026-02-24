@@ -23,3 +23,8 @@ export const GenericServerActionStatePlaceHolder: GenericServerActionState<any> 
     error: null,
     data: null
 }
+
+export type PermissionOptions = {
+    roles: string[],
+    objectTypes: string[]
+}
