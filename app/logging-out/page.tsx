@@ -1,7 +1,7 @@
 
 "use client";
 
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/auth-client";
 import { useRouter, redirect } from "next/navigation";
 import { use, useEffect } from "react";
 
@@ -11,7 +11,7 @@ export default function Page() {
 
 
 useEffect(() => {
-    signOut({ redirect: false })
+    signOut()
         .then(() => {
             router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
         })

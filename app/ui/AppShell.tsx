@@ -1,4 +1,4 @@
-import { Session } from 'next-auth';
+import type { Session } from '@/lib/auth';
 import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'

@@ -1,72 +1,17 @@
 "use server"
-import { Account } from "@auth/core/types"
-import { createClient, RedisClientType } from '@redis/client';
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { loggerFactory } from '@/app/lib/logger'
-import { auth } from "@/auth"
-import { jwtDecode } from "jwt-decode";
-import { redirect } from "next/navigation";
+import { redirect } from "next/navigation"
+import Database from "better-sqlite3"
 
 const logger = loggerFactory({ module: 'accessTokens' })
-
-// Extend global type for TypeScript
-declare global {
-  // eslint-disable-next-line no-var
-  var redis: RedisClientType | undefined;
-}
-
-async function createRedisClient(): Promise<RedisClientType> {
-  console.log('Creating new Redis client');
-  const client = createClient({
-    username: process.env.REDIS_USERNAME!,
-    password: process.env.REDIS_PASSWORD!,
-    socket: {
-      host: process.env.REDIS_HOST!,
-      port: parseInt(process.env.REDIS_PORT!),
-    },
-  });
-
-  client.on('error', err => logger.error('Redis Client Error:' + err));
-  await client.connect();
-  return client as RedisClientType;
-}
-
-async function getRedisClient(): Promise<RedisClientType> {
-  if (global.redis) {
-    return global.redis;
-  }
-
-  const client = await createRedisClient();
-
-  // In development, save to global to persist across hot reloads
-  if (process.env.NODE_ENV !== 'production') {
-    global.redis = client;
-  }
-
-  console.log(`Redis client created and cached: ${!!global.redis}`);
-  return client;
-}
-
-// Lazy-initialized client getter
-const getClient = (() => {
-  let clientPromise: Promise<RedisClientType> | null = null;
-  return () => {
-    if (!clientPromise) {
-      clientPromise = getRedisClient();
-    }
-    return clientPromise;
-  };
-})();
 
 interface RefreshResponse extends Record<string, string | number> {
   id_token: string,
   access_token: string,
   expires_in: number,
   token_type: string
-}
-
-interface ActiveRefresh extends Record<string, string | Promise<RefreshResponse>> {
-  userId: string,
-  promiseOfRefreshedTokens: Promise<RefreshResponse>
 }
 
 interface OpenIDConfig extends Record<string, string | string[] | number> {
@@ -84,119 +29,131 @@ interface OpenIDConfig extends Record<string, string | string[] | number> {
   userinfo_endpoint: string
 }
 
-
-// list of active refreshes
-// only want to do one refresh for a user, so we keep a static list
-let activeRefreshes: ActiveRefresh[] = [];
-
-
-export const storeAccount = async (userId: string, account: Account, refresh?: boolean): Promise<void> => {
-
-  logger.debug(`storing account for session ${userId}, expiry at ${account.expires_at ? (new Date(account.expires_at * 1000)).toISOString() : 'unknown'}`);
-  const client = await getClient();
-
-  await client.set(
-    (process.env.REDIS_KEY_PREFIX ?? '') + userId,
-    JSON.stringify(account),
-    (!refresh ? {
-      expiration: {
-        type: 'EXAT',
-        value: Math.floor(Date.now() / 1000) + (process.env.REFRESH_TOKEN_LIFE ? parseInt(process.env.REFRESH_TOKEN_LIFE) : 30 * 24 * 60 * 60)
-      }
-    } : {
-      expiration: 'KEEPTTL'
-    })
-  );
+// Get database connection
+const getDb = () => {
+  return new Database("./mcdl-auth.db")
 }
 
-
-
-
-// IMPORTANT: the userId here is the auth.js user id (session), NOT the provider ID or the Cognito "sub"
+// Get the access token for the current session
 export const getAccessToken = async (): Promise<string | null> => {
+  const session = await auth.api.getSession({ headers: await headers() })
 
-  const session = await auth();
-  if (!session || !session.user)
-   return null;
-
-  const userId = session.user.id as string;
-
-  logger.debug(`getting access token for ${userId}`);
-
-  const client = await getClient();
-  let account: Account = JSON.parse(await client.get((process.env.REDIS_KEY_PREFIX ?? '') + userId) as string);
-
-  if (!account) {
-    logger.warn(`no access token found for ${userId}`);
-    redirect('/logging-out');
+  if (!session || !session.user) {
+    logger.warn('No session found')
+    return null
   }
 
-  if (!account.expires_at || account.expires_at * 1000 - Date.now() > 5 * 60 * 1000) // if the token has 5 min or more of life
-    return account.access_token ?? null;
+  const userId = session.user.id
+  logger.debug(`getting access token for ${userId}`)
 
-  // we need to refresh the token
-  // but it might already be underway, so check for that and short circuit if so
-  
-  logger.debug(`getAccessToken refreshing tokens for user ${userId}...`);
+  try {
+    const db = getDb()
+    
+    // Get the account information from better-auth database
+    const account = db.prepare(`
+      SELECT * FROM account 
+      WHERE userId = ? AND providerId = 'cognito'
+      ORDER BY createdAt DESC 
+      LIMIT 1
+    `).get(userId) as any
 
-  const existingRefresh = activeRefreshes.find(e => e.userId === userId);
-  if (existingRefresh)
-    return existingRefresh.promiseOfRefreshedTokens.then(r => r.access_token);
+    if (!account) {
+      logger.warn(`no account found for user ${userId}`)
+      db.close()
+      redirect('/logging-out')
+    }
 
-  // new one, so lets start it
-  if (!account.refresh_token)
-    throw new Error('no refresh token available')
+    if (!account.accessToken) {
+      logger.warn(`no access token found for ${userId}`)
+      db.close()
+      redirect('/logging-out')
+    }
 
-  const promiseOfRefreshedTokens = getRefreshedTokens(account.refresh_token);
-  activeRefreshes.push({ userId, promiseOfRefreshedTokens });
+    // Check if token needs refresh (5 minutes buffer)
+    const expiresAt = new Date(account.accessTokenExpiresAt).getTime()
+    const now = Date.now()
+    
+    if (expiresAt - now > 5 * 60 * 1000) {
+      // Token is still valid
+      db.close()
+      return account.accessToken
+    }
 
-  // wait for completion...
-  const newTokens = await promiseOfRefreshedTokens;
-  const newAccount = { ...account, id_token: newTokens.id_token, access_token: newTokens.access_token, expires_at: Math.floor(Date.now() / 1000) + newTokens.expires_in };
-  await storeAccount(process.env.REDIS_KEY_PREFIX ?? '' + userId, newAccount, true);
+    // Token needs refresh
+    logger.debug(`refreshing token for user ${userId}`)
+    
+    if (!account.refreshToken) {
+      logger.error('no refresh token available')
+      db.close()
+      redirect('/logging-out')
+    }
 
-  // all cleaned up with new kv in redis, so can allow new token refreshes
-  // race condition potential here, but I believe this works
-  activeRefreshes = activeRefreshes.filter(e => e.userId !== userId);
-  return newTokens.access_token;
+    const newTokens = await refreshAccessToken(account.refreshToken)
+    
+    // Update the account with new tokens
+    const newExpiresAt = new Date(Date.now() + newTokens.expires_in * 1000).toISOString()
+    
+    db.prepare(`
+      UPDATE account 
+      SET accessToken = ?, 
+          idToken = ?, 
+          accessTokenExpiresAt = ?
+      WHERE id = ?
+    `).run(newTokens.access_token, newTokens.id_token, newExpiresAt, account.id)
+
+    db.close()
+    return newTokens.access_token
+  } catch (error) {
+    logger.error('Error getting access token:', error)
+    redirect('/logging-out')
+  }
 }
 
+const refreshAccessToken = async (refresh_token: string): Promise<RefreshResponse> => {
+  const openIdConfig = await getOpenIdConfig()
 
-const getRefreshedTokens = async (refresh_token: string): Promise<RefreshResponse> => {
-  let openIdConfig = await getOpenIdConfig();
-
-  let response = await fetch(`${openIdConfig.token_endpoint}`, {
+  const response = await fetch(openIdConfig.token_endpoint, {
     method: 'POST',
     body: new URLSearchParams({
       'grant_type': 'refresh_token',
-      'client_id': process.env.AUTH_COGNITO_ID,
-      'client_secret': process.env.AUTH_COGNITO_SECRET,
+      'client_id': process.env.AUTH_COGNITO_ID!,
+      'client_secret': process.env.AUTH_COGNITO_SECRET!,
       'refresh_token': refresh_token
-    } as Record<string, string>),
+    }),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-  });
+  })
 
+  if (!response.ok) {
+    logger.error('Failed to refresh token:', await response.text())
+    redirect('/logging-out')
+  }
 
-  if (!response.ok)
-    redirect('/logging-out');
-
-  return await response.json();
+  return await response.json()
 }
 
-// open ID config never should not change, so get it once
-let openIdConfig: OpenIDConfig | null = null;
+// Cache OpenID config
+let openIdConfig: OpenIDConfig | null = null
 
 const getOpenIdConfig = async (): Promise<OpenIDConfig> => {
-  if (openIdConfig)
-    return openIdConfig;
+  if (openIdConfig) {
+    return openIdConfig
+  }
 
-  let response = await fetch(`${process.env.AUTH_COGNITO_ISSUER}/.well-known/openid-configuration`)
-  if (!response.ok)
-    throw new Error(`Can't get Open ID config`);
+  const response = await fetch(`${process.env.AUTH_COGNITO_ISSUER}/.well-known/openid-configuration`)
+  
+  if (!response.ok) {
+    throw new Error(`Can't get Open ID config`)
+  }
 
-  openIdConfig = await response.json();
+  openIdConfig = await response.json()
+  return openIdConfig as OpenIDConfig
+}
 
-  return openIdConfig as OpenIDConfig;
+// Kept for backwards compatibility - better-auth handles account storage automatically
+export const storeAccount = async (userId: string, account: any, refresh?: boolean): Promise<void> => {
+  logger.debug(`storeAccount called - better-auth handles this automatically`)
+  // Better-auth stores accounts automatically during OAuth flow
+  // This function is kept for compatibility but doesn't need to do anything
 }

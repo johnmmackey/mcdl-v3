@@ -1,8 +1,8 @@
 'use client';
 
-import { Session } from 'next-auth';
-import { signIn, signOut } from "next-auth/react"
+import { signIn, signOut } from "@/lib/auth-client"
 import { useRouter } from 'next/navigation';
+import type { Session } from "@/lib/auth";
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -41,7 +41,7 @@ type Props = {
 export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
-        await signOut({ redirect: false });
+        await signOut();
         router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
     }
 
@@ -116,7 +116,7 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }
 
 export const LoginButton = () => {
     return (
-        <Button variant='outline' onClick={() => signIn('cognito')}>
+        <Button variant='outline' onClick={() => signIn.social({ provider: 'cognito', callbackURL: '/dashboard' })}>
             Log In
         </Button>
     )

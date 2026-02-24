@@ -1,12 +1,12 @@
 'use client'
 
-import { signIn } from "next-auth/react"
+import { signIn } from "@/lib/auth-client"
 
 export default function SignIn() {
   return (
 
         <div >
-          <button onClick={() => signIn('cognito')}>
+          <button onClick={() => signIn.social({ provider: 'cognito', callbackURL: '/' })}>
             Sign In
           </button>
         </div>
