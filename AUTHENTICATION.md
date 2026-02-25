@@ -129,7 +129,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000     # Base application URL
 These are automatically computed from core variables:
 
 ```env
-COGNITO_ISSUER=https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_USER_POOL_ID}
 NEXT_PUBLIC_LOGOUT_URL=${COGNITO_DOMAIN}/logout?client_id=${COGNITO_CLIENT_ID}&logout_uri=${NEXT_PUBLIC_APP_URL}/logged-out
 ```
 ## Authentication Flow
@@ -323,16 +322,6 @@ npx @better-auth/cli@latest migrate
 rm mcdl-auth.db
 npx @better-auth/cli@latest migrate
 ```
-
-### Token Refresh Issues
-
-Verify `COGNITO_ISSUER` is correctly formatted:
-```
-https://cognito-idp.{region}.amazonaws.com/{userPoolId}
-```
-
-Check the Cognito configuration extracts the correct region and pool ID.
-
 ### Session Not Persisting
 
 - Verify cookies are enabled in the browser
