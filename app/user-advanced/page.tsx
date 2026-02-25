@@ -1,8 +1,9 @@
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { getAccessToken } from "@/app/lib/accessTokens"
 
 export default async function Page() {
-    const session = await auth();
+    const session = await auth.api.getSession({ headers: await headers() });
     if (!session || !session.user) {
         throw new Error('Authentication required');
     }

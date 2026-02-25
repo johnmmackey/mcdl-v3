@@ -11,10 +11,7 @@ The client requires configuration for Amazon Cognito (used a the authorization b
 This configuration is provided by the `.env.local` file in the root directory. Sample:
 ```
 DATA_URL=http://serverhost:8095
-AUTH_SECRET=/somefancysecret=
-AUTH_COGNITO_ID=alongidstring
-AUTH_COGNITO_SECRET=salongersecretstring
-AUTH_COGNITO_ISSUER=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_blah
+
 ```
 Ensure the server is running before starting.
 

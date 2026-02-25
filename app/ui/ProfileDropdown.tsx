@@ -1,15 +1,12 @@
 'use client';
 
-import { Session } from 'next-auth';
-import { signIn, signOut } from "next-auth/react"
+import { signIn, signOut } from "@/lib/auth-client"
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import type { Session } from "@/lib/auth";
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ShieldAlertIcon, UsersIcon } from 'lucide-react'
 import { SettingsIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
-import { toast } from "sonner";
 
 import {
     UserIcon,
@@ -29,37 +26,44 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 
-import { userInitials } from '@/app/lib/userInitials';
-
 type Props = {
-    trigger: ReactNode
     defaultOpen?: boolean
     align?: 'start' | 'center' | 'end',
     session: Session
 }
 
-export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }: Props) => {
+export const ProfileDropdown = ({ defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
-        await signOut({ redirect: false });
+        await signOut();
         router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
     }
 
     return (
         <DropdownMenu defaultOpen={defaultOpen}>
-            <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
+                <Button id='profile-dropdown' variant='ghost' size='icon' className='size-9.5'>
+                    <Avatar className='size-9.5 '>
+                        <AvatarFallback>
+                            {session?.user?.givenName ? session.user.givenName[0] : '?'}{session?.user?.familyName ? session.user.familyName[0] : '?'}
+                        </AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent className='w-80' align={align || 'end'}>
                 <DropdownMenuLabel className='flex items-center gap-4 px-4 py-2.5 font-normal'>
                     <div className='relative'>
                         <Avatar className='size-10'>
-                            <AvatarFallback>{userInitials(session.user?.name ?? '')}</AvatarFallback>
+                            <AvatarFallback>
+                                {session?.user?.givenName ? session.user.givenName[0] : '?'}{session?.user?.familyName ? session.user.familyName[0] : '?'}
+                            </AvatarFallback>
                         </Avatar>
 
                     </div>
                     <div className='flex flex-1 flex-col items-start'>
                         {session && session.user &&
                             <>
-                                <span className='text-foreground text-lg font-semibold'>{session.user.name}</span>
+                                <span className='text-foreground text-lg font-semibold'>{session.user.givenName} {session.user.familyName}</span>
                                 <span className='text-muted-foreground text-base'>{session.user.email}</span>
                             </>
                         }
@@ -116,7 +120,7 @@ export const ProfileDropdown = ({ trigger, defaultOpen, align = 'end', session }
 
 export const LoginButton = () => {
     return (
-        <Button variant='outline' onClick={() => signIn('cognito')}>
+        <Button variant='outline' onClick={() => signIn.social({ provider: 'cognito', callbackURL: '/' })}>
             Log In
         </Button>
     )

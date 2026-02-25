@@ -1,11 +1,6 @@
-import { Session } from 'next-auth';
+import type { Session } from '@/lib/auth';
 import Image from 'next/image'
-
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-
 
 import {
     SidebarInset,
@@ -14,7 +9,6 @@ import {
 } from '@/components/ui/sidebar'
 
 import { LoginButton, ProfileDropdown } from './ProfileDropdown';
-import { userInitials } from '@/app/lib/userInitials';
 import { AppBreadcrumbs } from './AppBreadCrumbs';
 import { MySidebar } from './MySidebar';
 
@@ -42,16 +36,7 @@ export const MyAppShell = ({
                         <span className='hidden md:inline'>Montgomery County Diving League</span>
 
                         {session && session.user
-                            ? <ProfileDropdown
-                                trigger={
-                                    <Button id='profile-dropdown' variant='ghost' size='icon' className='size-9.5'>
-                                        <Avatar className='size-9.5 '>
-                                            <AvatarFallback>{userInitials(session.user.name ?? '')}</AvatarFallback>
-                                        </Avatar>
-                                    </Button>
-                                }
-                                session={session}
-                            />
+                            ? <ProfileDropdown session={session} />
                             : <LoginButton />
                         }
                     </div>

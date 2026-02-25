@@ -4,7 +4,8 @@ import { Toaster } from 'sonner'
 
 import { SanityLive } from "@/sanity/live";
 
-import { auth, } from "@/auth"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { MyAppShell } from '@/app/ui/AppShell'
 import { loggerFactory } from '@/app/lib/logger'
 const logger = loggerFactory({ module: 'rootLayout' })
@@ -25,7 +26,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
   logger.debug('session is', session);
 
   return (
