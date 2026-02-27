@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { fetchTeam } from '@/app/lib/api';
 import { TeamProfile } from '@/app/teams/components/TeamProfile';
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 export default async function Page(props: {
     params: Promise<{ teamId: string }>,
@@ -23,6 +25,12 @@ export default async function Page(props: {
 
         <div>
             <TeamProfile team={team} className='mb-8'/>
+
+            <div className="mb-6">
+                <Link href={`/teams/${teamId}/divers`}>
+                    <Button variant="default">View Divers</Button>
+                </Link>
+            </div>
 
             <Table className='max-w-md text-center'>
                 <TableHeader>

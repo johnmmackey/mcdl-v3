@@ -35,7 +35,7 @@ export default async function Page(props: {
     if (!meet) {
         notFound();
     }
-    const hasPermission = await getPermissions('meets', meetId); 
+    const hasPermission = await getPermissions('meets', meetId);
 
     let defaultDate = new Date();
     defaultDate.setHours(0, 0, 0, 0);
@@ -47,9 +47,15 @@ export default async function Page(props: {
 
             <Tabs defaultValue="results">
                 <TabsList variant="line">
-                    <TabsTrigger value="entries" className='text-lg' hidden={!hasPermission('meet:viewEntries')}>Entries</TabsTrigger>
-                    
-                    {meet._count.scores && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
+                    {hasPermission('meet:viewEntries') &&
+                        <TabsTrigger
+                            value="entries"
+                            className='text-lg'
+                        >
+                            Entries
+                        </TabsTrigger>
+                    }
+                    {meet._count.scores > 0 && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
                         <TabsTrigger value="results" className='text-lg'>
                             {meet.scoresPublished ? 'Results' : 'PRELIMINARY Results'}
                         </TabsTrigger>
@@ -57,15 +63,17 @@ export default async function Page(props: {
 
 
                 </TabsList>
-
-                {meet._count.scores && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
+                {hasPermission('meet:viewEntries') &&
+                    <TabsContent value="entries">
+                        <MeetEntries meet={meet} />
+                    </TabsContent>
+                }
+                {meet._count.scores > 0 && (meet.scoresPublished || hasPermission('meet:previewResults')) &&
                     <TabsContent value="results">
                         <MeetResults meet={meet} />
                     </TabsContent>
                 }
-                <TabsContent value="entries" hidden={!hasPermission('meet:viewEntries')}>
-                    <MeetEntries meet={meet} />
-                </TabsContent>
+
 
                 <TabsContent value="reports" >
                     <Link href={`/meets/${meetId}/enter`}>
@@ -76,8 +84,6 @@ export default async function Page(props: {
 
                 </TabsContent>
             </Tabs>
-
-
         </div>
     )
 }

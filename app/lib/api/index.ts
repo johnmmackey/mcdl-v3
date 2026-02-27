@@ -41,3 +41,5 @@ export {
 export * from './reference';
 
 export * from './teams';
+
+export * from './divers';

@@ -32,6 +32,7 @@ export async function MeetEntries(props: { meet: MeetWithTeams } ) {
                     )
                 }}
             />
+            <pre>entries: {JSON.stringify(meetEntries, null, 2)}</pre>
         </>
     )
 }
