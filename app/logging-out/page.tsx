@@ -1,32 +1,14 @@
-
-"use client";
+"use server";
 
 import { signOut } from "@/lib/auth-client";
-import { useRouter, redirect } from "next/navigation";
-import { use, useEffect } from "react";
+import { ClientSignOut } from "./clientSignout";
 
-export default function Page() {
-    // Client-side sign out to clear session and trigger any client-side effects
-    const router = useRouter();
+const logoutUrl = `${process.env.COGNITO_DOMAIN}/logout?client_id=${process.env.COGNITO_CLIENT_ID}&logout_uri=${process.env.NEXT_PUBLIC_APP_URL}/logged-out`;
 
-
-useEffect(() => {
-    signOut()
-        .then(() => {
-            router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
-        })
-        .catch((error) => {
-            console.error('Error during sign out:', error);
-            router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
-        })
-    }, [router]);
-
-    
-
+export default async function Page() {
+    console.log('signout says', await signOut());
+    //redirect(logoutUrl);
     return (
-        <div>
-            Logging out...
-            
-        </div>
+        <ClientSignOut logoutUrl={logoutUrl} />
     )
 }

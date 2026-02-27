@@ -234,3 +234,37 @@ div.revertstyles p {
 .grid-table-header-cells {
   @apply text-lg font-semibold mb-1;
 }
+
+/*
+  ---break---
+*/
+
+/* Sonner toast customization */
+[data-sonner-toast] {
+  /* Make toasts wider */
+  min-width: 400px !important;
+  max-width: 800px !important;
+  
+  /* Increase padding */
+  padding: 20px !important;
+  
+  /* Larger font size */
+  font-size: 18px !important;
+}
+
+[data-sonner-toast] [data-title] {
+  /* Make title larger */
+  font-size: 18px !important;
+  font-weight: 600 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  /* Make description text larger */
+  font-size: 16px !important;
+  margin-top: 8px !important;
+}
+
+[data-sonner-toast] [data-icon] {
+  /* Increase spacing between icon and text */
+  margin-right: 16px !important;
+}

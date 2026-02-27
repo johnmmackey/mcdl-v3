@@ -20,7 +20,7 @@ export const MakeSeasonCurrent = ({
         startTransition(async () => {
 
             let r = await makeSeasonCurrent(seasonId);
-            r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/seasons`);
+            r.error ? toast.error(`Submission Failed`, { description: `${r.error.msg}` }) : router.push(`/seasons`);
         });
     }
 

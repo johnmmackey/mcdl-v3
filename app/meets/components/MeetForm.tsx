@@ -111,7 +111,7 @@ export const MeetForm = ({
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
             let r = await (meetId ? updateMeet(meetId, data) : createMeet(data));
-            r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/meets`);
+            r.error ? toast.error(`Submission Failed`, { description: `${r.error.msg}` }) : router.push(`/meets`);
         });
     }
 

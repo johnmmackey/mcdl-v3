@@ -52,7 +52,7 @@ export function UserForm({ userId, user, permissionOptions }: { userId?: string,
         }
         startTransition(async () => {
             let r = await (userId ? updateUser(userId, fdata) : createUser(fdata));
-            r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/users`);
+            r.error ? toast.error(`Submission Failed`, { description: `${r.error.msg}` }) : router.push(`/users`);
         });
     }
 

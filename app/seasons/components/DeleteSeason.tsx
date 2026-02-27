@@ -23,7 +23,7 @@ export const DeleteSeason = ({
     const handleDelete = () => {
         startTransition(async () => {
             let r = await deleteSeason(seasonId);
-            r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/seasons`);
+            r.error ? toast.error(`Deletion Failed`, { description: `${r.error.msg}` }) : router.push(`/seasons`);
         });
     }
 

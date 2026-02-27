@@ -21,7 +21,7 @@ export const DeleteTeamDialog = ({
             actionName="Delete"
             onAction={async () => {
                 const r = await deleteTeam(teamId);
-                r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/teams`);
+                r.error ? toast.error(`Deletion Failed`, { description: `${r.error.msg}` }) : router.push(`/teams`);
             }}
             dangerMode
             trigger={trigger}

@@ -21,7 +21,7 @@ export const DeleteUserDialog = ({
             actionName="Delete"
             onAction={async () => {
                 const r = await deleteUser(userId);
-                r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.push(`/users`);
+                r.error ? toast.error(`Deletion Failed`, { description: `${r.error.msg}` }) : router.push(`/users`);
             }}
             dangerMode
             trigger={trigger}

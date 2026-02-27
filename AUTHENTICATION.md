@@ -124,13 +124,6 @@ COGNITO_DOMAIN=https://your-domain.auth.region.amazoncognito.com
 NEXT_PUBLIC_APP_URL=http://localhost:3000     # Base application URL
 ```
 
-### Derived Variables
-
-These are automatically computed from core variables:
-
-```env
-NEXT_PUBLIC_LOGOUT_URL=${COGNITO_DOMAIN}/logout?client_id=${COGNITO_CLIENT_ID}&logout_uri=${NEXT_PUBLIC_APP_URL}/logged-out
-```
 ## Authentication Flow
 
 ### Sign In
@@ -145,11 +138,11 @@ signIn.social({ provider: 'cognito', callbackURL: '/dashboard' })
 
 ### Sign Out
 
-**Client-side** ([app/ui/ProfileDropdown.tsx](app/ui/ProfileDropdown.tsx)):
+Redirect to ([/logging-out](app/logging-out)), which has logic similar to the following.
+Note that it appears `signOut` must be called from a client component. 
 ```typescript
 import { signOut } from '@/lib/auth-client'
-
-await signOut()
+signOut()
 ```
 
 ### Get Session

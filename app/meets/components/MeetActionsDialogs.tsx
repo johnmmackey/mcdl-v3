@@ -115,7 +115,7 @@ export const DeleteMeetDialog = ({
             actionName="Delete"
             onAction={async () => {
                 const r = await deleteMeet(meetId);
-                r.error ? toast.error(`Deletion failed: ${r.error.msg}`) : router.back();
+                r.error ? toast.error(`Deletion Failed`, { description: `${r.error.msg}` }) : router.back();
             }}
             dangerMode
         >
@@ -144,7 +144,7 @@ export const PublishMeetDialog = ({
             actionName="Publish"
             onAction={async () => {
                 const r = await setPublishedStatus(meetId, true);
-                r.error && toast.error(`Publish failed: ${r.error.msg}`);
+                r.error ? toast.error(`Publish Failed`, { description: `${r.error.msg}` }) : toast.success(`Publish Successful`);
             }}
         >
             <p className="">This finalizes the meet and makes the results publically visible.</p>

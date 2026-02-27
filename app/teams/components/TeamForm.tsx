@@ -46,7 +46,7 @@ export const TeamForm = ({
     const handleSubmit = async (data: z.infer<typeof formValidationSchema>) => {
         startTransition(async () => {
             let r = await (team.id ? updateTeam(data) : createTeam(data));
-            r.error ? toast.error(`Submission failed: ${r.error.msg}`) : router.push(`/teams`);
+            r.error ? toast.error(`Submission Failed`, { description: `${r.error.msg}` }) : router.push(`/teams`);
         });
     }
 

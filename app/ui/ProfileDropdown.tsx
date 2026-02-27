@@ -1,6 +1,6 @@
 'use client';
 
-import { signIn, signOut } from "@/lib/auth-client"
+import { signIn } from "@/lib/auth-client"
 import { useRouter } from 'next/navigation';
 import type { Session } from "@/lib/auth";
 
@@ -35,8 +35,7 @@ type Props = {
 export const ProfileDropdown = ({ defaultOpen, align = 'end', session }: Props) => {
     const router = useRouter();
     const handleSignOut = async () => {
-        await signOut();
-        router.push(process.env.NEXT_PUBLIC_LOGOUT_URL || '/');
+        router.push('/logging-out');
     }
 
     return (
